@@ -1,6 +1,6 @@
 import { To } from 'react-router-dom';
 
-export const linkBasename = '/staging/starter';
+export const linkBasename = '/subscriptions/cloud-inventory';
 export const mergeToBasename = (to: To, basename: string): To => {
   if (typeof to === 'string') {
     // replace possible "//" after basename
