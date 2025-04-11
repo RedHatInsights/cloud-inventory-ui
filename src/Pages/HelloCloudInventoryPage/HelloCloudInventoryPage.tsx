@@ -1,8 +1,8 @@
-import { Text } from '@patternfly/react-core';
 import React from 'react';
+import { Hello } from '../../Components/Hello';
 
 const HelloCloudInventory = () => {
-  return <Text component="p">Hello, Cloud Inventory!</Text>;
+  return <Hello name={'Cloud Inventory'} />
 };
 
 export default HelloCloudInventory;
