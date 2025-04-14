@@ -9,7 +9,7 @@ const HelloCloudInventory = () => {
         <Content component="h1">Cloud Inventory</Content>
       </PageSection>
       <PageSection>
-        <Hello name={'Cloud Inventory'} />
+        <Hello name="Cloud Inventory" />
       </PageSection>
     </Page>
   );
