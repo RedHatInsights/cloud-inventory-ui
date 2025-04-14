@@ -8,14 +8,14 @@ objects:
   - apiVersion: cloud.redhat.com/v1alpha1
     kind: Frontend
     metadata:
-      name: cloud-inventory
+      name: cloudInventory
     spec:
       feoConfigEnabled: true
       searchEntries:
-        - id: "cloud-inventory"
-          title: "Cloud Inventory"
+        - id: 'cloud-inventory'
+          title: 'Cloud Inventory'
           href: /subscriptions/cloud-inventory
-          description: "Manage your cloud subscriptions"
+          description: 'Manage your cloud subscriptions'
           alt_title:
             - Cloud Inventory
       bundleSegments:

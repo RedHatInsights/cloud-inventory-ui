@@ -1,10 +1,10 @@
-import { Text } from "@patternfly/react-core"
-import React from "react"
+import { Text } from '@patternfly/react-core';
+import React from 'react';
 
 interface HelloProps {
-    name: string
+  name: string;
 }
 
-export const Hello = ({name}: HelloProps) => (
-    <Text component="p">Hello, {name}</Text>
-)
+export const Hello = ({ name }: HelloProps) => (
+  <Text component="p">Hello, {name}</Text>
+);
