@@ -20,7 +20,7 @@ objects:
             - Cloud Inventory
       bundleSegments:
         - segmentId: cloud-inventory
-          bundleId: staging
+          bundleId: subscriptions
           position: 100
           navItems:
             - id: cloud-inventory
@@ -44,7 +44,6 @@ objects:
             module: './RootApp'
             routes:
               - pathname: /subscriptions/cloud-inventory
-
 parameters:
   - name: ENV_NAME
     required: true
