@@ -8,7 +8,7 @@ objects:
   - apiVersion: cloud.redhat.com/v1alpha1
     kind: Frontend
     metadata:
-      name: cloudInventory
+      name: cloud-inventory
     spec:
       feoConfigEnabled: true
       searchEntries:
