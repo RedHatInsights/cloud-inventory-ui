@@ -4,9 +4,6 @@ module.exports = {
   useProxy: true,
   proxyVerbose: true,
   sassPrefix: '.cloud-inventory, .cloudInventory',
-  /**
-   * Change to false after your app is registered in configuration files
-   */
   interceptChromeConfig: false,
   /**
    * Add additional webpack plugins
