@@ -1,6 +1,6 @@
-# frontend-starter-app
+# Cloud Inventory UI
 
-React.js starter app for Red Hat Hybrid cloud console UI modules that includes Patternfly and shared Red Hat cloud service frontend components.
+Home of all UI development for Red Hat's console.redhat.com cloud inventory application
 
 ## Initial etc/hosts setup
 
@@ -13,20 +13,23 @@ Best way is to edit manually `/etc/hosts` on your localhost line:
 ```
 
 Alternatively you can do this by running following command:
+
 ```bash
 npm run patch:hosts
 ```
 
 If this command throws an error run it as a `sudo`:
+
 ```bash
 sudo npm run patch:hosts
 ```
 
 ## Getting started
 
-1. ```npm install```
+1. `npm install`
 
-2. ```npm run start```
+2. `npm run start`
+
    1. If you are running the [chrome-service-backend](https://github.com/RedHatInsights/chrome-service-backend) locally, set the environment variable `CHROME_SERVICE` to the port that it is listening on (by default `8000`). For example, `CHROME_SERVICE=8000 npm run start`.
 
 3. Open browser in URL listed in the terminal output
@@ -39,8 +42,6 @@ HCC uses OpenShift frontend operator to collect metadata about individual UI mod
 
 To learn about the operator and its configuration follow [this link](./docs/frontend-operator/index.md)
 
-
 ### Testing
 
 `npm run verify` will run `npm run lint` (eslint) and `npm test` (Jest)
-

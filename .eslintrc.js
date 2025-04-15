@@ -8,7 +8,7 @@ module.exports = {
       files: ['src/**/*.ts', 'src/**/*.tsx'],
       parser: '@typescript-eslint/parser',
       plugins: ['@typescript-eslint'],
-      extends: ['plugin:@typescript-eslint/recommended'],
+      extends: ['plugin:@typescript-eslint/recommended', 'prettier'],
       rules: {
         'react/prop-types': 'off',
         '@typescript-eslint/no-unused-vars': 'error',
@@ -16,7 +16,7 @@ module.exports = {
     },
   ],
   rules: {
-    "requireConfigFile": "off",
+    requireConfigFile: 'off',
     'sort-imports': [
       'error',
       {
@@ -24,6 +24,6 @@ module.exports = {
       },
     ],
     // Enable this if you want to use absolute import paths
-    "rulesdir/forbid-pf-relative-imports": "off"
+    'rulesdir/forbid-pf-relative-imports': 'off',
   },
 };

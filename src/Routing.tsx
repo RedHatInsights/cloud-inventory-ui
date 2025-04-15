@@ -3,19 +3,19 @@ import { Route as RouterRoute, Routes as RouterRoutes } from 'react-router-dom';
 import { InvalidObject } from '@redhat-cloud-services/frontend-components/InvalidObject';
 import { Bullseye, Spinner } from '@patternfly/react-core';
 
-const SamplePage = lazy(
+const HelloPage = lazy(
   () =>
     import(
-      /* webpackChunkName: "SamplePage" */ './Routes/SamplePage/SamplePage'
+      /* webpackChunkName: "HelloCloudInventoryPage" */ './Pages/HelloCloudInventoryPage/HelloCloudInventoryPage'
     )
 );
 const OopsPage = lazy(
-  () => import(/* webpackChunkName: "OopsPage" */ './Routes/OopsPage/OopsPage')
+  () => import(/* webpackChunkName: "OopsPage" */ './Pages/OopsPage/OopsPage')
 );
 const NoPermissionsPage = lazy(
   () =>
     import(
-      /* webpackChunkName: "NoPermissionsPage" */ './Routes/NoPermissionsPage/NoPermissionsPage'
+      /* webpackChunkName: "NoPermissionsPage" */ './Pages/NoPermissionsPage/NoPermissionsPage'
     )
 );
 
@@ -30,7 +30,7 @@ const routes = [
   },
   {
     path: '/',
-    element: SamplePage,
+    element: HelloPage,
   },
   /* Catch all unmatched routes */
   {

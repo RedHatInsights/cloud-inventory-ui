@@ -19,7 +19,7 @@ const App = () => {
 
   useEffect(() => {
     // You can use directly the name of your app
-    updateDocumentTitle('Starter app');
+    updateDocumentTitle('Cloud Inventory');
   }, []);
 
   return (
