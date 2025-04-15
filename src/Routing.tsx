@@ -3,7 +3,7 @@ import { Route as RouterRoute, Routes as RouterRoutes } from 'react-router-dom';
 import { InvalidObject } from '@redhat-cloud-services/frontend-components/InvalidObject';
 import { Bullseye, Spinner } from '@patternfly/react-core';
 
-const SamplePage = lazy(
+const HelloPage = lazy(
   () =>
     import(
       /* webpackChunkName: "HelloCloudInventoryPage" */ './Pages/HelloCloudInventoryPage/HelloCloudInventoryPage'
@@ -30,7 +30,7 @@ const routes = [
   },
   {
     path: '/',
-    element: SamplePage,
+    element: HelloPage,
   },
   /* Catch all unmatched routes */
   {
