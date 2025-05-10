@@ -609,7 +609,8 @@ spec:
       optional: true
     - name: netrc
       optional: true
-  taskRunTemplate: {}
+  taskRunTemplate:
+    serviceAccountName: build-pipeline-cloud-inventory-ui
   workspaces:
   - name: workspace
     volumeClaimTemplate:
