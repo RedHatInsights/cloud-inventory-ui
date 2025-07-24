@@ -1,7 +1,12 @@
 import React, { Suspense, lazy, useMemo } from 'react';
-import { Route as RouterRoute, Routes as RouterRoutes } from 'react-router-dom';
+import {
+  Navigate,
+  Route as RouterRoute,
+  Routes as RouterRoutes,
+} from 'react-router-dom';
 import { InvalidObject } from '@redhat-cloud-services/frontend-components/InvalidObject';
 import { Bullseye, Spinner } from '@patternfly/react-core';
+import { Paths, relativePath } from './utils/routing';
 
 const HelloPage = lazy(
   () =>
@@ -19,40 +24,48 @@ const NoPermissionsPage = lazy(
     )
 );
 
-const routes = [
+interface RouteDefinition {
+  path: Paths;
+  element:
+    | React.LazyExoticComponent<() => React.JSX.Element>
+    | (() => React.JSX.Element);
+}
+
+const routes: RouteDefinition[] = [
   {
-    path: 'no-permissions',
+    path: Paths.NoPermissions,
     element: NoPermissionsPage,
   },
   {
-    path: 'oops',
+    path: Paths.Oops,
     element: OopsPage,
   },
   {
-    path: '/',
+    path: Paths.Root,
+    element: () => <Navigate to={relativePath(Paths.GoldImages)} />,
+  },
+  {
+    path: Paths.GoldImages,
+    element: HelloPage,
+  },
+  {
+    path: Paths.CloudAccounts,
+    element: HelloPage,
+  },
+  {
+    path: Paths.MarketplacePurchases,
     element: HelloPage,
   },
   /* Catch all unmatched routes */
   {
-    route: {
-      path: '*',
-    },
-    element: InvalidObject,
+    path: Paths.Catch,
+    element: () => <InvalidObject />,
   },
 ];
 
-interface RouteType {
-  path?: string;
-  element: React.ComponentType;
-  childRoutes?: RouteType[];
-  elementProps?: Record<string, unknown>;
-}
-
-const renderRoutes = (routes: RouteType[] = []) =>
-  routes.map(({ path, element: Element, childRoutes, elementProps }) => (
-    <RouterRoute key={path} path={path} element={<Element {...elementProps} />}>
-      {renderRoutes(childRoutes)}
-    </RouterRoute>
+const renderRoutes = (routes: RouteDefinition[] = []) =>
+  routes.map(({ path, element: Element }) => (
+    <RouterRoute key={path} path={path} element={<Element />}></RouterRoute>
   ));
 
 const Routing = () => {

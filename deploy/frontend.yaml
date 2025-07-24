@@ -25,7 +25,17 @@ objects:
           navItems:
             - id: cloud-inventory
               title: Cloud Inventory
-              href: /subscriptions/cloud-inventory
+              expandable: true
+              routes:
+                - id: gold-images
+                  title: Gold Images
+                  href: /subscriptions/cloud-inventory/gold-images
+                - id: cloud-accounts
+                  title: Cloud Accounts
+                  href: /subscriptions/cloud-inventory/cloud-accounts
+                - id: marketplace-purchases
+                  title: Marketplace Purchases
+                  href: /subscriptions/cloud-inventory/marketplace-purchases
       API:
         versions:
           - v1
