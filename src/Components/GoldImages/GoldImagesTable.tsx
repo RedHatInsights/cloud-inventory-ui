@@ -52,7 +52,7 @@ export const GoldImagesTable = ({ goldImages }: GoldImagesProps) => {
       ...pageOptions,
       itemCount: filteredGoldImages.length,
     });
-  }, [cloudProviderFilter]);
+  }, [cloudProviderFilter, filteredGoldImages.length]);
 
   return (
     <Table>
@@ -67,9 +67,9 @@ export const GoldImagesTable = ({ goldImages }: GoldImagesProps) => {
             <Tr key={hyperscaler.provider}>
               <Td>
                 <b>{hyperscaler.provider}</b>
-                {hyperscaler.goldImages.map((goldImage) => {
+                {hyperscaler.goldImages.map((goldImage, i) => {
                   return (
-                    <Content key={goldImage.name} className="pf-v6-u-ml-sm">
+                    <Content key={i} className="pf-v6-u-ml-sm">
                       {goldImage.description}
                     </Content>
                   );

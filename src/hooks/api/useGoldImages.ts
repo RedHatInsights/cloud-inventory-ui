@@ -26,9 +26,7 @@ const fetchGoldImages: () => Promise<GoldImagesResponse> = async () => {
     );
   }
 
-  const goldImages = (await response.json()).body as GoldImagesResponse;
-
-  return goldImages;
+  return (await response.json()).body as GoldImagesResponse;
 };
 
 export const useGoldImages = () => {

@@ -59,7 +59,7 @@ function defaultSort<T extends { [s: string]: unknown }>(
     return data;
   }
 
-  return data.sort((a, b) => {
+  return data.toSorted((a, b) => {
     const aValue = rowTranslator(a)[sortIndex];
     const bValue = rowTranslator(b)[sortIndex];
 
@@ -89,9 +89,9 @@ function defaultSort<T extends { [s: string]: unknown }>(
  *
  * @param data Sortable<T> the data to be sorted
  * @param options TableSortOptions<T> options to specify for the sort
- *    * rowTransaltor? SortableRowTranslator<T> logic to transfor any sortable object into the displayed table rows
+ *    * rowTranslator? SortableRowTranslator<T> logic to transfor any sortable object into the displayed table rows
  *    * initialSort? InitialSortOptions specify whether or not to sort initally, and how
- *    * softFunc? SortFunc<T> override the default sort function with a custom one
+ *    * sortFunc? SortFunc<T> override the default sort function with a custom one
  * @returns sorted Sortable<T>
  */
 export function useTableSort<T extends { [s: string]: unknown }>(
