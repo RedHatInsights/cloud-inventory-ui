@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
 
-import { Main } from '@redhat-cloud-services/frontend-components/Main';
 import { NotAuthorized } from '@redhat-cloud-services/frontend-components/NotAuthorized';
 import { useChrome } from '@redhat-cloud-services/frontend-components/useChrome';
+import { Section } from '@redhat-cloud-services/frontend-components/Section';
 
 const NoPermissionsPage = () => {
   const { appAction } = useChrome();
@@ -12,9 +12,9 @@ const NoPermissionsPage = () => {
   }, []);
 
   return (
-    <Main>
+    <Section>
       <NotAuthorized serviceName="Cloud Inventory" />
-    </Main>
+    </Section>
   );
 };
 

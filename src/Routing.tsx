@@ -6,7 +6,8 @@ import {
 } from 'react-router-dom';
 import { InvalidObject } from '@redhat-cloud-services/frontend-components/InvalidObject';
 import { Bullseye, Spinner } from '@patternfly/react-core';
-import { Paths, relativePath } from './utils/routing';
+import { GoldImagesPage } from './Pages/GoldImagesPage/GoldImagesPage';
+import { Paths } from './utils/routing';
 
 const HelloPage = lazy(
   () =>
@@ -42,11 +43,11 @@ const routes: RouteDefinition[] = [
   },
   {
     path: Paths.Root,
-    element: () => <Navigate to={relativePath(Paths.GoldImages)} />,
+    element: () => <Navigate to={`./${Paths.GoldImages}`} />,
   },
   {
     path: Paths.GoldImages,
-    element: HelloPage,
+    element: GoldImagesPage,
   },
   {
     path: Paths.CloudAccounts,

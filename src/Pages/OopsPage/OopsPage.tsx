@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
-import { Main } from '@redhat-cloud-services/frontend-components/Main';
 import { Unavailable } from '@redhat-cloud-services/frontend-components/Unavailable';
 import { useChrome } from '@redhat-cloud-services/frontend-components/useChrome';
+import { Section } from '@redhat-cloud-services/frontend-components/Section';
 
 const OopsPage = () => {
   const { appAction } = useChrome();
@@ -11,9 +11,9 @@ const OopsPage = () => {
   }, []);
 
   return (
-    <Main>
+    <Section>
       <Unavailable />
-    </Main>
+    </Section>
   );
 };
 

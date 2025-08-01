@@ -7,5 +7,3 @@ export enum Paths {
   Catch = '*',
   Root = '/',
 }
-
-export const relativePath = (path: Paths) => `./${path}`;
