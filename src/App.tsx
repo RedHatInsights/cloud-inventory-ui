@@ -10,12 +10,14 @@ import {
   useRemoveNotification,
 } from './state/notificationsAtom';
 import './App.scss';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 const App = () => {
   const { updateDocumentTitle } = useChrome();
   const notifications = useAtomValue(notificationsAtom);
   const removeNotification = useRemoveNotification();
   const clearNotifications = useClearNotifications();
+  const queryClient = new QueryClient();
 
   useEffect(() => {
     // You can use directly the name of your app
@@ -24,12 +26,14 @@ const App = () => {
 
   return (
     <Fragment>
-      <NotificationsPortal
-        removeNotification={removeNotification}
-        onClearAll={clearNotifications}
-        notifications={notifications}
-      />
-      <Routing />
+      <QueryClientProvider client={queryClient}>
+        <NotificationsPortal
+          removeNotification={removeNotification}
+          onClearAll={clearNotifications}
+          notifications={notifications}
+        />
+        <Routing />
+      </QueryClientProvider>
     </Fragment>
   );
 };

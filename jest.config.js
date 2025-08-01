@@ -28,6 +28,7 @@ module.exports = {
     'Routing.tsx',
     'entry.ts',
     'state/notificationsAtom.ts',
+    'Components/util/testing/',
   ],
   roots: ['<rootDir>/src/'],
   moduleNameMapper: {
