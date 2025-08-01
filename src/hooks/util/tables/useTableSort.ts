@@ -59,7 +59,7 @@ function defaultSort<T extends { [s: string]: unknown }>(
     return data;
   }
 
-  return data.toSorted((a, b) => {
+  return data.sort((a, b) => {
     const aValue = rowTranslator(a)[sortIndex];
     const bValue = rowTranslator(b)[sortIndex];
 
