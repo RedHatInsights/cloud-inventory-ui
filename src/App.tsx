@@ -12,12 +12,13 @@ import {
 import './App.scss';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
+const queryClient = new QueryClient();
+
 const App = () => {
   const { updateDocumentTitle } = useChrome();
   const notifications = useAtomValue(notificationsAtom);
   const removeNotification = useRemoveNotification();
   const clearNotifications = useClearNotifications();
-  const queryClient = new QueryClient();
 
   useEffect(() => {
     // You can use directly the name of your app
