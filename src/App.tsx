@@ -10,6 +10,9 @@ import {
   useRemoveNotification,
 } from './state/notificationsAtom';
 import './App.scss';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+const queryClient = new QueryClient();
 
 const App = () => {
   const { updateDocumentTitle } = useChrome();
@@ -24,12 +27,14 @@ const App = () => {
 
   return (
     <Fragment>
-      <NotificationsPortal
-        removeNotification={removeNotification}
-        onClearAll={clearNotifications}
-        notifications={notifications}
-      />
-      <Routing />
+      <QueryClientProvider client={queryClient}>
+        <NotificationsPortal
+          removeNotification={removeNotification}
+          onClearAll={clearNotifications}
+          notifications={notifications}
+        />
+        <Routing />
+      </QueryClientProvider>
     </Fragment>
   );
 };
