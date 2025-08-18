@@ -1,10 +1,13 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { renderWithRouter } from '../../../utils/testing/customRender';
+import { screen, waitFor } from '@testing-library/react';
 import { GoldImagesPage } from '../GoldImagesPage';
 import React from 'react';
 import { ManipulatableQueryWrapper } from '../../../Components/util/testing/ManipulatableQueryWrapper';
 
 const mockNavigate = jest.fn();
 jest.mock('react-router-dom', () => ({
+  __esModule: true,
+  ...jest.requireActual('react-router-dom'),
   Navigate: () => {
     mockNavigate();
     return <div data-testid="navigate" />;
@@ -25,7 +28,7 @@ describe('Gold images page', () => {
   });
 
   it('renders', async () => {
-    render(<ComponentWithQueryClient />);
+    renderWithRouter(<ComponentWithQueryClient />);
 
     await waitFor(() =>
       expect(screen.queryByText('Gold Images')).toBeInTheDocument()
@@ -37,7 +40,7 @@ describe('Gold images page', () => {
       canReadCloudAccess: false,
     });
 
-    render(<ComponentWithQueryClient />);
+    renderWithRouter(<ComponentWithQueryClient />);
 
     await waitFor(() => expect(mockNavigate).toHaveBeenCalled());
   });
@@ -45,7 +48,7 @@ describe('Gold images page', () => {
   it('renders empty state when no gold images are present', async () => {
     queryClient.setQueryData(['goldImages'], {});
 
-    render(<ComponentWithQueryClient />);
+    renderWithRouter(<ComponentWithQueryClient />);
 
     await waitFor(() =>
       expect(screen.queryByText('No gold images')).toBeInTheDocument()

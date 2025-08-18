@@ -6,9 +6,9 @@ import {
   SelectList,
   SelectOption,
 } from '@patternfly/react-core';
-import { useAtom } from 'jotai';
 import React, { Ref, useState } from 'react';
 import { cloudProviderFilterData } from '../../state/goldImages';
+import { useQueryParamInformedAtom } from '../../hooks/util/useQueryParam';
 
 interface CloudProviderFilterSelectProps {
   cloudProviders: string[];
@@ -18,9 +18,8 @@ export const CloudProviderFilterSelect = ({
   cloudProviders,
 }: CloudProviderFilterSelectProps) => {
   const [isFilterExpanded, setIsFilterExpanded] = useState(false);
-  const [cloudProviderFilter, setCloudProviderFilter] = useAtom(
-    cloudProviderFilterData
-  );
+  const [cloudProviderFilter, setCloudProviderFilter] =
+    useQueryParamInformedAtom(cloudProviderFilterData, 'cloudProvider');
 
   return (
     <Select

@@ -2,7 +2,8 @@ import React from 'react';
 import { GoldImagesPagination } from '../GoldImagesPagination';
 import { HydrateAtomsTestProvider } from '../../util/testing/HydrateAtomsTestProvider';
 import { goldImagePaginationData } from '../../../state/goldImages';
-import { fireEvent, render, waitFor } from '@testing-library/react';
+import { fireEvent, waitFor } from '@testing-library/react';
+import { renderWithRouter } from '../../../utils/testing/customRender';
 
 const GoldImagesPaginationWithState = ({
   init,
@@ -16,7 +17,7 @@ const GoldImagesPaginationWithState = ({
 
 describe('Gold Images Pagination', () => {
   it('renders', () => {
-    const { container } = render(<GoldImagesPagination />);
+    const { container } = renderWithRouter(<GoldImagesPagination />);
 
     expect(
       container.querySelector('.pf-v6-c-pagination__total-items')?.firstChild
@@ -25,7 +26,7 @@ describe('Gold Images Pagination', () => {
   });
 
   it('can go to the next page', async () => {
-    const { container } = render(
+    const { container } = renderWithRouter(
       <GoldImagesPaginationWithState
         init={{ page: 1, perPage: 10, itemCount: 123 }}
       />
@@ -57,7 +58,7 @@ describe('Gold Images Pagination', () => {
   });
 
   it('can go back a page', async () => {
-    const { container } = render(
+    const { container } = renderWithRouter(
       <GoldImagesPaginationWithState
         init={{ page: 2, perPage: 10, itemCount: 123 }}
       />
@@ -89,7 +90,7 @@ describe('Gold Images Pagination', () => {
   });
 
   it('can change page size', async () => {
-    const { container, queryByText } = render(
+    const { container, queryByText } = renderWithRouter(
       <GoldImagesPaginationWithState
         init={{ page: 1, perPage: 10, itemCount: 123 }}
       />

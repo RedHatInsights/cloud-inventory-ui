@@ -1,5 +1,6 @@
 import React from 'react';
-import { fireEvent, render, waitFor } from '@testing-library/react';
+import { fireEvent, waitFor } from '@testing-library/react';
+import { renderWithRouter } from '../../../utils/testing/customRender';
 import { GoldImagesResponse } from '../../../hooks/api/useGoldImages';
 import { GoldImagesTable } from '../GoldImagesTable';
 import { HydrateAtomsTestProvider } from '../../util/testing/HydrateAtomsTestProvider';
@@ -28,7 +29,7 @@ const goldImageTestData: (amount: number) => GoldImagesResponse = (
 
 describe('Gold images table', () => {
   it('renders', () => {
-    const { container } = render(
+    const { container } = renderWithRouter(
       <GoldImagesTable goldImages={goldImageTestData(3)} />
     );
 
@@ -41,7 +42,7 @@ describe('Gold images table', () => {
       a.provider.localeCompare(b.provider)
     );
 
-    const { container } = render(
+    const { container } = renderWithRouter(
       <GoldImagesTable goldImages={goldImageData} />
     );
 
@@ -73,7 +74,7 @@ describe('Gold images table', () => {
   });
 
   it('applies pagination', () => {
-    const { container } = render(
+    const { container } = renderWithRouter(
       <GoldImagesTable goldImages={goldImageTestData(12)} />
     );
 
@@ -84,7 +85,7 @@ describe('Gold images table', () => {
   it('applies filters', () => {
     const goldImageData = goldImageTestData(3);
 
-    const { container } = render(
+    const { container } = renderWithRouter(
       <HydrateAtomsTestProvider
         initialValues={[
           [cloudProviderFilterData, [Object.values(goldImageData)[0].provider]],
