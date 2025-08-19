@@ -8,7 +8,12 @@ function useInitializeFromQueryParam<T>(key: string, setter: (v: T) => void) {
 
   useEffect(() => {
     if (init != undefined) {
-      setter(JSON.parse(decodeURI(init)));
+      // If we fail to parse the search, ignore it
+      try {
+        setter(JSON.parse(decodeURIComponent(init)));
+      } catch {
+        console.error(`Failed to parse search param ${key}`);
+      }
     }
   }, []);
 }
@@ -19,7 +24,7 @@ function useUpdateQueryParams<T>(
 ): (v: T) => void {
   const [searchParams, setSearchParams] = useSearchParams();
   return function (v: T) {
-    searchParams.set(key, encodeURI(JSON.stringify(v)));
+    searchParams.set(key, encodeURIComponent(JSON.stringify(v)));
     setSearchParams(searchParams);
     setter(v);
   };
