@@ -1,10 +1,10 @@
-import { render } from '@testing-library/react';
+import { renderWithRouter } from '../../../utils/testing/customRender';
 import { GoldImagesToolbar } from '../GoldImagesToolbar';
 import React from 'react';
 
 describe('Gold images toolbar', () => {
   it('renders', () => {
-    const { container } = render(
+    const { container } = renderWithRouter(
       <GoldImagesToolbar
         goldImages={{ test: { provider: 'test', goldImages: [] } }}
       />

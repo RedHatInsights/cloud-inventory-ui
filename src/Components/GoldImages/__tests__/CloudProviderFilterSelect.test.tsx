@@ -2,7 +2,8 @@ import React from 'react';
 import { HydrateAtomsTestProvider } from '../../util/testing/HydrateAtomsTestProvider';
 import { CloudProviderFilterSelect } from '../CloudProviderFilterSelect';
 import { cloudProviderFilterData } from '../../../state/goldImages';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, screen, waitFor } from '@testing-library/react';
+import { renderWithRouter } from '../../../utils/testing/customRender';
 
 const CloudProviderFilterSelectWithState = ({ init }: { init: string[] }) => (
   <HydrateAtomsTestProvider initialValues={[[cloudProviderFilterData, init]]}>
@@ -14,13 +15,13 @@ const CloudProviderFilterSelectWithState = ({ init }: { init: string[] }) => (
 
 describe('Cloud provider filter select', () => {
   it('renders', () => {
-    render(<CloudProviderFilterSelectWithState init={[]} />);
+    renderWithRouter(<CloudProviderFilterSelectWithState init={[]} />);
 
     expect(screen.queryByText('Filter by cloud provider')).toBeInTheDocument();
   });
 
   it('renders the options', async () => {
-    const { queryByText } = render(
+    const { queryByText } = renderWithRouter(
       <CloudProviderFilterSelectWithState init={[]} />
     );
 
@@ -46,7 +47,7 @@ describe('Cloud provider filter select', () => {
   });
 
   it('can select an option', async () => {
-    const { queryByText } = render(
+    const { queryByText } = renderWithRouter(
       <CloudProviderFilterSelectWithState init={[]} />
     );
 
@@ -79,7 +80,7 @@ describe('Cloud provider filter select', () => {
   });
 
   it('can expand with label', async () => {
-    const { queryByText } = render(
+    const { queryByText } = renderWithRouter(
       <CloudProviderFilterSelectWithState init={[]} />
     );
 
@@ -101,7 +102,7 @@ describe('Cloud provider filter select', () => {
   });
 
   it('closes when clicked outside of', async () => {
-    const { container, queryByText } = render(
+    const { container, queryByText } = renderWithRouter(
       <CloudProviderFilterSelectWithState init={[]} />
     );
 

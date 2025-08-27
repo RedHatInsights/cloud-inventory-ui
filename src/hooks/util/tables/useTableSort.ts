@@ -1,6 +1,7 @@
 import { SortByDirection } from '@patternfly/react-table';
 import { ThSortType } from '@patternfly/react-table/dist/esm/components/Table/base/types';
-import { MouseEvent, useState } from 'react';
+import { MouseEvent } from 'react';
+import { useQueryParamInformedState } from '../useQueryParam';
 
 type Sortable<T extends { [s: string]: unknown }> = Array<T>;
 
@@ -96,18 +97,21 @@ function defaultSort<T extends { [s: string]: unknown }>(
  */
 export function useTableSort<T extends { [s: string]: unknown }>(
   data: Sortable<T>,
+  key: string,
   {
     rowTranslator = defaultSortableRowTranslator<T>,
     initialSort = undefined,
     sortFunc = defaultSort,
   }: TableSortOptions<T> = {}
 ): TableSortResult<T> {
-  const [activeSortIndex, setActiveSortIndex] = useState<number | undefined>(
-    initialSort?.index
-  );
-  const [activeSortDirection, setActiveSortDirection] = useState<
-    SortByDirection | undefined
-  >(initialSort?.dir);
+  const [activeSortIndex, setActiveSortIndex] = useQueryParamInformedState<
+    number | undefined
+  >(initialSort?.index, `${key}ActiveSortIndex`);
+  const [activeSortDirection, setActiveSortDirection] =
+    useQueryParamInformedState<SortByDirection | undefined>(
+      initialSort?.dir,
+      `${key}ActiveSortDir`
+    );
 
   const getSortParams = (index: number) => ({
     sortBy: {

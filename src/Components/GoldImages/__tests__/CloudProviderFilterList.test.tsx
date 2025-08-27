@@ -1,5 +1,6 @@
 import React from 'react';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { renderWithRouter } from '../../../utils/testing/customRender';
+import { fireEvent, screen } from '@testing-library/react';
 import { HydrateAtomsTestProvider } from '../../util/testing/HydrateAtomsTestProvider';
 import { CloudProviderFilterList } from '../CloudProviderFilterList';
 import { cloudProviderFilterData } from '../../../state/goldImages';
@@ -11,15 +12,19 @@ const CloudProviderFilterListWithState = ({ init }: { init: string[] }) => (
 );
 
 describe('Cloud provider filter list', () => {
-  it('renders when filters are set', () => {
-    render(<CloudProviderFilterListWithState init={['AWS']} />);
+  afterEach(() => {
+    window.history.pushState(null, document.title, '/');
+  });
+
+  it('renderWithRouters when filters are set', () => {
+    renderWithRouter(<CloudProviderFilterListWithState init={['AWS']} />);
 
     expect(screen.queryByText('Cloud provider')).toBeInTheDocument();
     expect(screen.queryByText('AWS')).toBeInTheDocument();
   });
 
-  it('only renders selected filters', () => {
-    render(
+  it('only renderWithRouters selected filters', () => {
+    renderWithRouter(
       <CloudProviderFilterListWithState init={['AWS', 'Google Cloud Engine']} />
     );
 
@@ -28,14 +33,14 @@ describe('Cloud provider filter list', () => {
     expect(screen.queryByText('MicrosoftAzure')).not.toBeInTheDocument();
   });
 
-  it('does not render when no filters are selected', () => {
-    render(<CloudProviderFilterListWithState init={[]} />);
+  it('does not renderWithRouter when no filters are selected', () => {
+    renderWithRouter(<CloudProviderFilterListWithState init={[]} />);
 
     expect(screen.queryByText('Cloud provider')).not.toBeInTheDocument();
   });
 
   it('removes filter when "x" is clicked', () => {
-    const { container } = render(
+    const { container } = renderWithRouter(
       <CloudProviderFilterListWithState init={['AWS', 'Google Cloud Engine']} />
     );
 
@@ -57,7 +62,7 @@ describe('Cloud provider filter list', () => {
   });
 
   it('clears all filters when "clear filters" is clicked', () => {
-    const { container } = render(
+    const { container } = renderWithRouter(
       <CloudProviderFilterListWithState init={['AWS', 'Google Cloud Engine']} />
     );
 

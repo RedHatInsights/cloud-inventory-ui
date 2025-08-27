@@ -11,19 +11,21 @@ import {
 } from '@patternfly/react-table';
 import { Content } from '@patternfly/react-core';
 import { useTableSort } from '../../hooks/util/tables/useTableSort';
-import { useAtom, useAtomValue } from 'jotai';
+import { useAtomValue } from 'jotai';
 import {
   cloudProviderFilterData,
   goldImagePaginationData,
 } from '../../state/goldImages';
+import { useQueryParamInformedAtom } from '../../hooks/util/useQueryParam';
 
 interface GoldImagesProps {
   goldImages: GoldImagesResponse;
 }
 
 export const GoldImagesTable = ({ goldImages }: GoldImagesProps) => {
-  const [pageOptions, setGoldImagePagination] = useAtom(
-    goldImagePaginationData
+  const [pageOptions, setGoldImagePagination] = useQueryParamInformedAtom(
+    goldImagePaginationData,
+    'pagination'
   );
   const cloudProviderFilter = useAtomValue(cloudProviderFilterData);
 
@@ -34,13 +36,17 @@ export const GoldImagesTable = ({ goldImages }: GoldImagesProps) => {
           cloudProviderFilter.includes(cloudProvider.provider)
         );
 
-  const { sorted, getSortParams } = useTableSort(filteredGoldImages, {
-    rowTranslator: (hyperscaler) => [hyperscaler.provider],
-    initialSort: {
-      dir: SortByDirection.asc,
-      index: 0,
-    },
-  });
+  const { sorted, getSortParams } = useTableSort(
+    filteredGoldImages,
+    'goldImages',
+    {
+      rowTranslator: (hyperscaler) => [hyperscaler.provider],
+      initialSort: {
+        dir: SortByDirection.asc,
+        index: 0,
+      },
+    }
+  );
 
   const paginatedGoldImage = sorted.slice(
     (pageOptions.page - 1) * pageOptions.perPage,

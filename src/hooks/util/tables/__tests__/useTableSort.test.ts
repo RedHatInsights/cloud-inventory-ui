@@ -1,4 +1,5 @@
-import { renderHook, waitFor } from '@testing-library/react';
+import { waitFor } from '@testing-library/react';
+import { renderHookWithRouter } from '../../../../utils/testing/customRender';
 import { useTableSort } from '../useTableSort';
 import { IExtraColumnData, SortByDirection } from '@patternfly/react-table';
 import { MouseEvent, act } from 'react';
@@ -7,7 +8,9 @@ import { expectToThrow } from '../../../../utils/testing/expectToThrow';
 describe('Table sort hook', () => {
   it("doesn't sort initially", async () => {
     const initialData = [{ test: 2 }, { test: 1 }, { test: 3 }];
-    const { result } = renderHook(() => useTableSort(initialData));
+    const { result } = renderHookWithRouter(() =>
+      useTableSort(initialData, 'data')
+    );
 
     (await waitFor(() => expect(result.current.sorted))).toStrictEqual(
       initialData
@@ -17,7 +20,9 @@ describe('Table sort hook', () => {
   it('can sort numbers', async () => {
     const initialData = [{ test: 2 }, { test: 1 }, { test: 3 }];
     const sortedData = initialData.sort((a, b) => (a.test < b.test ? 1 : 0));
-    const { result } = renderHook(() => useTableSort(initialData));
+    const { result } = renderHookWithRouter(() =>
+      useTableSort(initialData, 'data')
+    );
 
     if (result.current.getSortParams(0).onSort == undefined) {
       throw new Error('onSort not defined');
@@ -42,8 +47,8 @@ describe('Table sort hook', () => {
   it('sorts by default when asked', async () => {
     const initialData = [{ test: 2 }, { test: 1 }, { test: 3 }];
     const sortedData = initialData.sort((a, b) => (a.test < b.test ? 1 : 0));
-    const { result } = renderHook(() =>
-      useTableSort(initialData, {
+    const { result } = renderHookWithRouter(() =>
+      useTableSort(initialData, 'data', {
         initialSort: { dir: SortByDirection.asc, index: 0 },
       })
     );
@@ -56,8 +61,8 @@ describe('Table sort hook', () => {
   it('can sort strings', async () => {
     const initialData = [{ test: 'b' }, { test: 'a' }, { test: 'z' }];
     const sortedData = initialData.sort((a, b) => a.test.localeCompare(b.test));
-    const { result } = renderHook(() =>
-      useTableSort(initialData, {
+    const { result } = renderHookWithRouter(() =>
+      useTableSort(initialData, 'data', {
         initialSort: { dir: SortByDirection.asc, index: 0 },
       })
     );
@@ -70,8 +75,8 @@ describe('Table sort hook', () => {
   it('throws error on unsupported types', async () => {
     const initialData = [{ test: {} }, { test: 1 }, { test: 'z' }];
     expectToThrow(async () =>
-      renderHook(() =>
-        useTableSort(initialData, {
+      renderHookWithRouter(() =>
+        useTableSort(initialData, 'data', {
           initialSort: { dir: SortByDirection.asc, index: 0 },
         })
       )
@@ -81,11 +86,24 @@ describe('Table sort hook', () => {
   it('throws error on mismatched types', async () => {
     const initialData = [{ test: 'a' }, { test: 1 }, { test: 'z' }];
     expectToThrow(async () =>
-      renderHook(() =>
-        useTableSort(initialData, {
+      renderHookWithRouter(() =>
+        useTableSort(initialData, 'data', {
           initialSort: { dir: SortByDirection.asc, index: 0 },
         })
       )
     ).rejects.toThrow(/Invalid comparison/);
+  });
+
+  it('updates the URL search', async () => {
+    const initialData = [{ test: 'b' }, { test: 'a' }, { test: 'z' }];
+    renderHookWithRouter(() =>
+      useTableSort(initialData, 'data', {
+        initialSort: { dir: SortByDirection.asc, index: 0 },
+      })
+    );
+
+    (await waitFor(() => expect(window.location.search))).toEqual(
+      '?dataActiveSortDir=%2522asc%2522'
+    );
   });
 });
