@@ -8,11 +8,12 @@ import { InvalidObject } from '@redhat-cloud-services/frontend-components/Invali
 import { Bullseye, Spinner } from '@patternfly/react-core';
 import { GoldImagesPage } from './Pages/GoldImagesPage/GoldImagesPage';
 import { Paths } from './utils/routing';
+import CloudInventoryPage from './Pages/CloudInventoryPage/CloudInventoryPage';
 
 const HelloPage = lazy(
   () =>
     import(
-      /* webpackChunkName: "HelloCloudInventoryPage" */ './Pages/HelloCloudInventoryPage/HelloCloudInventoryPage'
+      /* webpackChunkName: "CloudInventoryPage" */ './Pages/CloudInventoryPage/CloudInventoryPage'
     )
 );
 const OopsPage = lazy(
@@ -50,8 +51,12 @@ const routes: RouteDefinition[] = [
     element: GoldImagesPage,
   },
   {
+    path: Paths.Root,
+    element: () => <Navigate to={`./${Paths.CloudAccounts}`} />,
+  },
+  {
     path: Paths.CloudAccounts,
-    element: HelloPage,
+    element: CloudInventoryPage,
   },
   {
     path: Paths.MarketplacePurchases,
