@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import HelloCloudInventory from '../HelloCloudInventoryPage';
+import HelloCloudInventory from '../CloudInventoryPage';
 
 it('Renders hello page', () => {
   render(<HelloCloudInventory />);
