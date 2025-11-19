@@ -5,7 +5,7 @@ import React from 'react';
 export const NoCloudAccounts = () => (
   <EmptyState icon={WrenchIcon} titleText="No cloud accounts">
     <EmptyStateBody>
-      <Content>You do not have access to any cloud accounts</Content>
+      <Content>You do not have any cloud accounts connected.</Content>
     </EmptyStateBody>
   </EmptyState>
 );

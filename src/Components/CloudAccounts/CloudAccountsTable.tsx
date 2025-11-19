@@ -9,27 +9,15 @@ import {
   Tr,
 } from '@patternfly/react-table';
 import { Content } from '@patternfly/react-core';
-import { Button } from '@patternfly/react-core';
-import {
-  CheckCircleIcon,
-  ExclamationCircleIcon,
-} from '@patternfly/react-icons';
 import { useTableSort } from '../../hooks/util/tables/useTableSort';
+import { CloudAccountRow } from './types';
+import { providerToParam } from './CloudProviderUtils';
+import { getStatusIcon } from './GetStatusIcon';
+
+import { Link } from 'react-router-dom';
 
 export const CloudAccountsTable = () => {
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'Enabled':
-      case 'Granted':
-        return <CheckCircleIcon color="green" />;
-      case 'Failed':
-        return <ExclamationCircleIcon color="red" />;
-      default:
-        return null;
-    }
-  };
-
-  const dummyData = [
+  const dummyData: CloudAccountRow[] = [
     {
       id: '652039897783',
       provider: 'AWS',
@@ -41,6 +29,12 @@ export const CloudAccountsTable = () => {
       provider: 'Azure',
       goldImage: 'Failed',
       date: '2024-04-08',
+    },
+    {
+      id: '1000000012345',
+      provider: 'Google Cloud',
+      goldImage: 'Requested',
+      date: '2025-07-08',
     },
   ];
 
@@ -64,15 +58,17 @@ export const CloudAccountsTable = () => {
       <Tbody>
         {sorted.map((row) => (
           <Tr key={row.id}>
+            <Td>{row.id}</Td>
             <Td>
-              <Button variant="link" isInline>
-                {row.id}
-              </Button>
+              <Link
+                to={`gold-images?provider=${providerToParam[row.provider]}`}
+              >
+                {row.provider}
+              </Link>
             </Td>
-            <Td>{row.provider}</Td>
             <Td>
               <span className="pf-v6-u-display-flex pf-v6-u-align-items-center">
-                {getStatusIcon(row.goldImage)}
+                {getStatusIcon(row.goldImage, `Status: ${row.goldImage}`)}
                 <Content className="pf-v6-u-ml-sm">{row.goldImage}</Content>
               </span>
             </Td>

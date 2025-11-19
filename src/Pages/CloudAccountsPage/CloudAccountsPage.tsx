@@ -7,7 +7,7 @@ import { CloudAccountsPagination } from '../../Components/CloudAccounts/CloudAcc
 import { CloudAccountsToolbar } from '../../Components/CloudAccounts/CloudAccountsToolbar';
 // import { NoCloudAccounts } from '../../Components/CloudAccounts/NoCloudAccounts';
 
-const CloudInventoryPage = () => {
+const CloudAccountsPage = () => {
   return (
     <>
       <PageHeader>
@@ -30,4 +30,4 @@ const CloudInventoryPage = () => {
   );
 };
 
-export default CloudInventoryPage;
+export default CloudAccountsPage;

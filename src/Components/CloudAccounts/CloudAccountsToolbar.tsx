@@ -2,7 +2,7 @@ import { Toolbar, ToolbarContent, ToolbarGroup } from '@patternfly/react-core';
 import React from 'react';
 // import { CloudProviderFilterSelect } from './CloudProviderFilterSelect';
 import { CloudAccountsPagination } from '../CloudAccounts/CloudAccountsPagination';
-import { CloudAccountsFilterSelect } from './CloudAccountsFilterSelect';
+import { CloudAccountsFilterList } from './CloudAccountsFilterSelect';
 // import { CloudProviderFilterList } from './CloudProviderFilterList';
 
 // interface CloudAccountsFilterBarProps {
@@ -18,7 +18,7 @@ export const CloudAccountsToolbar = () => {
     <>
       <Toolbar>
         <ToolbarContent>
-          <CloudAccountsFilterSelect />
+          <CloudAccountsFilterList />
           <ToolbarGroup align={{ default: 'alignEnd' }}>
             <CloudAccountsPagination isCompact />
           </ToolbarGroup>
