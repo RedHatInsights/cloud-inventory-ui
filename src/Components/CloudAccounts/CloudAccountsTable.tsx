@@ -8,37 +8,65 @@ import {
   Thead,
   Tr,
 } from '@patternfly/react-table';
-import { Content } from '@patternfly/react-core';
+import { Button, Content } from '@patternfly/react-core';
 import { useTableSort } from '../../hooks/util/tables/useTableSort';
 import { CloudAccountRow } from './types';
-import { providerToParam } from './CloudProviderUtils';
+import { CloudAccount } from '../../hooks/api/useCloudAccounts';
+import { PROVIDER_MAP } from './CloudAccountsUtils';
+import { providerToParam } from './CloudAccountsUtils';
 import { getStatusIcon } from './GetStatusIcon';
+import { formatDate } from '../../hooks/util/dates';
+import { useAtomValue } from 'jotai';
+import {
+  cloudAccountsAccountFilterData,
+  cloudAccountsGoldImageFilterData,
+  cloudAccountsProviderFilterData,
+} from '../../state/cloudAccounts';
 
-import { Link } from 'react-router-dom';
+type Props = {
+  cloudAccounts: CloudAccount[];
+};
 
-export const CloudAccountsTable = () => {
-  const dummyData: CloudAccountRow[] = [
-    {
-      id: '652039897783',
-      provider: 'AWS',
-      goldImage: 'Granted',
-      date: '2024-05-02',
-    },
-    {
-      id: '100000000000',
-      provider: 'Azure',
-      goldImage: 'Failed',
-      date: '2024-04-08',
-    },
-    {
-      id: '1000000012345',
-      provider: 'Google Cloud',
-      goldImage: 'Requested',
-      date: '2025-07-08',
-    },
-  ];
+export const CloudAccountsTable = ({ cloudAccounts }: Props) => {
+  const cloudAccountFilter = useAtomValue(cloudAccountsAccountFilterData);
+  const cloudProviderFilter = useAtomValue(cloudAccountsProviderFilterData);
+  const cloudGoldImageFilter = useAtomValue(cloudAccountsGoldImageFilterData);
 
-  const { sorted, getSortParams } = useTableSort(dummyData, 'cloudAccounts', {
+  const rows: CloudAccountRow[] = cloudAccounts
+    .filter((acct) => {
+      if (
+        cloudAccountFilter.length > 0 &&
+        !cloudAccountFilter.some((val) =>
+          acct.providerAccountID.toLowerCase().includes(val.toLowerCase())
+        )
+      ) {
+        return false;
+      }
+
+      if (
+        cloudProviderFilter.length > 0 &&
+        !cloudProviderFilter.includes(PROVIDER_MAP[acct.shortName])
+      ) {
+        return false;
+      }
+
+      if (
+        cloudGoldImageFilter.length > 0 &&
+        !cloudGoldImageFilter.includes(acct.goldImageAccess)
+      ) {
+        return false;
+      }
+
+      return true;
+    })
+    .map((acct) => ({
+      id: acct.providerAccountID,
+      provider: PROVIDER_MAP[acct.shortName],
+      goldImage: acct.goldImageAccess,
+      date: acct.dateAdded,
+    }));
+
+  const { sorted, getSortParams } = useTableSort(rows, 'cloudAccounts', {
     rowTranslator: (row) => [row.id, row.provider, row.goldImage, row.date],
     initialSort: {
       index: 0,
@@ -53,28 +81,43 @@ export const CloudAccountsTable = () => {
           <Th sort={getSortParams(1)}>Cloud provider</Th>
           <Th sort={getSortParams(2)}>Gold image access</Th>
           <Th sort={getSortParams(3)}>Date added</Th>
+          <Th screenReaderText="Actions" />
         </Tr>
       </Thead>
       <Tbody>
         {sorted.map((row) => (
           <Tr key={row.id}>
-            <Td>{row.id}</Td>
             <Td>
-              <Link
-                to={`gold-images?provider=${providerToParam[row.provider]}`}
+              <Button variant="link" isInline component="a" href="">
+                {row.id}
+              </Button>
+            </Td>
+
+            <Td>
+              <Button
+                variant="link"
+                isInline
+                component="a"
+                href={`gold-images?provider=${providerToParam[row.provider]}`}
               >
                 {row.provider}
-              </Link>
+              </Button>
             </Td>
+
             <Td>
               <span className="pf-v6-u-display-flex pf-v6-u-align-items-center">
                 {getStatusIcon(row.goldImage, `Status: ${row.goldImage}`)}
                 <Content className="pf-v6-u-ml-sm">{row.goldImage}</Content>
               </span>
             </Td>
-            {/* <Content className="pf-v6-u-ml-sm">{row.cloudAccounts}</Content>
-            </Td> */}
-            <Td>{row.date}</Td>
+
+            <Td>{formatDate(row.date)}</Td>
+
+            <Td>
+              <Button variant="link" isInline component="a">
+                View Purchases
+              </Button>
+            </Td>
           </Tr>
         ))}
       </Tbody>

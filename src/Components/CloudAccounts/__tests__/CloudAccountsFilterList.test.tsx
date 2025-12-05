@@ -1,7 +1,7 @@
 import React from 'react';
 import { render } from '@testing-library/react';
-import { CloudProviderFilterList } from '../CloudProviderFilterList';
-import { cloudProviderFilterData } from '../../../state/goldImages';
+import { CloudAccountsFilterList } from '../CloudAccountsFilterList';
+import { cloudAccountsAccountFilterData } from '../../../state/cloudAccounts';
 import { FilterListBase } from '../../shared/FilterListBase';
 
 jest.mock('../../shared/FilterListBase', () => ({
@@ -11,20 +11,20 @@ jest.mock('../../shared/FilterListBase', () => ({
 
 const mockedFilterListBase = FilterListBase as jest.Mock;
 
-describe('CloudProviderFilterList', () => {
+describe('CloudAccountsFilterList', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
   it('renders FilterListBase with the correct props', () => {
-    render(<CloudProviderFilterList />);
+    render(<CloudAccountsFilterList />);
 
     expect(mockedFilterListBase).toHaveBeenCalledTimes(1);
 
     const call = mockedFilterListBase.mock.calls[0][0];
 
-    expect(call.atom).toBe(cloudProviderFilterData);
-    expect(call.queryParam).toBe('cloudProvider');
-    expect(call.label).toBe('Cloud Provider');
+    expect(call.atom).toBe(cloudAccountsAccountFilterData);
+    expect(call.queryParam).toBe('cloud account');
+    expect(call.label).toBe('Cloud account');
   });
 });

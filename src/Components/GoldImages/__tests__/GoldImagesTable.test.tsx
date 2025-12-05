@@ -52,7 +52,6 @@ describe('Gold images table', () => {
       throw new Error('Sort button not found');
     }
 
-    // sort
     fireEvent.click(sortButton);
 
     await waitFor(() =>
@@ -62,7 +61,6 @@ describe('Gold images table', () => {
       ).toBe(sortedGoldImageData[sortedGoldImageData.length - 1].provider)
     );
 
-    // sort the other direction
     fireEvent.click(sortButton);
 
     await waitFor(() =>
@@ -78,7 +76,6 @@ describe('Gold images table', () => {
       <GoldImagesTable goldImages={goldImageTestData(12)} />
     );
 
-    // 10 is default pagination size
     expect(container.querySelector('tbody')?.childNodes.length).toBe(10);
   });
 

@@ -5,9 +5,47 @@ import { Section } from '@redhat-cloud-services/frontend-components/Section';
 import { PageHeader } from '@redhat-cloud-services/frontend-components/PageHeader';
 import { CloudAccountsPagination } from '../../Components/CloudAccounts/CloudAccountsPagination';
 import { CloudAccountsToolbar } from '../../Components/CloudAccounts/CloudAccountsToolbar';
-// import { NoCloudAccounts } from '../../Components/CloudAccounts/NoCloudAccounts';
+import { useCloudAccounts } from '../../hooks/api/useCloudAccounts';
+import { Unavailable } from '@redhat-cloud-services/frontend-components/Unavailable';
+import { Navigate } from 'react-router-dom';
+import { Loading } from '../../Components/util/Loading';
+import { useRbacPermission } from '../../hooks/util/useRbacPermissions';
+import { Paths } from '../../utils/routing';
+import { NoCloudAccounts } from '../../Components/CloudAccounts/NoCloudAccounts';
+import { cloudAccountsPaginationData } from '../../state/cloudAccounts';
+import { useSetAtom } from 'jotai';
 
-const CloudAccountsPage = () => {
+export const CloudAccountsPage = () => {
+  const {
+    data: cloudAccountsResponse,
+    isError: isCloudAccountsError,
+    isLoading: areCloudAccountsLoading,
+  } = useCloudAccounts();
+
+  const setPagination = useSetAtom(cloudAccountsPaginationData);
+
+  const accounts = cloudAccountsResponse?.body ?? [];
+  const hasAccounts = accounts.length > 0;
+
+  React.useEffect(() => {
+    if (!cloudAccountsResponse?.pagination) return;
+    const { limit, offset, total } = cloudAccountsResponse.pagination;
+    setPagination({
+      perPage: limit,
+      itemCount: total,
+      page: Math.floor(offset / limit) + 1,
+    });
+  }, [cloudAccountsResponse, setPagination]);
+  const { data: permissions, isLoading: arePermissionsLoading } =
+    useRbacPermission();
+
+  if (arePermissionsLoading) return <Loading />;
+  if (!permissions?.canReadCloudAccess)
+    return <Navigate to={`../${Paths.NoPermissions}`} />;
+
+  if (areCloudAccountsLoading) return <Loading />;
+  if (isCloudAccountsError) return <Unavailable />;
+
   return (
     <>
       <PageHeader>
@@ -15,15 +53,15 @@ const CloudAccountsPage = () => {
       </PageHeader>
       <Section>
         <PageSection>
-          {/* {(!cloudAccounts || Object.keys(cloudAccounts).length == 0) && (
-            <NoCloudAccounts />
-          )} */}
-          <>
-            <CloudAccountsToolbar />
-            <CloudAccountsTable />
-            <br />
-            <CloudAccountsPagination />
-          </>
+          {!hasAccounts && <NoCloudAccounts />}
+          {hasAccounts && (
+            <>
+              <CloudAccountsToolbar />
+              <CloudAccountsTable cloudAccounts={accounts} />
+              <br />
+              <CloudAccountsPagination />
+            </>
+          )}
         </PageSection>
       </Section>
     </>

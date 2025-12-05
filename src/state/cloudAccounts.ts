@@ -12,4 +12,6 @@ export const cloudAccountsPaginationData = atom<CloudAccountsPaginationData>({
   itemCount: 0,
 });
 
-export const cloudAccountsFilterData = atom<string[]>([]);
+export const cloudAccountsAccountFilterData = atom<string[]>([]);
+export const cloudAccountsProviderFilterData = atom<string[]>([]);
+export const cloudAccountsGoldImageFilterData = atom<string[]>([]);

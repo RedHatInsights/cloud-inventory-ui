@@ -1,11 +1,26 @@
-import { Content, EmptyState, EmptyStateBody } from '@patternfly/react-core';
-import { WrenchIcon } from '@patternfly/react-icons';
+import {
+  Button,
+  EmptyState,
+  EmptyStateActions,
+  EmptyStateBody,
+} from '@patternfly/react-core';
 import React from 'react';
+import CubesIcon from '@patternfly/react-icons/dist/esm/icons/cubes-icon';
 
 export const NoCloudAccounts = () => (
-  <EmptyState icon={WrenchIcon} titleText="No cloud accounts">
+  <EmptyState
+    titleText="Cloud Accounts Available"
+    headingLevel="h4"
+    icon={CubesIcon}
+  >
     <EmptyStateBody>
-      <Content>You do not have any cloud accounts connected.</Content>
+      Cloud accounts appear when they are connected through
+      integrations.Additionally, accounts will show up here if auto-registration
+      or gold image access is initiated on the cloud provider. Please refer to
+      the documentation for further guidance.
     </EmptyStateBody>
+    <EmptyStateActions>
+      <Button variant="link">View documentation</Button>
+    </EmptyStateActions>
   </EmptyState>
 );

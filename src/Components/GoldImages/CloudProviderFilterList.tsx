@@ -1,7 +1,13 @@
 import React from 'react';
 import { cloudProviderFilterData } from '../../state/goldImages';
-import { CloudProviderFilterListBase } from '../shared/CloudProviderFilterListBase';
+import { FilterListBase } from '../shared/FilterListBase';
 
 export const CloudProviderFilterList = () => {
-  return <CloudProviderFilterListBase atom={cloudProviderFilterData} />;
+  return (
+    <FilterListBase
+      atom={cloudProviderFilterData}
+      queryParam="cloudProvider"
+      label="Cloud Provider"
+    />
+  );
 };
