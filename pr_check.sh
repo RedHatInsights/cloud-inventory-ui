@@ -9,8 +9,8 @@ export COMPONENT="cloud-inventory-ui"
 export IMAGE="quay.io/cloudservices/$COMPONENT"
 export WORKSPACE=${WORKSPACE:-$APP_ROOT} # if running in jenkins, use the build's workspace
 export APP_ROOT=$(pwd)
+export NODE_BUILD_VERSION=24
 COMMON_BUILDER=https://raw.githubusercontent.com/RedHatInsights/insights-frontend-builder-common/master
-
 
 set -exv
 # source is preferred to | bash -s in this case to avoid a subshell
@@ -19,7 +19,7 @@ BUILD_RESULTS=$?
 
 # Stubbed out for now
 mkdir -p $WORKSPACE/artifacts
-cat << EOF > $WORKSPACE/artifacts/junit-dummy.xml
+cat <<EOF >$WORKSPACE/artifacts/junit-dummy.xml
 <testsuite tests="1">
     <testcase classname="dummy" name="dummytest"/>
 </testsuite>
