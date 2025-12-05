@@ -1,35 +1,13 @@
-import { Button, Label, LabelGroup } from '@patternfly/react-core';
 import React from 'react';
 import { cloudProviderFilterData } from '../../state/goldImages';
-import { useQueryParamInformedAtom } from '../../hooks/util/useQueryParam';
+import { FilterListBase } from '../shared/FilterListBase';
 
 export const CloudProviderFilterList = () => {
-  const [cloudProviderFilter, setCloudProviderFilter] =
-    useQueryParamInformedAtom(cloudProviderFilterData, 'cloudProvider');
-
   return (
-    <>
-      <LabelGroup categoryName="Cloud provider">
-        {cloudProviderFilter.map((cloudProvider) => (
-          <Label
-            key={cloudProvider}
-            onClose={() => {
-              setCloudProviderFilter(
-                cloudProviderFilter.filter(
-                  (existing) => cloudProvider != existing
-                )
-              );
-            }}
-          >
-            {cloudProvider}
-          </Label>
-        ))}
-      </LabelGroup>
-      {cloudProviderFilter.length != 0 && (
-        <Button variant="link" onClick={() => setCloudProviderFilter([])}>
-          Clear filters
-        </Button>
-      )}
-    </>
+    <FilterListBase
+      atom={cloudProviderFilterData}
+      queryParam="cloudProvider"
+      label="Cloud Provider"
+    />
   );
 };
