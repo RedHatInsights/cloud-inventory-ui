@@ -1,20 +1,22 @@
-import { Provider } from './types';
-export const providerIdToProvider: Record<string, Provider> = {
-  aws: 'AWS',
-  azure: 'Azure',
-  gcp: 'Google Cloud',
-};
+import {
+  CloudProvider,
+  CloudProviderId,
+  CloudProviderShortName,
+} from './CloudAccountProviders';
 
-export const providerToParam: Record<Provider, string> = {
-  AWS: 'aws',
-  Azure: 'azure',
-  'Google Cloud': 'google',
-} as const;
-
-export const PROVIDER_MAP = {
+export const CloudProviderLabelMap: Record<
+  CloudProviderShortName,
+  CloudProvider
+> = {
   AWS: 'AWS',
   GCE: 'Google Cloud',
   MSAZ: 'Azure',
+};
+
+export const providerToApiParam: Record<CloudProvider, CloudProviderId> = {
+  AWS: 'aws',
+  Azure: 'azure',
+  'Google Cloud': 'gcp',
 } as const;
 
-export type ProviderKey = keyof typeof PROVIDER_MAP;
+export type ProviderKey = keyof typeof CloudProviderLabelMap;

@@ -12,8 +12,6 @@ import { Loading } from '../../Components/util/Loading';
 import { useRbacPermission } from '../../hooks/util/useRbacPermissions';
 import { Paths } from '../../utils/routing';
 import { NoCloudAccounts } from '../../Components/CloudAccounts/NoCloudAccounts';
-import { cloudAccountsPaginationData } from '../../state/cloudAccounts';
-import { useSetAtom } from 'jotai';
 
 export const CloudAccountsPage = () => {
   const {
@@ -22,20 +20,9 @@ export const CloudAccountsPage = () => {
     isLoading: areCloudAccountsLoading,
   } = useCloudAccounts();
 
-  const setPagination = useSetAtom(cloudAccountsPaginationData);
-
   const accounts = cloudAccountsResponse?.body ?? [];
   const hasAccounts = accounts.length > 0;
 
-  React.useEffect(() => {
-    if (!cloudAccountsResponse?.pagination) return;
-    const { limit, offset, total } = cloudAccountsResponse.pagination;
-    setPagination({
-      perPage: limit,
-      itemCount: total,
-      page: Math.floor(offset / limit) + 1,
-    });
-  }, [cloudAccountsResponse, setPagination]);
   const { data: permissions, isLoading: arePermissionsLoading } =
     useRbacPermission();
 

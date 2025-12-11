@@ -27,16 +27,16 @@ export const PaginationBase = ({
       isCompact={isCompact}
       onSetPage={(_evt, newPage) => {
         setPagination({
+          page: newPage,
           perPage,
           itemCount,
-          page: newPage,
         });
       }}
       onPerPageSelect={(_evt, newPerPage, newPage) => {
         setPagination({
-          itemCount,
-          perPage: newPerPage,
           page: newPage,
+          perPage: newPerPage,
+          itemCount,
         });
       }}
     />

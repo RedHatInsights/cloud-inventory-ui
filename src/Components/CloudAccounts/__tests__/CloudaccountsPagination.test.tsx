@@ -1,44 +1,49 @@
 import React from 'react';
-import { render } from '@testing-library/react';
+import { fireEvent, waitFor } from '@testing-library/react';
+import { renderWithRouter } from '../../../utils/testing/customRender';
+import { HydrateAtomsTestProvider } from '../../util/testing/HydrateAtomsTestProvider';
 import { CloudAccountsPagination } from '../CloudAccountsPagination';
-import { cloudAccountsPaginationData } from '../../../state/cloudAccounts';
+import { CloudAccountsPaginationData } from '../../../state/cloudAccounts';
 
-jest.mock('../../shared/PaginationBase', () => ({
-  PaginationBase: ({ atom, isCompact }: never) => (
-    <div
-      data-testid="pagination-base"
-      data-compact={isCompact}
-      data-atom={
-        atom === cloudAccountsPaginationData ? 'correct-atom' : 'wrong-atom'
-      }
-    />
-  ),
-}));
+const CloudAccountsPaginationWithState = ({
+  init,
+}: {
+  init: { page: number; perPage: number; itemCount: number };
+}) => (
+  <HydrateAtomsTestProvider
+    initialValues={[[CloudAccountsPaginationData, init]]}
+  >
+    <CloudAccountsPagination />
+  </HydrateAtomsTestProvider>
+);
 
-describe('CloudAccountsPagination', () => {
+describe('Cloud Accounts Pagination', () => {
   it('renders', () => {
-    const { getByTestId } = render(<CloudAccountsPagination />);
-    expect(getByTestId('pagination-base')).toBeInTheDocument();
+    const { container } = renderWithRouter(<CloudAccountsPagination />);
+    expect(
+      container.querySelector('.pf-v6-c-pagination__total-items')?.textContent
+    ).toContain('0 - 0');
   });
-
-  it('passes the correct pagination atom', () => {
-    const { getByTestId } = render(<CloudAccountsPagination />);
-    expect(getByTestId('pagination-base').getAttribute('data-atom')).toBe(
-      'correct-atom'
+  it('goes to the next page', async () => {
+    const { container } = renderWithRouter(
+      <CloudAccountsPaginationWithState
+        init={{ page: 1, perPage: 10, itemCount: 150 }}
+      />
     );
-  });
-
-  it('defaults isCompact to false', () => {
-    const { getByTestId } = render(<CloudAccountsPagination />);
-    expect(getByTestId('pagination-base').getAttribute('data-compact')).toBe(
-      'false'
+    const nextButton = container.querySelector(
+      '[aria-label="Go to next page"]'
     );
-  });
-
-  it('passes isCompact=true when provided', () => {
-    const { getByTestId } = render(<CloudAccountsPagination isCompact />);
-    expect(getByTestId('pagination-base').getAttribute('data-compact')).toBe(
-      'true'
+    if (!nextButton) throw new Error('Next page button not found');
+    await waitFor(() =>
+      expect(
+        container.querySelector('.pf-v6-c-pagination__total-items')?.textContent
+      ).toContain('1 - 10 of 150')
+    );
+    fireEvent.click(nextButton);
+    await waitFor(() =>
+      expect(
+        container.querySelector('.pf-v6-c-pagination__total-items')?.textContent
+      ).toContain('11 - 20')
     );
   });
 });

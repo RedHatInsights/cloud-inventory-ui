@@ -13,7 +13,7 @@ import CloudAccountsPage from './Pages/CloudAccountsPage/CloudAccountsPage';
 const HelloPage = lazy(
   () =>
     import(
-      /* webpackChunkName: "CloudInventoryPage" */ './Pages/CloudAccountsPage/CloudAccountsPage'
+      /* webpackChunkName: "HelloCloudInventoryPage" */ './Pages/HelloCloudInventoryPage/HelloCloudInventoryPage'
     )
 );
 const OopsPage = lazy(
@@ -51,13 +51,10 @@ const routes: RouteDefinition[] = [
     element: GoldImagesPage,
   },
   {
-    path: Paths.Root,
-    element: () => <Navigate to={`./${Paths.CloudAccounts}`} />,
-  },
-  {
     path: Paths.CloudAccounts,
     element: CloudAccountsPage,
   },
+  /* Catch all unmatched routes */
   {
     path: Paths.MarketplacePurchases,
     element: HelloPage,

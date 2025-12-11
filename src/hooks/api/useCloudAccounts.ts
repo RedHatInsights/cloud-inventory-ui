@@ -1,11 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
 import { HttpError } from '../../utils/errors';
+import { CloudProviderShortName } from '../../Components/CloudAccounts/CloudAccountProviders';
 
 export type CloudAccount = {
   providerAccountID: string;
   goldImageAccess: 'Granted' | 'Requested' | 'Failed';
   dateAdded: string;
-  shortName: 'AWS' | 'GCE' | 'MSAZ';
+  shortName: CloudProviderShortName;
 };
 
 export type CloudAccountsResponse = {
@@ -29,9 +30,6 @@ const fetchCloudAccounts = async (): Promise<CloudAccountsResponse> => {
     );
   }
   const json = await response.json();
-
-  console.log(' cloud accounts api raw response:', json);
-  console.log('Body length:', json?.body?.length);
 
   return json as CloudAccountsResponse;
 };

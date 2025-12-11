@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   SortByDirection,
   Table,
@@ -12,59 +12,40 @@ import { Button, Content } from '@patternfly/react-core';
 import { useTableSort } from '../../hooks/util/tables/useTableSort';
 import { CloudAccountRow } from './types';
 import { CloudAccount } from '../../hooks/api/useCloudAccounts';
-import { PROVIDER_MAP } from './CloudAccountsUtils';
-import { providerToParam } from './CloudAccountsUtils';
+import {
+  CloudProviderLabelMap,
+  providerToApiParam,
+} from './CloudAccountsUtils';
 import { getStatusIcon } from './GetStatusIcon';
 import { formatDate } from '../../hooks/util/dates';
-import { useAtomValue } from 'jotai';
-import {
-  cloudAccountsAccountFilterData,
-  cloudAccountsGoldImageFilterData,
-  cloudAccountsProviderFilterData,
-} from '../../state/cloudAccounts';
+import { toCloudAccountStatus } from './GetStatusIcon';
+import { CloudAccountsPaginationData } from '../../state/cloudAccounts';
+import { useQueryParamInformedAtom } from '../../hooks/util/useQueryParam';
 
-type Props = {
+type CloudAccountProps = {
   cloudAccounts: CloudAccount[];
 };
 
-export const CloudAccountsTable = ({ cloudAccounts }: Props) => {
-  const cloudAccountFilter = useAtomValue(cloudAccountsAccountFilterData);
-  const cloudProviderFilter = useAtomValue(cloudAccountsProviderFilterData);
-  const cloudGoldImageFilter = useAtomValue(cloudAccountsGoldImageFilterData);
+export const CloudAccountsTable = ({ cloudAccounts }: CloudAccountProps) => {
+  const [pagination, setPagination] = useQueryParamInformedAtom(
+    CloudAccountsPaginationData,
+    'pagination'
+  );
+  const { page, perPage } = pagination;
 
-  const rows: CloudAccountRow[] = cloudAccounts
-    .filter((acct) => {
-      if (
-        cloudAccountFilter.length > 0 &&
-        !cloudAccountFilter.some((val) =>
-          acct.providerAccountID.toLowerCase().includes(val.toLowerCase())
-        )
-      ) {
-        return false;
-      }
+  useEffect(() => {
+    setPagination({
+      ...pagination,
+      itemCount: cloudAccounts.length,
+    });
+  }, [cloudAccounts.length]);
 
-      if (
-        cloudProviderFilter.length > 0 &&
-        !cloudProviderFilter.includes(PROVIDER_MAP[acct.shortName])
-      ) {
-        return false;
-      }
-
-      if (
-        cloudGoldImageFilter.length > 0 &&
-        !cloudGoldImageFilter.includes(acct.goldImageAccess)
-      ) {
-        return false;
-      }
-
-      return true;
-    })
-    .map((acct) => ({
-      id: acct.providerAccountID,
-      provider: PROVIDER_MAP[acct.shortName],
-      goldImage: acct.goldImageAccess,
-      date: acct.dateAdded,
-    }));
+  const rows: CloudAccountRow[] = cloudAccounts.map((acct) => ({
+    id: acct.providerAccountID,
+    provider: CloudProviderLabelMap[acct.shortName],
+    goldImage: acct.goldImageAccess,
+    date: acct.dateAdded,
+  }));
 
   const { sorted, getSortParams } = useTableSort(rows, 'cloudAccounts', {
     rowTranslator: (row) => [row.id, row.provider, row.goldImage, row.date],
@@ -73,6 +54,10 @@ export const CloudAccountsTable = ({ cloudAccounts }: Props) => {
       dir: SortByDirection.asc,
     },
   });
+  const start = (page - 1) * perPage;
+  const end = start + perPage;
+  const paginatedCloudAccounts = sorted.slice(start, end);
+
   return (
     <Table aria-label="Cloud accounts table" variant="compact">
       <Thead>
@@ -85,7 +70,7 @@ export const CloudAccountsTable = ({ cloudAccounts }: Props) => {
         </Tr>
       </Thead>
       <Tbody>
-        {sorted.map((row) => (
+        {paginatedCloudAccounts.map((row) => (
           <Tr key={row.id}>
             <Td>
               <Button variant="link" isInline component="a" href="">
@@ -98,7 +83,10 @@ export const CloudAccountsTable = ({ cloudAccounts }: Props) => {
                 variant="link"
                 isInline
                 component="a"
-                href={`gold-images?provider=${providerToParam[row.provider]}`}
+                href={`/subscriptions/cloud-inventory/gold-images?provider=${encodeURIComponent(
+                  providerToApiParam[row.provider]
+                )}
+                `}
               >
                 {row.provider}
               </Button>
@@ -106,7 +94,10 @@ export const CloudAccountsTable = ({ cloudAccounts }: Props) => {
 
             <Td>
               <span className="pf-v6-u-display-flex pf-v6-u-align-items-center">
-                {getStatusIcon(row.goldImage, `Status: ${row.goldImage}`)}
+                {getStatusIcon(
+                  toCloudAccountStatus(row.goldImage),
+                  `Status: ${row.goldImage}`
+                )}
                 <Content className="pf-v6-u-ml-sm">{row.goldImage}</Content>
               </span>
             </Td>

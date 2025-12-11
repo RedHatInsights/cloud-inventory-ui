@@ -1,132 +1,104 @@
 import React from 'react';
-import { fireEvent, screen, waitFor } from '@testing-library/react';
+import { fireEvent, waitFor } from '@testing-library/react';
 import { renderWithRouter } from '../../../utils/testing/customRender';
 import { CloudAccountsTable } from '../CloudAccountsTable';
 import { CloudAccount } from '../../../hooks/api/useCloudAccounts';
-import {
-  cloudAccountsAccountFilterData,
-  cloudAccountsGoldImageFilterData,
-  cloudAccountsProviderFilterData,
-} from '../../../state/cloudAccounts';
-import { PROVIDER_MAP } from '../CloudAccountsUtils';
+import { CloudAccountsPaginationData } from '../../../state/cloudAccounts';
 import { HydrateAtomsTestProvider } from '../../util/testing/HydrateAtomsTestProvider';
 
-const cloudAccountsTestData = (amount: number): CloudAccount[] => {
-  const data: CloudAccount[] = [];
-  for (let i = 0; i < amount; i++) {
-    data.push({
-      providerAccountID: `acct-${i}`,
-      goldImageAccess: i % 2 === 0 ? 'Granted' : 'Requested',
-      dateAdded: `2024-01-${(i + 1).toString().padStart(2, '0')}`,
-      shortName: i % 2 === 0 ? 'AWS' : 'GCE',
-    });
-  }
-  return data;
+jest.mock('../../../Components/CloudAccounts/GetStatusIcon', () => ({
+  getStatusIcon: () => <span data-testid="status-icon" />,
+  toCloudAccountStatus: (v: string) => v,
+}));
+jest.mock('../../../hooks/util/dates', () => ({
+  formatDate: (d: string) => `Formatted:${d}`,
+}));
+const makeAccounts = (count: number): CloudAccount[] =>
+  Array.from({ length: count }).map((_, i) => ({
+    providerAccountID: `acct-${i}`,
+    shortName: i % 2 === 0 ? 'AWS' : 'GCE',
+    goldImageAccess: i % 2 === 0 ? 'Granted' : 'Failed',
+    dateAdded: `2024-01-${i + 1}`,
+  }));
+const renderTable = (accounts: CloudAccount[]) => {
+  return renderWithRouter(
+    <HydrateAtomsTestProvider
+      initialValues={[
+        [
+          CloudAccountsPaginationData,
+          { page: 1, perPage: 10, itemCount: accounts.length },
+        ],
+      ]}
+    >
+      <CloudAccountsTable cloudAccounts={accounts} />
+    </HydrateAtomsTestProvider>
+  );
 };
-describe('Cloud accounts table', () => {
+describe('CloudAccountsTable', () => {
   it('renders', () => {
-    const { container } = renderWithRouter(
-      <CloudAccountsTable cloudAccounts={cloudAccountsTestData(3)} />
-    );
+    const accounts = makeAccounts(12);
+    const { container } = renderTable(accounts);
     expect(container.querySelector('table')).toBeInTheDocument();
   });
-  it('sorts by cloud account when header is clicked', async () => {
-    const accounts = cloudAccountsTestData(3);
-    const sortedById = [...accounts].sort((a, b) =>
-      a.providerAccountID.localeCompare(b.providerAccountID)
-    );
-    const { container } = renderWithRouter(
-      <CloudAccountsTable cloudAccounts={accounts} />
-    );
-    const sortButton = container.querySelector('button');
-    if (!sortButton) {
-      throw new Error('Sort button not found');
-    }
-    fireEvent.click(sortButton);
+
+  it('renders only paginated rows', () => {
+    const accounts = makeAccounts(12);
+    const { container } = renderTable(accounts);
+    expect(container.querySelector('tbody')?.children.length).toBe(10);
+  });
+
+  it('sorts by cloud account ID when clicking header', async () => {
+    const accounts = makeAccounts(3);
+    const { container } = renderTable(accounts);
+    const sortButton = container.querySelector('th button');
+    fireEvent.click(sortButton!);
     await waitFor(() => {
-      expect(
-        container.querySelector('tbody')?.firstChild?.firstChild?.firstChild
-          ?.textContent
-      ).toBe(sortedById[sortedById.length - 1].providerAccountID);
+      const firstCell =
+        container.querySelector('tbody tr td')?.textContent ?? '';
+      expect(firstCell).toBe('acct-2');
     });
-    fireEvent.click(sortButton);
+    fireEvent.click(sortButton!);
     await waitFor(() => {
-      expect(
-        container.querySelector('tbody')?.firstChild?.firstChild?.firstChild
-          ?.textContent
-      ).toBe(sortedById[0].providerAccountID);
+      const firstCell =
+        container.querySelector('tbody tr td')?.textContent ?? '';
+      expect(firstCell).toBe('acct-0');
     });
   });
-  it('applies cloud account text filter', () => {
-    const accounts = cloudAccountsTestData(3);
-    const targetId = accounts[1].providerAccountID;
-    const { container } = renderWithRouter(
-      <HydrateAtomsTestProvider
-        initialValues={[[cloudAccountsAccountFilterData, [targetId]]]}
-      >
-        <CloudAccountsTable cloudAccounts={accounts} />
-      </HydrateAtomsTestProvider>
-    );
-    expect(container.querySelector('tbody')?.childNodes.length).toBe(1);
-    expect(
-      container.querySelector('tbody')?.firstChild?.firstChild?.firstChild
-        ?.textContent
-    ).toBe(targetId);
-  });
-  it('applies cloud provider filter', () => {
-    const accounts: CloudAccount[] = [
-      {
-        providerAccountID: 'acct-aws',
-        goldImageAccess: 'Granted',
-        dateAdded: '2024-01-01',
-        shortName: 'AWS',
-      },
-      {
-        providerAccountID: 'acct-gce',
-        goldImageAccess: 'Requested',
-        dateAdded: '2024-01-02',
-        shortName: 'GCE',
-      },
-    ];
-    const providerLabel = PROVIDER_MAP['AWS'];
-    const { container } = renderWithRouter(
-      <HydrateAtomsTestProvider
-        initialValues={[[cloudAccountsProviderFilterData, [providerLabel]]]}
-      >
-        <CloudAccountsTable cloudAccounts={accounts} />
-      </HydrateAtomsTestProvider>
-    );
-    expect(container.querySelector('tbody')?.childNodes.length).toBe(1);
-    expect(
-      container.querySelector('tbody')?.firstChild?.firstChild?.firstChild
-        ?.textContent
-    ).toBe('acct-aws');
-  });
-  it('applies gold image access filter', () => {
-    const accounts: CloudAccount[] = [
-      {
-        providerAccountID: 'acct-1',
-        goldImageAccess: 'Granted',
-        dateAdded: '2024-01-01',
-        shortName: 'AWS',
-      },
-      {
-        providerAccountID: 'acct-2',
-        goldImageAccess: 'Requested',
-        dateAdded: '2024-01-02',
-        shortName: 'GCE',
-      },
-    ];
 
-    const { container } = renderWithRouter(
-      <HydrateAtomsTestProvider
-        initialValues={[[cloudAccountsGoldImageFilterData, ['Requested']]]}
-      >
-        <CloudAccountsTable cloudAccounts={accounts} />
-      </HydrateAtomsTestProvider>
+  it('renders provider link with correct encoded provider param', () => {
+    const accounts = makeAccounts(1);
+    const { container } = renderTable(accounts);
+    const providerLink = container.querySelector(
+      'tbody tr td:nth-child(2) a'
+    ) as HTMLAnchorElement;
+    expect(providerLink.href).toContain(
+      '/subscriptions/cloud-inventory/gold-images?provider=aws'
     );
+  });
 
-    expect(container.querySelector('tbody')?.childNodes.length).toBe(1);
-    expect(screen.getByText('acct-2')).toBeInTheDocument();
+  it('renders gold image access text and status icon', () => {
+    const accounts = makeAccounts(1);
+    const { getByText, getByTestId } = renderTable(accounts);
+    expect(getByText('Granted')).toBeInTheDocument();
+    expect(getByTestId('status-icon')).toBeInTheDocument();
+  });
+
+  it('renders formatted date', () => {
+    const accounts = makeAccounts(1);
+    const { getByText } = renderTable(accounts);
+    expect(getByText(/Formatted:/)).toBeInTheDocument();
+  });
+
+  it('renders cloud account ID as a link', () => {
+    const accounts = makeAccounts(1);
+    const { getByText } = renderTable(accounts);
+    const link = getByText('acct-0').closest('a');
+    expect(link).toBeTruthy();
+  });
+
+  it('renders View Purchases link', () => {
+    const accounts = makeAccounts(2);
+    const { getAllByText } = renderTable(accounts);
+    expect(getAllByText('View Purchases').length).toBe(2);
   });
 });

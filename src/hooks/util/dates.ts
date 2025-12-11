@@ -1,4 +1,9 @@
-export const formatDate = (iso?: string) => {
-  if (!iso) return '';
-  return iso.split('T')[0];
+export const formatDate = (iso: string): string => {
+  const date = new Date(iso);
+
+  if (isNaN(date.getTime())) {
+    return '';
+  }
+
+  return date.toISOString().split('T')[0];
 };

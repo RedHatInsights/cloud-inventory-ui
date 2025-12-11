@@ -1,8 +1,8 @@
-export type Provider = 'AWS' | 'Azure' | 'Google Cloud';
+import { CloudProvider } from './CloudAccountProviders';
 
 export interface CloudAccountRow {
   id: string;
-  provider: Provider;
+  provider: CloudProvider;
   goldImage: string;
   date: string;
   [key: string]: string;

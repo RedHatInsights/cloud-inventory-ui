@@ -6,7 +6,7 @@ interface CloudAccountsPaginationData {
   itemCount: number;
 }
 
-export const cloudAccountsPaginationData = atom<CloudAccountsPaginationData>({
+export const CloudAccountsPaginationData = atom<CloudAccountsPaginationData>({
   page: 1,
   perPage: 10,
   itemCount: 0,
