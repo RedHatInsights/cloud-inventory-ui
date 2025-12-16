@@ -1,10 +1,11 @@
 import React from 'react';
 import { screen, waitFor } from '@testing-library/react';
-import { renderWithRouter } from '../../../utils/testing/customRender';
 import { CloudAccountsPage } from '../CloudAccountsPage';
+import { renderWithRouter } from '../../../utils/testing/customRender';
 import { ManipulatableQueryWrapper } from '../../../Components/util/testing/ManipulatableQueryWrapper';
 
 const mockNavigate = jest.fn();
+
 jest.mock('react-router-dom', () => ({
   __esModule: true,
   ...jest.requireActual('react-router-dom'),
@@ -13,51 +14,67 @@ jest.mock('react-router-dom', () => ({
     return <div data-testid="navigate" />;
   },
 }));
-jest.mock('jotai', () => ({
-  ...jest.requireActual('jotai'),
-  useAtomValue: () => ({ page: 1, perPage: 10 }),
-}));
 
 const { ComponentWithQueryClient, queryClient } = ManipulatableQueryWrapper(
   <CloudAccountsPage />
 );
 
-describe('CloudAccountsPage', () => {
-  beforeEach(() => {
-    queryClient.clear();
-    queryClient.setQueryData(['rbacPermissions'], {
-      canReadCloudAccess: true,
-    });
-    queryClient.setQueryData(['cloudAccounts'], {
-      body: [],
-    });
-    mockNavigate.mockClear();
+beforeEach(() => {
+  queryClient.clear();
+
+  queryClient.setQueryData(['rbacPermissions'], {
+    canReadCloudAccess: true,
+  });
+});
+it('renders cloud accounts page', async () => {
+  queryClient.setQueryData(['cloudAccounts', { limit: 10, offset: 0 }], {
+    body: [
+      {
+        providerAccountID: 'abc',
+        shortName: 'AWS',
+        goldImageAccess: 'Granted',
+        dateAdded: '2025-01-01',
+      },
+    ],
+    pagination: {
+      total: 1,
+      count: 1,
+      limit: 10,
+      offset: 0,
+    },
   });
 
-  it('renders page header', async () => {
-    renderWithRouter(<ComponentWithQueryClient />);
-    await waitFor(() => {
-      expect(screen.getByText('Cloud Inventory')).toBeInTheDocument();
-    });
+  renderWithRouter(<ComponentWithQueryClient />);
+
+  await waitFor(() =>
+    expect(screen.getByText('Cloud Accounts')).toBeInTheDocument()
+  );
+});
+it('shows empty state when no accounts exist', async () => {
+  queryClient.setQueryData(['cloudAccounts', { limit: 10, offset: 0 }], {
+    body: [],
+    pagination: {
+      total: 0,
+      count: 0,
+      limit: 10,
+      offset: 0,
+    },
   });
 
-  it('redirects if user lacks permissions', async () => {
-    queryClient.setQueryData(['rbacPermissions'], {
-      canReadCloudAccess: false,
-    });
-    renderWithRouter(<ComponentWithQueryClient />);
-    await waitFor(() => expect(mockNavigate).toHaveBeenCalled());
+  renderWithRouter(<ComponentWithQueryClient />);
+
+  expect(
+    await screen.findByText(/Cloud accounts appear here/i)
+  ).toBeInTheDocument();
+});
+it('redirects when user lacks permission', async () => {
+  queryClient.setQueryData(['rbacPermissions'], {
+    canReadCloudAccess: false,
   });
 
-  it('renders empty state when no cloud accounts exist', async () => {
-    queryClient.setQueryData(['cloudAccounts'], {
-      body: [],
-    });
-    renderWithRouter(<ComponentWithQueryClient />);
-    await waitFor(() =>
-      expect(
-        screen.getByRole('heading', { name: /cloud accounts/i })
-      ).toBeInTheDocument()
-    );
+  renderWithRouter(<ComponentWithQueryClient />);
+
+  await waitFor(() => {
+    expect(mockNavigate).toHaveBeenCalled();
   });
 });

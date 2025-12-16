@@ -11,19 +11,6 @@ export enum CloudAccountStatus {
   Requested = 'Requested',
 }
 
-export const toCloudAccountStatus = (value: string): CloudAccountStatus => {
-  switch (value) {
-    case CloudAccountStatus.Granted:
-      return CloudAccountStatus.Granted;
-    case CloudAccountStatus.Failed:
-      return CloudAccountStatus.Failed;
-    case CloudAccountStatus.Requested:
-      return CloudAccountStatus.Requested;
-    default:
-      return CloudAccountStatus.Requested;
-  }
-};
-
 export const getStatusIcon = (status: CloudAccountStatus, label: string) => {
   switch (status) {
     case CloudAccountStatus.Granted:

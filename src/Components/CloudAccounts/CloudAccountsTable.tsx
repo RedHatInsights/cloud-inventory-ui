@@ -12,15 +12,18 @@ import { Button, Content } from '@patternfly/react-core';
 import { useTableSort } from '../../hooks/util/tables/useTableSort';
 import { CloudAccountRow } from './types';
 import { CloudAccount } from '../../hooks/api/useCloudAccounts';
-import {
-  CloudProviderLabelMap,
-  providerToApiParam,
-} from './CloudAccountsUtils';
-import { getStatusIcon } from './GetStatusIcon';
+import { CloudAccountStatus, getStatusIcon } from './GetStatusIcon';
 import { formatDate } from '../../hooks/util/dates';
-import { toCloudAccountStatus } from './GetStatusIcon';
 import { CloudAccountsPaginationData } from '../../state/cloudAccounts';
-import { useQueryParamInformedAtom } from '../../hooks/util/useQueryParam';
+import {
+  generateQueryParamsForData,
+  useQueryParamInformedAtom,
+} from '../../hooks/util/useQueryParam';
+import { Link } from 'react-router-dom';
+import {
+  shortNameToDisplay,
+  shortToFriendly,
+} from '../../hooks/util/cloudProviderMaps';
 
 type CloudAccountProps = {
   cloudAccounts: CloudAccount[];
@@ -31,7 +34,8 @@ export const CloudAccountsTable = ({ cloudAccounts }: CloudAccountProps) => {
     CloudAccountsPaginationData,
     'pagination'
   );
-  const { page, perPage } = pagination;
+
+  // const { page, perPage } = pagination;
 
   useEffect(() => {
     setPagination({
@@ -42,8 +46,9 @@ export const CloudAccountsTable = ({ cloudAccounts }: CloudAccountProps) => {
 
   const rows: CloudAccountRow[] = cloudAccounts.map((acct) => ({
     id: acct.providerAccountID,
-    provider: CloudProviderLabelMap[acct.shortName],
-    goldImage: acct.goldImageAccess,
+    provider: shortToFriendly[acct.shortName],
+    providerLabel: shortNameToDisplay[acct.shortName],
+    goldImage: acct.goldImageAccess as CloudAccountStatus,
     date: acct.dateAdded,
   }));
 
@@ -54,9 +59,9 @@ export const CloudAccountsTable = ({ cloudAccounts }: CloudAccountProps) => {
       dir: SortByDirection.asc,
     },
   });
-  const start = (page - 1) * perPage;
-  const end = start + perPage;
-  const paginatedCloudAccounts = sorted.slice(start, end);
+  // const start = (page - 1) * perPage;
+  // const end = start + perPage;
+  // const paginatedCloudAccounts = sorted.slice(start, end);
 
   return (
     <Table aria-label="Cloud accounts table" variant="compact">
@@ -70,7 +75,7 @@ export const CloudAccountsTable = ({ cloudAccounts }: CloudAccountProps) => {
         </Tr>
       </Thead>
       <Tbody>
-        {paginatedCloudAccounts.map((row) => (
+        {sorted.map((row) => (
           <Tr key={row.id}>
             <Td>
               <Button variant="link" isInline component="a" href="">
@@ -79,23 +84,23 @@ export const CloudAccountsTable = ({ cloudAccounts }: CloudAccountProps) => {
             </Td>
 
             <Td>
-              <Button
-                variant="link"
-                isInline
-                component="a"
-                href={`/subscriptions/cloud-inventory/gold-images?provider=${encodeURIComponent(
-                  providerToApiParam[row.provider]
-                )}
-                `}
+              <Link
+                to={{
+                  pathname: '/subscriptions/cloud-inventory/gold-images',
+                  search: generateQueryParamsForData(
+                    [row.provider],
+                    'cloudProvider'
+                  ).toString(),
+                }}
               >
-                {row.provider}
-              </Button>
+                {row.providerLabel}
+              </Link>
             </Td>
 
             <Td>
               <span className="pf-v6-u-display-flex pf-v6-u-align-items-center">
                 {getStatusIcon(
-                  toCloudAccountStatus(row.goldImage),
+                  row.goldImage as CloudAccountStatus,
                   `Status: ${row.goldImage}`
                 )}
                 <Content className="pf-v6-u-ml-sm">{row.goldImage}</Content>

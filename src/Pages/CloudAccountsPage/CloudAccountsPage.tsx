@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { CloudAccountsTable } from '../../Components/CloudAccounts/CloudAccountsTable';
 import { Content, PageSection } from '@patternfly/react-core';
 import { Section } from '@redhat-cloud-services/frontend-components/Section';
@@ -12,16 +12,33 @@ import { Loading } from '../../Components/util/Loading';
 import { useRbacPermission } from '../../hooks/util/useRbacPermissions';
 import { Paths } from '../../utils/routing';
 import { NoCloudAccounts } from '../../Components/CloudAccounts/NoCloudAccounts';
+import { useQueryParamInformedAtom } from '../../hooks/util/useQueryParam';
+import { CloudAccountsPaginationData } from '../../state/cloudAccounts';
 
 export const CloudAccountsPage = () => {
+  const [pagination, setPagination] = useQueryParamInformedAtom(
+    CloudAccountsPaginationData,
+    'pagination'
+  );
+
+  const { page, perPage } = pagination;
+
   const {
     data: cloudAccountsResponse,
     isError: isCloudAccountsError,
     isLoading: areCloudAccountsLoading,
-  } = useCloudAccounts();
+  } = useCloudAccounts({ limit: perPage, offset: (page - 1) * perPage });
 
   const accounts = cloudAccountsResponse?.body ?? [];
   const hasAccounts = accounts.length > 0;
+  useEffect(() => {
+    if (cloudAccountsResponse?.pagination) {
+      setPagination({
+        ...pagination,
+        itemCount: cloudAccountsResponse.pagination.total,
+      });
+    }
+  }, [cloudAccountsResponse?.pagination?.total]);
 
   const { data: permissions, isLoading: arePermissionsLoading } =
     useRbacPermission();
@@ -36,7 +53,7 @@ export const CloudAccountsPage = () => {
   return (
     <>
       <PageHeader>
-        <Content component="h1">Cloud Inventory</Content>
+        <Content component="h1">Cloud Accounts</Content>
       </PageHeader>
       <Section>
         <PageSection>

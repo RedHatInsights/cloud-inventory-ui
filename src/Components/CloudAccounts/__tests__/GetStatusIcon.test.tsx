@@ -1,29 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import {
-  CloudAccountStatus,
-  getStatusIcon,
-  toCloudAccountStatus,
-} from '../GetStatusIcon';
-
-describe('toCloudAccountStatus', () => {
-  it('returns Granted when passed "Granted"', () => {
-    expect(toCloudAccountStatus('Granted')).toBe(CloudAccountStatus.Granted);
-  });
-
-  it('returns Failed when passed "Failed"', () => {
-    expect(toCloudAccountStatus('Failed')).toBe(CloudAccountStatus.Failed);
-  });
-
-  it('returns Requested when passed "Requested"', () => {
-    expect(toCloudAccountStatus('Requested')).toBe(
-      CloudAccountStatus.Requested
-    );
-  });
-
-  it('returns Requested for unknown values (default)', () => {
-    expect(toCloudAccountStatus('???')).toBe(CloudAccountStatus.Requested);
-  });
-});
+import { CloudAccountStatus, getStatusIcon } from '../GetStatusIcon';
 
 describe('getStatusIcon', () => {
   it('renders green check icon for Granted', () => {
@@ -31,7 +7,8 @@ describe('getStatusIcon', () => {
     const icon = screen.getByLabelText('Access Granted');
     expect(icon).toBeInTheDocument();
     expect(icon).toHaveAttribute('color', 'green');
-    expect(icon.querySelector('title')?.textContent).toBe('Access Granted');
+    const title = icon.querySelector('title');
+    expect(title?.textContent).toBe('Access Granted');
   });
 
   it('renders red exclamation icon for Failed', () => {
@@ -39,7 +16,8 @@ describe('getStatusIcon', () => {
     const icon = screen.getByLabelText('Access Failed');
     expect(icon).toBeInTheDocument();
     expect(icon).toHaveAttribute('color', 'red');
-    expect(icon.querySelector('title')?.textContent).toBe('Access Failed');
+    const title = icon.querySelector('title');
+    expect(title?.textContent).toBe('Access Failed');
   });
 
   it('renders black wrench icon for Requested', () => {
@@ -47,19 +25,21 @@ describe('getStatusIcon', () => {
     const icon = screen.getByLabelText('Pending Request');
     expect(icon).toBeInTheDocument();
     expect(icon).toHaveAttribute('color', 'black');
-    expect(icon.querySelector('title')?.textContent).toBe('Pending Request');
+    const title = icon.querySelector('title');
+    expect(title?.textContent).toBe('Pending Request');
   });
 
-  it('returns null for unknown status (default case)', () => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const result = getStatusIcon('something' as any, '???');
+  it('returns null for unknown status', () => {
+    const result = getStatusIcon('UNKNOWN' as CloudAccountStatus, '???');
     expect(result).toBeNull();
   });
 
-  it('handles empty label gracefully', () => {
+  it('renders icon even with empty label', () => {
     render(getStatusIcon(CloudAccountStatus.Requested, '')!);
+
     const icon = screen.getByLabelText('');
     expect(icon).toBeInTheDocument();
-    expect(icon.querySelector('title')).toBeNull();
+    const title = icon.querySelector('title');
+    expect(title).toBeNull();
   });
 });

@@ -22,8 +22,8 @@ describe('formatDate', () => {
   });
 
   it('returns empty string when new Date() cannot parse the value', () => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const result = formatDate('2025-99-99');
+    expect(result).toBe('');
   });
 
   it('normalizes date to UTC and keeps YYYY-MM-DD', () => {

@@ -59,6 +59,7 @@ const routes: RouteDefinition[] = [
     path: Paths.MarketplacePurchases,
     element: HelloPage,
   },
+  /* Catch all unmatched routes */
   {
     path: Paths.Catch,
     element: () => <InvalidObject />,

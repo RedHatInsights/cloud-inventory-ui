@@ -6,8 +6,14 @@ type GoldImage = {
   description: string;
 };
 
+export enum CloudProviderName {
+  AWS = 'AWS',
+  GCP = 'Google Compute Engine',
+  AZURE = 'Microsoft Azure',
+}
+
 type CloudProviderDetail = {
-  provider: string;
+  provider: CloudProviderName;
   goldImages: GoldImage[];
 };
 
