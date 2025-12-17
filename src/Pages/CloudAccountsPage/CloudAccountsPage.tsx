@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { CloudAccountsTable } from '../../Components/CloudAccounts/CloudAccountsTable';
 import { Content, PageSection } from '@patternfly/react-core';
 import { Section } from '@redhat-cloud-services/frontend-components/Section';
@@ -13,7 +13,11 @@ import { useRbacPermission } from '../../hooks/util/useRbacPermissions';
 import { Paths } from '../../utils/routing';
 import { NoCloudAccounts } from '../../Components/CloudAccounts/NoCloudAccounts';
 import { useQueryParamInformedAtom } from '../../hooks/util/useQueryParam';
-import { CloudAccountsPaginationData } from '../../state/cloudAccounts';
+import {
+  CloudAccountsPaginationData,
+  CloudAccountsSort,
+  DefaultCloudAccountsSort,
+} from '../../state/cloudAccounts';
 
 export const CloudAccountsPage = () => {
   const [pagination, setPagination] = useQueryParamInformedAtom(
@@ -21,15 +25,23 @@ export const CloudAccountsPage = () => {
     'pagination'
   );
 
+  const [sort, setSort] = useState<CloudAccountsSort>(DefaultCloudAccountsSort);
+
   const { page, perPage } = pagination;
 
   const {
     data: cloudAccountsResponse,
     isError: isCloudAccountsError,
     isLoading: areCloudAccountsLoading,
-  } = useCloudAccounts({ limit: perPage, offset: (page - 1) * perPage });
+  } = useCloudAccounts({
+    limit: perPage,
+    offset: (page - 1) * perPage,
+    sortField: sort.field,
+    sortDirection: sort.direction,
+  });
 
   const accounts = cloudAccountsResponse?.body ?? [];
+
   const hasAccounts = accounts.length > 0;
   useEffect(() => {
     if (cloudAccountsResponse?.pagination) {
@@ -61,7 +73,11 @@ export const CloudAccountsPage = () => {
           {hasAccounts && (
             <>
               <CloudAccountsToolbar />
-              <CloudAccountsTable cloudAccounts={accounts} />
+              <CloudAccountsTable
+                cloudAccounts={accounts}
+                sort={sort}
+                onSortChange={setSort}
+              />
               <br />
               <CloudAccountsPagination />
             </>

@@ -2,7 +2,6 @@ import { PrimitiveAtom, useAtom } from 'jotai';
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
-// Given specific query params, what's the state?
 function useInitializeFromQueryParam<T>(key: string, setter: (v: T) => void) {
   const [searchParams] = useSearchParams();
   const init = searchParams.get(key);
@@ -19,9 +18,6 @@ function useInitializeFromQueryParam<T>(key: string, setter: (v: T) => void) {
   }, []);
 }
 
-// Other option, be more freeform
-// const myParams = generateQueryParamsForData(["Azure"], 'cloudProvider')
-// The problem is requires external knowledge of other components
 export function generateQueryParamsForData<T>(
   data: T,
   key: string

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import {
   SortByDirection,
   Table,
@@ -14,36 +14,21 @@ import { CloudAccountRow } from './types';
 import { CloudAccount } from '../../hooks/api/useCloudAccounts';
 import { CloudAccountStatus, getStatusIcon } from './GetStatusIcon';
 import { formatDate } from '../../hooks/util/dates';
-import { CloudAccountsPaginationData } from '../../state/cloudAccounts';
-import {
-  generateQueryParamsForData,
-  useQueryParamInformedAtom,
-} from '../../hooks/util/useQueryParam';
+import { generateQueryParamsForData } from '../../hooks/util/useQueryParam';
 import { Link } from 'react-router-dom';
 import {
   shortNameToDisplay,
   shortToFriendly,
 } from '../../hooks/util/cloudProviderMaps';
+import { CloudAccountsSort } from '../../state/cloudAccounts';
 
 type CloudAccountProps = {
   cloudAccounts: CloudAccount[];
+  sort: CloudAccountsSort;
+  onSortChange: (sort: CloudAccountsSort) => void;
 };
 
 export const CloudAccountsTable = ({ cloudAccounts }: CloudAccountProps) => {
-  const [pagination, setPagination] = useQueryParamInformedAtom(
-    CloudAccountsPaginationData,
-    'pagination'
-  );
-
-  // const { page, perPage } = pagination;
-
-  useEffect(() => {
-    setPagination({
-      ...pagination,
-      itemCount: cloudAccounts.length,
-    });
-  }, [cloudAccounts.length]);
-
   const rows: CloudAccountRow[] = cloudAccounts.map((acct) => ({
     id: acct.providerAccountID,
     provider: shortToFriendly[acct.shortName],
@@ -59,9 +44,6 @@ export const CloudAccountsTable = ({ cloudAccounts }: CloudAccountProps) => {
       dir: SortByDirection.asc,
     },
   });
-  // const start = (page - 1) * perPage;
-  // const end = start + perPage;
-  // const paginatedCloudAccounts = sorted.slice(start, end);
 
   return (
     <Table aria-label="Cloud accounts table" variant="compact">

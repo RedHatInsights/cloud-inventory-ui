@@ -1,5 +1,6 @@
 import { atom } from 'jotai';
 import { renderHookWithRouter } from '../../../utils/testing/customRender';
+import { generateQueryParamsForData } from '../useQueryParam';
 import {
   useQueryParamInformedAtom,
   useQueryParamInformedState,
@@ -123,5 +124,28 @@ describe('query param informed hook', () => {
     expect(mockURLSearchParams.get('customState')).toBe('2');
     expect(mockURLSearchParams.get('customAtom')).toBe('2');
     expect(mockURLSearchParams.get('preExisting')).toEqual('value');
+  });
+
+  describe('generateQueryParamsForData', () => {
+    it('creates URLSearchParams with encoded JSON value', () => {
+      const data = { foo: 'bar', count: 2 };
+      const key = 'testKey';
+
+      const params = generateQueryParamsForData(data, key);
+
+      expect(params).toBeInstanceOf(URLSearchParams);
+      expect(params.get(key)).toBe(encodeURIComponent(JSON.stringify(data)));
+    });
+
+    it('handles strings correctly', () => {
+      const data = 'hello world';
+      const key = 'str';
+
+      const params = generateQueryParamsForData(data, key);
+
+      expect(params.get(key)).toBe(
+        encodeURIComponent(JSON.stringify('hello world'))
+      );
+    });
   });
 });

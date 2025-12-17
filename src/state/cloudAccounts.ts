@@ -11,3 +11,21 @@ export const CloudAccountsPaginationData = atom<CloudAccountsPaginationData>({
   perPage: 10,
   itemCount: 0,
 });
+
+export type CloudAccountsSortField =
+  | 'providerAccountID'
+  | 'provider'
+  | 'goldImageAccess'
+  | 'dateAdded';
+
+export type CloudAccountsSortDirection = 'asc' | 'desc';
+
+export type CloudAccountsSort = {
+  field: CloudAccountsSortField;
+  direction: CloudAccountsSortDirection;
+};
+
+export const DefaultCloudAccountsSort: CloudAccountsSort = {
+  field: 'providerAccountID',
+  direction: 'asc',
+};

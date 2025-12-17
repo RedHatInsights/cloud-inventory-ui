@@ -3,6 +3,7 @@ import { screen, waitFor } from '@testing-library/react';
 import { CloudAccountsPage } from '../CloudAccountsPage';
 import { renderWithRouter } from '../../../utils/testing/customRender';
 import { ManipulatableQueryWrapper } from '../../../Components/util/testing/ManipulatableQueryWrapper';
+import { DefaultCloudAccountsSort } from '../../../state/cloudAccounts';
 
 const mockNavigate = jest.fn();
 
@@ -27,22 +28,33 @@ beforeEach(() => {
   });
 });
 it('renders cloud accounts page', async () => {
-  queryClient.setQueryData(['cloudAccounts', { limit: 10, offset: 0 }], {
-    body: [
+  queryClient.setQueryData(
+    [
+      'cloudAccounts',
       {
-        providerAccountID: 'abc',
-        shortName: 'AWS',
-        goldImageAccess: 'Granted',
-        dateAdded: '2025-01-01',
+        limit: 10,
+        offset: 0,
+        sortField: DefaultCloudAccountsSort.field,
+        sortDirection: DefaultCloudAccountsSort.direction,
       },
     ],
-    pagination: {
-      total: 1,
-      count: 1,
-      limit: 10,
-      offset: 0,
-    },
-  });
+    {
+      body: [
+        {
+          providerAccountID: 'abc',
+          shortName: 'AWS',
+          goldImageAccess: 'Granted',
+          dateAdded: '2025-01-01',
+        },
+      ],
+      pagination: {
+        total: 1,
+        count: 1,
+        limit: 10,
+        offset: 0,
+      },
+    }
+  );
 
   renderWithRouter(<ComponentWithQueryClient />);
 
@@ -51,21 +63,31 @@ it('renders cloud accounts page', async () => {
   );
 });
 it('shows empty state when no accounts exist', async () => {
-  queryClient.setQueryData(['cloudAccounts', { limit: 10, offset: 0 }], {
-    body: [],
-    pagination: {
-      total: 0,
-      count: 0,
-      limit: 10,
-      offset: 0,
-    },
-  });
-
+  queryClient.setQueryData(
+    [
+      'cloudAccounts',
+      {
+        limit: 10,
+        offset: 0,
+        sortField: DefaultCloudAccountsSort.field,
+        sortDirection: DefaultCloudAccountsSort.direction,
+      },
+    ],
+    {
+      body: [],
+      pagination: {
+        total: 1,
+        count: 1,
+        limit: 10,
+        offset: 0,
+      },
+    }
+  );
   renderWithRouter(<ComponentWithQueryClient />);
 
-  expect(
-    await screen.findByText(/Cloud accounts appear here/i)
-  ).toBeInTheDocument();
+  const emptyStateText = await screen.findByText(/cloud accounts appear here/i);
+
+  expect(emptyStateText).toBeInTheDocument();
 });
 it('redirects when user lacks permission', async () => {
   queryClient.setQueryData(['rbacPermissions'], {

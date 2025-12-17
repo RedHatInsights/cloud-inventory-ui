@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { HttpError } from '../../utils/errors';
+import { CloudAccountsSortDirection } from '../../state/cloudAccounts';
 
 export enum CloudProviderShortname {
   AWS = 'AWS',
@@ -28,14 +29,27 @@ export type CloudAccountsResponse = {
 export type fetchCloudAccountsArgs = {
   limit: number;
   offset: number;
+  sortField?: string;
+  sortDirection?: CloudAccountsSortDirection;
 };
 
 const fetchCloudAccounts = async ({
   limit,
   offset,
+  sortField,
+  sortDirection,
 }: fetchCloudAccountsArgs): Promise<CloudAccountsResponse> => {
+  const params = new URLSearchParams({
+    limit: String(limit),
+    offset: String(offset),
+  });
+
+  if (sortField && sortDirection) {
+    params.set('sort by', sortField);
+    params.set('sort_direction', sortDirection);
+  }
   const response = await fetch(
-    `/api/rhsm/v2/cloud_access_providers/accounts?limit=${limit}&offset=${offset}`
+    `/api/rhsm/v2/cloud_access_providers/accounts?${params.toString()}`
   );
 
   if (!response.ok) {

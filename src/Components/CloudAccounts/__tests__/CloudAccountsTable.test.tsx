@@ -6,7 +6,10 @@ import {
   CloudAccount,
   CloudProviderShortname,
 } from '../../../hooks/api/useCloudAccounts';
-import { CloudAccountsPaginationData } from '../../../state/cloudAccounts';
+import {
+  CloudAccountsPaginationData,
+  DefaultCloudAccountsSort,
+} from '../../../state/cloudAccounts';
 import { HydrateAtomsTestProvider } from '../../util/testing/HydrateAtomsTestProvider';
 
 jest.mock('../../../Components/CloudAccounts/GetStatusIcon', () => ({
@@ -33,6 +36,7 @@ const makeAccounts = (count: number): CloudAccount[] =>
   });
 
 const renderTable = (accounts: CloudAccount[]) => {
+  const onSortChange = jest.fn();
   return renderWithRouter(
     <HydrateAtomsTestProvider
       initialValues={[
@@ -42,7 +46,11 @@ const renderTable = (accounts: CloudAccount[]) => {
         ],
       ]}
     >
-      <CloudAccountsTable cloudAccounts={accounts} />
+      <CloudAccountsTable
+        cloudAccounts={accounts}
+        sort={DefaultCloudAccountsSort}
+        onSortChange={onSortChange}
+      />
     </HydrateAtomsTestProvider>
   );
 };
