@@ -31,6 +31,33 @@ type CloudAccountProps = {
   onSortChange: (sort: CloudAccountsSort) => void;
 };
 
+export const mapField = (field: CloudAccountsSortField) => {
+  switch (field) {
+    case 'providerAccountID':
+      return 'id';
+    case 'provider':
+      return 'provider';
+    case 'goldImageAccess':
+      return 'goldImage';
+    case 'dateAdded':
+      return 'date';
+  }
+};
+
+export const sortRowsForDev = (
+  rows: CloudAccountRow[],
+  sort: CloudAccountsSort
+) => {
+  return [...rows].sort((a, b) => {
+    const aVal = a[mapField(sort.field)];
+    const bVal = b[mapField(sort.field)];
+
+    if (aVal < bVal) return sort.direction === 'asc' ? -1 : 1;
+    if (aVal > bVal) return sort.direction === 'asc' ? 1 : -1;
+    return 0;
+  });
+};
+
 export const CloudAccountsTable = ({
   cloudAccounts,
   sort,
@@ -74,6 +101,9 @@ export const CloudAccountsTable = ({
     });
   };
 
+  const displayRows =
+    process.env.NODE_ENV === 'development' ? sortRowsForDev(rows, sort) : rows;
+
   return (
     <Table aria-label="Cloud accounts table" variant="compact">
       <Thead>
@@ -97,7 +127,7 @@ export const CloudAccountsTable = ({
         </Tr>
       </Thead>
       <Tbody>
-        {rows.map((row) => (
+        {displayRows.map((row) => (
           <Tr key={row.id}>
             {' '}
             <Td>

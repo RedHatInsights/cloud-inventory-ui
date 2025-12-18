@@ -62,6 +62,7 @@ it('renders cloud accounts page', async () => {
     expect(screen.getByText('Cloud Accounts')).toBeInTheDocument()
   );
 });
+
 it('shows empty state when no accounts exist', async () => {
   queryClient.setQueryData(
     [
@@ -88,6 +89,20 @@ it('shows empty state when no accounts exist', async () => {
   const emptyStateText = await screen.findByText(/cloud accounts appear here/i);
 
   expect(emptyStateText).toBeInTheDocument();
+});
+
+it('shows loading state while cloud accounts are loading', async () => {
+  queryClient.setQueryData(['rbacPermissions'], {
+    canReadCloudAccess: true,
+  });
+
+  queryClient.setQueryDefaults(['cloudAccounts'], {
+    queryFn: () => new Promise(() => {}),
+  });
+
+  renderWithRouter(<ComponentWithQueryClient />);
+
+  expect(await screen.findByLabelText(/contents/i)).toBeInTheDocument();
 });
 it('redirects when user lacks permission', async () => {
   queryClient.setQueryData(['rbacPermissions'], {
