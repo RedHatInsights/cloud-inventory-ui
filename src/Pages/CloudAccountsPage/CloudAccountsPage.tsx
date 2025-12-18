@@ -19,6 +19,13 @@ import {
   DefaultCloudAccountsSort,
 } from '../../state/cloudAccounts';
 
+const sortFieldToApiField: Record<string, string> = {
+  providerAccountID: 'provider_account_id',
+  provider: 'provider',
+  goldImageAccess: 'gold_image_access',
+  dateAdded: 'date_added',
+};
+
 export const CloudAccountsPage = () => {
   const [pagination, setPagination] = useQueryParamInformedAtom(
     CloudAccountsPaginationData,
@@ -36,7 +43,7 @@ export const CloudAccountsPage = () => {
   } = useCloudAccounts({
     limit: perPage,
     offset: (page - 1) * perPage,
-    sortField: sort.field,
+    sortField: sortFieldToApiField[sort.field],
     sortDirection: sort.direction,
   });
 

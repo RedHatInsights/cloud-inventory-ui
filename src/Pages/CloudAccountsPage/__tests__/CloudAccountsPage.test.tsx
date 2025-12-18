@@ -34,7 +34,7 @@ it('renders cloud accounts page', async () => {
       {
         limit: 10,
         offset: 0,
-        sortField: DefaultCloudAccountsSort.field,
+        sortField: 'provider_account_id',
         sortDirection: DefaultCloudAccountsSort.direction,
       },
     ],
@@ -69,7 +69,7 @@ it('shows empty state when no accounts exist', async () => {
       {
         limit: 10,
         offset: 0,
-        sortField: DefaultCloudAccountsSort.field,
+        sortField: 'provider_account_id',
         sortDirection: DefaultCloudAccountsSort.direction,
       },
     ],

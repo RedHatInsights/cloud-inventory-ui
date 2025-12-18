@@ -45,7 +45,7 @@ const fetchCloudAccounts = async ({
   });
 
   if (sortField && sortDirection) {
-    params.set('sort by', sortField);
+    params.set('sort_by', sortField);
     params.set('sort_direction', sortDirection);
   }
   const response = await fetch(

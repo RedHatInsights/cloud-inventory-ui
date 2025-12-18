@@ -1,5 +1,5 @@
 import React from 'react';
-import { fireEvent, waitFor } from '@testing-library/react';
+import { fireEvent } from '@testing-library/react';
 import { renderWithRouter } from '../../../utils/testing/customRender';
 import { CloudAccountsTable } from '../CloudAccountsTable';
 import {
@@ -62,21 +62,35 @@ describe('CloudAccountsTable', () => {
     expect(container.querySelector('table')).toBeInTheDocument();
   });
 
-  it('sorts by cloud account ID when clicking header', async () => {
+  it('calls onSortChange when clicking a sortable column header', () => {
     const accounts = makeAccounts(3);
-    const { container } = renderTable(accounts);
+    const onSortChange = jest.fn();
+
+    const { container } = renderWithRouter(
+      <HydrateAtomsTestProvider
+        initialValues={[
+          [
+            CloudAccountsPaginationData,
+            { page: 1, perPage: 10, itemCount: accounts.length },
+          ],
+        ]}
+      >
+        <CloudAccountsTable
+          cloudAccounts={accounts}
+          sort={DefaultCloudAccountsSort}
+          onSortChange={onSortChange}
+        />
+      </HydrateAtomsTestProvider>
+    );
+
     const sortButton = container.querySelector('th button');
+    expect(sortButton).toBeTruthy();
+
     fireEvent.click(sortButton!);
-    await waitFor(() => {
-      const firstCell =
-        container.querySelector('tbody tr td')?.textContent ?? '';
-      expect(firstCell).toBe('acct-2');
-    });
-    fireEvent.click(sortButton!);
-    await waitFor(() => {
-      const firstCell =
-        container.querySelector('tbody tr td')?.textContent ?? '';
-      expect(firstCell).toBe('acct-0');
+
+    expect(onSortChange).toHaveBeenCalledWith({
+      field: 'providerAccountID',
+      direction: 'desc',
     });
   });
 
