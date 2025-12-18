@@ -9,6 +9,7 @@ import {
 import React, { Ref, useState } from 'react';
 import { cloudProviderFilterData } from '../../state/goldImages';
 import { useQueryParamInformedAtom } from '../../hooks/util/useQueryParam';
+import { CloudProviderName } from '../../hooks/api/useGoldImages';
 
 interface CloudProviderFilterSelectProps {
   cloudProviders: string[];
@@ -45,8 +46,11 @@ export const CloudProviderFilterSelect = ({
       }}
       selected={cloudProviderFilter}
       onSelect={(_event, value) => {
-        if (!cloudProviderFilter.includes(value as string)) {
-          setCloudProviderFilter([...cloudProviderFilter, value as string]);
+        if (!cloudProviderFilter.includes(value as CloudProviderName)) {
+          setCloudProviderFilter([
+            ...cloudProviderFilter,
+            value as CloudProviderName,
+          ]);
         }
         setIsFilterExpanded(false);
       }}
