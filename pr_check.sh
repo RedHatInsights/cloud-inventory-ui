@@ -10,7 +10,7 @@ export IMAGE="quay.io/cloudservices/$COMPONENT"
 export WORKSPACE=${WORKSPACE:-$APP_ROOT} # if running in jenkins, use the build's workspace
 export APP_ROOT=$(pwd)
 export NODE_BUILD_VERSION=24
-COMMON_BUILDER=https://raw.githubusercontent.com/RedHatInsights/insights-frontend-builder-common/d2439ca2d2e84bc4413af7675b28d7fd0243730f
+COMMON_BUILDER=https://raw.githubusercontent.com/RedHatInsights/insights-frontend-builder-common/master
 
 set -exv
 # source is preferred to | bash -s in this case to avoid a subshell
