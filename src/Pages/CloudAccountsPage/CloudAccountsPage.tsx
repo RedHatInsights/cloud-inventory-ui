@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { CloudAccountsTable } from '../../Components/CloudAccounts/CloudAccountsTable';
 import { Content, PageSection } from '@patternfly/react-core';
 import { Section } from '@redhat-cloud-services/frontend-components/Section';
@@ -12,19 +12,12 @@ import { Loading } from '../../Components/util/Loading';
 import { useRbacPermission } from '../../hooks/util/useRbacPermissions';
 import { Paths } from '../../utils/routing';
 import { NoCloudAccounts } from '../../Components/CloudAccounts/NoCloudAccounts';
-import { useQueryParamInformedAtom } from '../../hooks/util/useQueryParam';
 import {
-  CloudAccountsPaginationData,
-  CloudAccountsSort,
-  DefaultCloudAccountsSort,
-} from '../../state/cloudAccounts';
-
-const sortFieldToApiField: Record<string, string> = {
-  providerAccountID: 'provider_account_id',
-  provider: 'provider',
-  goldImageAccess: 'gold_image_access',
-  dateAdded: 'date_added',
-};
+  useQueryParamInformedAtom,
+  useQueryParamInformedState,
+} from '../../hooks/util/useQueryParam';
+import { CloudAccountsPaginationData } from '../../state/cloudAccounts';
+import { SortByDirection } from '@patternfly/react-table';
 
 export const CloudAccountsPage = () => {
   const [pagination, setPagination] = useQueryParamInformedAtom(
@@ -32,7 +25,13 @@ export const CloudAccountsPage = () => {
     'pagination'
   );
 
-  const [sort, setSort] = useState<CloudAccountsSort>(DefaultCloudAccountsSort);
+  const [sortBy, setSortBy] = useQueryParamInformedState<string | undefined>(
+    undefined,
+    'cloudAccountsActiveSortBy'
+  );
+  const [sortDir, setSortDir] = useQueryParamInformedState<
+    SortByDirection | undefined
+  >(undefined, 'cloudAccountsActiveSortDir');
 
   const { page, perPage } = pagination;
 
@@ -43,8 +42,8 @@ export const CloudAccountsPage = () => {
   } = useCloudAccounts({
     limit: perPage,
     offset: (page - 1) * perPage,
-    sortField: sortFieldToApiField[sort.field],
-    sortDirection: sort.direction,
+    sortField: sortBy,
+    sortDirection: sortDir,
   });
 
   const accounts = cloudAccountsResponse?.body ?? [];
@@ -82,8 +81,10 @@ export const CloudAccountsPage = () => {
               <CloudAccountsToolbar />
               <CloudAccountsTable
                 cloudAccounts={accounts}
-                sort={sort}
-                onSortChange={setSort}
+                sortBy={sortBy}
+                sortDir={sortDir}
+                setSortBy={setSortBy}
+                setSortDir={setSortDir}
               />
               <br />
               <CloudAccountsPagination />

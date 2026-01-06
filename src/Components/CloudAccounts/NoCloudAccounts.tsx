@@ -16,8 +16,8 @@ export const NoCloudAccounts = () => (
     icon={CubesIcon}
   >
     <EmptyStateBody>
-      Cloud accounts appear here when they are connected through
-      <Link to="/settings/integrations">Integrations</Link>. Additionally,
+      Cloud accounts appear here when they are connected through{' '}
+      <Link to="/settings/integrations/">Integrations</Link>. Additionally,
       accounts will show up here if auto-registration or gold image access is
       initiated on the cloud provider. Please refer to the documentation for
       further guidance.

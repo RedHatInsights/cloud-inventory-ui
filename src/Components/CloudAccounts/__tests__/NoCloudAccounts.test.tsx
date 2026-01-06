@@ -40,6 +40,6 @@ describe('NoCloudAccounts', () => {
     });
 
     expect(link).toBeInTheDocument();
-    expect(link).toHaveAttribute('href', '/settings/integrations');
+    expect(link).toHaveAttribute('href', '/settings/integrations/');
   });
 });

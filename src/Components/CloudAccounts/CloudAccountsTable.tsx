@@ -15,20 +15,16 @@ import { CloudAccountRow } from './types';
 import { CloudAccountStatus, getStatusIcon } from './GetStatusIcon';
 import { formatDate } from '../../hooks/util/dates';
 import { generateQueryParamsForData } from '../../hooks/util/useQueryParam';
-import {
-  shortNameToDisplay,
-  shortToFriendly,
-} from '../../hooks/util/cloudProviderMaps';
-import {
-  CloudAccountsSort,
-  CloudAccountsSortDirection,
-  CloudAccountsSortField,
-} from '../../state/cloudAccounts';
+import { shortToFriendly } from '../../hooks/util/cloudProviderMaps';
+import { CloudAccountsSortField } from '../../state/cloudAccounts';
+import { useApiBasedTableSort } from '../../hooks/util/tables/useTableSort';
 
 type CloudAccountProps = {
   cloudAccounts: CloudAccount[];
-  sort: CloudAccountsSort;
-  onSortChange: (sort: CloudAccountsSort) => void;
+  sortBy?: string;
+  sortDir?: SortByDirection;
+  setSortBy: (sortBy: string) => void;
+  setSortDir: (sortBy: SortByDirection) => void;
 };
 
 export const mapField = (field: CloudAccountsSortField) => {
@@ -44,92 +40,49 @@ export const mapField = (field: CloudAccountsSortField) => {
   }
 };
 
-export const sortRowsForDev = (
-  rows: CloudAccountRow[],
-  sort: CloudAccountsSort
-) => {
-  return [...rows].sort((a, b) => {
-    const aVal = a[mapField(sort.field)];
-    const bVal = b[mapField(sort.field)];
-
-    if (aVal < bVal) return sort.direction === 'asc' ? -1 : 1;
-    if (aVal > bVal) return sort.direction === 'asc' ? 1 : -1;
-    return 0;
-  });
-};
-
 export const CloudAccountsTable = ({
   cloudAccounts,
-  sort,
-  onSortChange,
+  sortBy,
+  setSortBy,
+  sortDir,
+  setSortDir,
 }: CloudAccountProps) => {
   const rows: CloudAccountRow[] = cloudAccounts.map((acct) => ({
     id: acct.providerAccountID,
     provider: shortToFriendly[acct.shortName],
-    providerLabel: shortNameToDisplay[acct.shortName],
     goldImage: acct.goldImageAccess as CloudAccountStatus,
     date: acct.dateAdded,
   }));
 
-  const columns: {
-    title: string;
-    sortField?: CloudAccountsSortField;
-  }[] = [
-    { title: 'Cloud account', sortField: 'providerAccountID' },
-    { title: 'Cloud provider', sortField: 'provider' },
-    { title: 'Gold image access', sortField: 'goldImageAccess' },
-    { title: 'Date added', sortField: 'dateAdded' },
-  ];
+  const displayRows = rows;
 
-  const activeSortIndex = columns.findIndex(
-    (col) => col.sortField === sort.field
-  );
-
-  const onColumnSort = (
-    _event: React.SyntheticEvent,
-    columnIndex: number,
-    direction: SortByDirection
-  ) => {
-    const sortField = columns[columnIndex]?.sortField;
-    if (!sortField) {
-      return;
-    }
-
-    onSortChange({
-      field: sortField,
-      direction: direction as CloudAccountsSortDirection,
-    });
-  };
-
-  const displayRows =
-    process.env.NODE_ENV === 'development' ? sortRowsForDev(rows, sort) : rows;
+  const { getSortParams } = useApiBasedTableSort('cloudAccountsSort', {
+    sortBy,
+    setSortBy,
+    sortDir,
+    setSortDir,
+    lookup: {
+      0: 'providerAccountID',
+      1: 'shortName',
+      2: 'goldImageAccess',
+      3: 'dateAdded',
+    },
+  });
 
   return (
     <Table aria-label="Cloud accounts table" variant="compact">
       <Thead>
         <Tr>
-          {columns.map((column, index) => (
-            <Th
-              key={column.title}
-              sort={{
-                sortBy: {
-                  index: activeSortIndex,
-                  direction: sort.direction as SortByDirection,
-                },
-                onSort: onColumnSort,
-                columnIndex: index,
-              }}
-            >
-              {column.title}
-            </Th>
-          ))}
+          <Th sort={getSortParams(0)}>Cloud account</Th>
+          <Th sort={getSortParams(1)}>Cloud provider</Th>
+          <Th sort={getSortParams(2)}>Gold image access</Th>
+          <Th sort={getSortParams(3)}>Date added</Th>
           <Th screenReaderText="Actions" />
         </Tr>
       </Thead>
       <Tbody>
         {displayRows.map((row) => (
           <Tr key={row.id}>
-            {' '}
             <Td>
               <Button variant="link" isInline component="a" href="">
                 {row.id}
@@ -145,7 +98,7 @@ export const CloudAccountsTable = ({
                   ).toString(),
                 }}
               >
-                {row.providerLabel}
+                {row.provider}
               </Link>
             </Td>
             <Td>

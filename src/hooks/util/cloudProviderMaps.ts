@@ -9,9 +9,3 @@ export const shortToFriendly: Record<
   [CloudProviderShortname.GCP]: CloudProviderName.GCP,
   [CloudProviderShortname.AZURE]: CloudProviderName.AZURE,
 };
-
-export const shortNameToDisplay: Record<CloudProviderShortname, string> = {
-  [CloudProviderShortname.AWS]: 'AWS',
-  [CloudProviderShortname.GCP]: 'GCP',
-  [CloudProviderShortname.AZURE]: 'Azure',
-};

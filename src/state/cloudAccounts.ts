@@ -17,15 +17,3 @@ export type CloudAccountsSortField =
   | 'provider'
   | 'goldImageAccess'
   | 'dateAdded';
-
-export type CloudAccountsSortDirection = 'asc' | 'desc';
-
-export type CloudAccountsSort = {
-  field: CloudAccountsSortField;
-  direction: CloudAccountsSortDirection;
-};
-
-export const DefaultCloudAccountsSort: CloudAccountsSort = {
-  field: 'providerAccountID',
-  direction: 'asc',
-};

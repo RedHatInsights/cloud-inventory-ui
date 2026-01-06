@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { HttpError } from '../../utils/errors';
-import { CloudAccountsSortDirection } from '../../state/cloudAccounts';
+import { SortByDirection } from '@patternfly/react-table';
 
 export enum CloudProviderShortname {
   AWS = 'AWS',
@@ -30,7 +30,7 @@ export type fetchCloudAccountsArgs = {
   limit: number;
   offset: number;
   sortField?: string;
-  sortDirection?: CloudAccountsSortDirection;
+  sortDirection?: SortByDirection;
 };
 
 const fetchCloudAccounts = async ({

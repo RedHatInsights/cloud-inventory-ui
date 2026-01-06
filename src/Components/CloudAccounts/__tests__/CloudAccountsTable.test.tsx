@@ -1,23 +1,23 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { fireEvent, screen } from '@testing-library/react';
 import { CloudAccountsTable, mapField } from '../CloudAccountsTable';
 import {
   CloudAccount,
   CloudProviderShortname,
 } from '../../../hooks/api/useCloudAccounts';
-import {
-  CloudAccountsPaginationData,
-  DefaultCloudAccountsSort,
-} from '../../../state/cloudAccounts';
+import { CloudAccountsPaginationData } from '../../../state/cloudAccounts';
 import { HydrateAtomsTestProvider } from '../../util/testing/HydrateAtomsTestProvider';
 import { renderWithRouter } from '../../../utils/testing/customRender';
+import { SortByDirection } from '@patternfly/react-table';
 
 jest.mock('../../../Components/CloudAccounts/GetStatusIcon', () => ({
   getStatusIcon: () => <span data-testid="status-icon" />,
 }));
+
 jest.mock('../../../hooks/util/dates', () => ({
   formatDate: (d: string) => `Formatted:${d}`,
 }));
+
 const makeAccounts = (count: number): CloudAccount[] =>
   Array.from({ length: count }).map((_, i) => ({
     providerAccountID: `acct-${i}`,
@@ -28,14 +28,25 @@ const makeAccounts = (count: number): CloudAccount[] =>
     dateAdded: `2024-01-${String(i + 1).padStart(2, '0')}`,
   }));
 
-const originalEnv = process.env.NODE_ENV;
+const TestTableComponent = ({ accounts }: { accounts: CloudAccount[] }) => {
+  const [sortBy, setSortBy] = useState('');
+  const [sortDir, setSortDir] = useState(SortByDirection.asc);
+  const [stateAccounts, setAccounts] = useState(accounts);
 
-const renderTable = (
-  accounts: CloudAccount[],
-  sort = DefaultCloudAccountsSort,
-  onSortChange = jest.fn()
-) =>
-  renderWithRouter(
+  useEffect(() => {
+    if (sortBy != '')
+      setAccounts(
+        stateAccounts.sort((a, b) => {
+          const result = a[sortBy as keyof CloudAccount].localeCompare(
+            b[sortBy as keyof CloudAccount]
+          );
+
+          return sortDir == SortByDirection.asc ? result : result * -1;
+        })
+      );
+  }, [sortBy, sortDir]);
+
+  return (
     <HydrateAtomsTestProvider
       initialValues={[
         [
@@ -46,11 +57,18 @@ const renderTable = (
     >
       <CloudAccountsTable
         cloudAccounts={accounts}
-        sort={sort}
-        onSortChange={onSortChange}
+        setSortBy={setSortBy}
+        sortBy={sortBy}
+        sortDir={sortDir}
+        setSortDir={setSortDir}
       />
     </HydrateAtomsTestProvider>
   );
+};
+
+const renderTable = (accounts: CloudAccount[]) =>
+  renderWithRouter(<TestTableComponent accounts={accounts} />);
+
 describe('CloudAccountsTable', () => {
   it('renders the table', () => {
     renderTable(makeAccounts(3));
@@ -58,24 +76,7 @@ describe('CloudAccountsTable', () => {
       screen.getByRole('grid', { name: /cloud accounts table/i })
     ).toBeInTheDocument();
   });
-  it('emits sort change when clicking Cloud account column', () => {
-    const onSortChange = jest.fn();
-    renderTable(makeAccounts(3), DefaultCloudAccountsSort, onSortChange);
-    fireEvent.click(screen.getByRole('button', { name: /cloud account/i }));
-    expect(onSortChange).toHaveBeenCalledWith({
-      field: 'providerAccountID',
-      direction: 'desc',
-    });
-  });
-  it('emits correct field when clicking Cloud provider column', () => {
-    const onSortChange = jest.fn();
-    renderTable(makeAccounts(3), DefaultCloudAccountsSort, onSortChange);
-    fireEvent.click(screen.getByRole('button', { name: /cloud provider/i }));
-    expect(onSortChange).toHaveBeenCalledWith({
-      field: 'provider',
-      direction: 'asc',
-    });
-  });
+
   it('renders provider link with cloudProvider query param', () => {
     renderTable(makeAccounts(1));
     const link = screen.getByRole('link', { name: 'AWS' });
@@ -83,28 +84,23 @@ describe('CloudAccountsTable', () => {
     const param = url.searchParams.get('cloudProvider');
     expect(JSON.parse(decodeURIComponent(param!))).toEqual(['AWS']);
   });
+
   it('renders gold image status and icon', () => {
     renderTable(makeAccounts(1));
     expect(screen.getByText('Granted')).toBeInTheDocument();
     expect(screen.getByTestId('status-icon')).toBeInTheDocument();
   });
+
   it('renders formatted date (development sorting path)', () => {
-    process.env.NODE_ENV = 'development';
-
-    renderTable(makeAccounts(2), {
-      field: 'providerAccountID',
-      direction: 'asc',
-    });
-
+    renderTable(makeAccounts(2));
     expect(screen.getAllByText(/Formatted:/)).toHaveLength(2);
-
-    process.env.NODE_ENV = originalEnv;
   });
 
   it('renders cloud account ID as a link', () => {
     renderTable(makeAccounts(1));
     expect(screen.getByText('acct-0').closest('a')).toBeTruthy();
   });
+
   it('renders View Purchases action', () => {
     renderTable(makeAccounts(2));
     expect(screen.getAllByText('View Purchases')).toHaveLength(2);
@@ -128,106 +124,89 @@ describe('CloudAccountsTable', () => {
     });
   });
 
-  describe('onColumnSort behavior', () => {
-    it('emits correct sort field and direction when clicking Cloud account column', () => {
-      const onSortChange = jest.fn();
-      renderTable(makeAccounts(3), DefaultCloudAccountsSort, onSortChange);
+  describe('column sorts', () => {
+    it('by cloud account id', () => {
+      const { container } = renderTable(makeAccounts(3));
       fireEvent.click(screen.getByRole('button', { name: /cloud account/i }));
-      expect(onSortChange).toHaveBeenCalledWith({
-        field: 'providerAccountID',
-        direction: 'desc',
-      });
+      expect(
+        String(
+          container.querySelector('tbody')?.firstChild?.childNodes[0]
+            .textContent
+        )
+      ).toBe('acct-0');
+
+      // flip
+      fireEvent.click(screen.getByRole('button', { name: /cloud account/i }));
+      expect(
+        String(
+          container.querySelector('tbody')?.firstChild?.childNodes[0]
+            .textContent
+        )
+      ).toBe('acct-2');
     });
-    it('emits correct sort field when clicking Cloud provider column', () => {
-      const onSortChange = jest.fn();
-      renderTable(makeAccounts(3), DefaultCloudAccountsSort, onSortChange);
+
+    it('by cloud provider', () => {
+      const { container } = renderTable(makeAccounts(3));
       fireEvent.click(screen.getByRole('button', { name: /cloud provider/i }));
-      expect(onSortChange).toHaveBeenCalledWith({
-        field: 'provider',
-        direction: 'asc',
-      });
+      expect(
+        String(
+          container.querySelector('tbody')?.firstChild?.childNodes[1]
+            .textContent
+        )
+      ).toBe('AWS');
+
+      // flip
+      fireEvent.click(screen.getByRole('button', { name: /cloud provider/i }));
+      expect(
+        String(
+          container.querySelector('tbody')?.firstChild?.childNodes[1]
+            .textContent
+        )
+      ).toBe('Google Compute Engine');
     });
-    it('emits correct sort field when clicking Gold image access column', () => {
-      const onSortChange = jest.fn();
-      renderTable(makeAccounts(3), DefaultCloudAccountsSort, onSortChange);
+
+    it('by gold image', () => {
+      const { container } = renderTable(makeAccounts(3));
       fireEvent.click(
         screen.getByRole('button', { name: /gold image access/i })
       );
-      expect(onSortChange).toHaveBeenCalledWith({
-        field: 'goldImageAccess',
-        direction: 'asc',
-      });
-    });
-    it('emits correct sort field when clicking Date added column', () => {
-      const onSortChange = jest.fn();
-      renderTable(makeAccounts(3), DefaultCloudAccountsSort, onSortChange);
-      fireEvent.click(screen.getByRole('button', { name: /date added/i }));
-      expect(onSortChange).toHaveBeenCalledWith({
-        field: 'dateAdded',
-        direction: 'asc',
-      });
-    });
-    it('does nothing when clicking a non-sortable column', () => {
-      const onSortChange = jest.fn();
-      renderTable(makeAccounts(3), DefaultCloudAccountsSort, onSortChange);
-      fireEvent.click(screen.getByRole('columnheader', { name: /actions/i }));
-      expect(onSortChange).not.toHaveBeenCalled();
-    });
-  });
+      expect(
+        String(
+          container.querySelector('tbody')?.firstChild?.childNodes[2]
+            .textContent
+        )
+      ).toBe('Failed');
 
-  describe('onColumnSort behavior', () => {
-    it('calls onSortChange with correct field and direction', () => {
-      const onSortChange = jest.fn();
-      renderTable(makeAccounts(3), DefaultCloudAccountsSort, onSortChange);
-      fireEvent.click(screen.getByRole('button', { name: /cloud account/i }));
-      expect(onSortChange).toHaveBeenCalledWith({
-        field: 'providerAccountID',
-        direction: 'desc',
-      });
-    });
-
-    it('uses the correct column index to determine sortField', () => {
-      const onSortChange = jest.fn();
-      renderTable(makeAccounts(3), DefaultCloudAccountsSort, onSortChange);
-      fireEvent.click(screen.getByRole('button', { name: /cloud provider/i }));
-      expect(onSortChange).toHaveBeenCalledWith({
-        field: 'provider',
-        direction: 'asc',
-      });
-    });
-
-    it('does not call onSortChange if column has no sortField', () => {
-      const onSortChange = jest.fn();
-      renderTable(makeAccounts(3), DefaultCloudAccountsSort, onSortChange);
-      const headers = screen.getAllByRole('columnheader');
-      const actionsHeader = headers[headers.length - 1];
-      fireEvent.click(actionsHeader);
-      expect(onSortChange).not.toHaveBeenCalled();
-    });
-
-    it('passes direction through unchanged', () => {
-      const onSortChange = jest.fn();
-      renderTable(
-        makeAccounts(3),
-        {
-          field: 'providerAccountID',
-          direction: 'desc',
-        },
-        onSortChange
+      // flip
+      fireEvent.click(
+        screen.getByRole('button', { name: /gold image access/i })
       );
-      fireEvent.click(screen.getByRole('button', { name: /cloud account/i }));
-      expect(onSortChange).toHaveBeenCalledWith({
-        field: 'providerAccountID',
-        direction: 'asc',
-      });
+      expect(
+        String(
+          container.querySelector('tbody')?.firstChild?.childNodes[2]
+            .textContent
+        )
+      ).toBe('Granted');
     });
-  });
-  it('does not call onSortChange when column has no sortField', () => {
-    const onSortChange = jest.fn();
-    renderTable(makeAccounts(2), DefaultCloudAccountsSort, onSortChange);
 
-    fireEvent.click(screen.getByRole('columnheader', { name: /actions/i }));
+    it('by date added', () => {
+      const { container } = renderTable(makeAccounts(3));
+      fireEvent.click(screen.getByRole('button', { name: /date added/i }));
+      expect(
+        String(
+          container.querySelector('tbody')?.firstChild?.childNodes[3]
+            .textContent
+        )
+      ).toBe('Formatted:2024-01-01');
 
-    expect(onSortChange).not.toHaveBeenCalled();
+      // flip
+      fireEvent.click(screen.getByRole('button', { name: /date added/i }));
+      expect(
+        String(
+          container.querySelector('tbody')?.firstChild?.childNodes[3]
+            .textContent
+        )
+      ).toBe('Formatted:2024-01-03');
+    });
   });
 });

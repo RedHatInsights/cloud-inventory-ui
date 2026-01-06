@@ -3,7 +3,6 @@ import { screen, waitFor } from '@testing-library/react';
 import { CloudAccountsPage } from '../CloudAccountsPage';
 import { renderWithRouter } from '../../../utils/testing/customRender';
 import { ManipulatableQueryWrapper } from '../../../Components/util/testing/ManipulatableQueryWrapper';
-import { DefaultCloudAccountsSort } from '../../../state/cloudAccounts';
 
 const mockNavigate = jest.fn();
 
@@ -34,8 +33,6 @@ it('renders cloud accounts page', async () => {
       {
         limit: 10,
         offset: 0,
-        sortField: 'provider_account_id',
-        sortDirection: DefaultCloudAccountsSort.direction,
       },
     ],
     {
@@ -70,8 +67,6 @@ it('shows empty state when no accounts exist', async () => {
       {
         limit: 10,
         offset: 0,
-        sortField: 'provider_account_id',
-        sortDirection: DefaultCloudAccountsSort.direction,
       },
     ],
     {
@@ -104,6 +99,7 @@ it('shows loading state while cloud accounts are loading', async () => {
 
   expect(await screen.findByLabelText(/contents/i)).toBeInTheDocument();
 });
+
 it('redirects when user lacks permission', async () => {
   queryClient.setQueryData(['rbacPermissions'], {
     canReadCloudAccess: false,
