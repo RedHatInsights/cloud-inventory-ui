@@ -8,6 +8,7 @@ import { InvalidObject } from '@redhat-cloud-services/frontend-components/Invali
 import { Bullseye, Spinner } from '@patternfly/react-core';
 import { GoldImagesPage } from './Pages/GoldImagesPage/GoldImagesPage';
 import { Paths } from './utils/routing';
+import CloudAccountsPage from './Pages/CloudAccountsPage/CloudAccountsPage';
 
 const HelloPage = lazy(
   () =>
@@ -51,8 +52,9 @@ const routes: RouteDefinition[] = [
   },
   {
     path: Paths.CloudAccounts,
-    element: HelloPage,
+    element: CloudAccountsPage,
   },
+  /* Catch all unmatched routes */
   {
     path: Paths.MarketplacePurchases,
     element: HelloPage,

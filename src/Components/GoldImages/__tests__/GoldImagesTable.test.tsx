@@ -1,7 +1,10 @@
 import React from 'react';
 import { fireEvent, waitFor } from '@testing-library/react';
 import { renderWithRouter } from '../../../utils/testing/customRender';
-import { GoldImagesResponse } from '../../../hooks/api/useGoldImages';
+import {
+  CloudProviderName,
+  GoldImagesResponse,
+} from '../../../hooks/api/useGoldImages';
 import { GoldImagesTable } from '../GoldImagesTable';
 import { HydrateAtomsTestProvider } from '../../util/testing/HydrateAtomsTestProvider';
 import { cloudProviderFilterData } from '../../../state/goldImages';
@@ -9,16 +12,22 @@ import { cloudProviderFilterData } from '../../../state/goldImages';
 const goldImageTestData: (amount: number) => GoldImagesResponse = (
   amount: number
 ) => {
+  const providers = [
+    CloudProviderName.AWS,
+    CloudProviderName.GCP,
+    CloudProviderName.AZURE,
+  ];
+
   const data: GoldImagesResponse = {};
 
   for (let i = 0; i < amount; i++) {
-    const k = (Math.random() + 1).toString(36).substring(7);
-    data[k] = {
-      provider: k,
+    const provider = providers[i % providers.length];
+    data[`${provider}-${i}`] = {
+      provider,
       goldImages: [
         {
-          name: `Test ${k}`,
-          description: `Test description ${k}`,
+          name: `Test ${i}`,
+          description: `Test description ${i}`,
         },
       ],
     };
@@ -52,7 +61,6 @@ describe('Gold images table', () => {
       throw new Error('Sort button not found');
     }
 
-    // sort
     fireEvent.click(sortButton);
 
     await waitFor(() =>
@@ -62,7 +70,6 @@ describe('Gold images table', () => {
       ).toBe(sortedGoldImageData[sortedGoldImageData.length - 1].provider)
     );
 
-    // sort the other direction
     fireEvent.click(sortButton);
 
     await waitFor(() =>
@@ -78,7 +85,6 @@ describe('Gold images table', () => {
       <GoldImagesTable goldImages={goldImageTestData(12)} />
     );
 
-    // 10 is default pagination size
     expect(container.querySelector('tbody')?.childNodes.length).toBe(10);
   });
 
