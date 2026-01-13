@@ -23,7 +23,7 @@ describe('Cloud provider filter list', () => {
 
   it('renderWithRouters when filters are set', () => {
     renderWithRouter(
-      <CloudProviderFilterListWithState init={[CloudProviderName.AWS]} />
+      <CloudProviderFilterListWithState init={[CloudProviderName.AWS]} />,
     );
 
     expect(screen.queryByText('Cloud provider')).toBeInTheDocument();
@@ -34,7 +34,7 @@ describe('Cloud provider filter list', () => {
     renderWithRouter(
       <CloudProviderFilterListWithState
         init={[CloudProviderName.AWS, CloudProviderName.GCP]}
-      />
+      />,
     );
 
     expect(screen.queryByText('AWS')).toBeInTheDocument();
@@ -52,14 +52,14 @@ describe('Cloud provider filter list', () => {
     const { container } = renderWithRouter(
       <CloudProviderFilterListWithState
         init={[CloudProviderName.AWS, CloudProviderName.GCP]}
-      />
+      />,
     );
 
     expect(screen.queryByText('AWS')).toBeInTheDocument();
     expect(screen.queryByText('Google Compute Engine')).toBeInTheDocument();
 
     const closeButton = container.querySelector(
-      '[aria-label="Close Google Compute Engine"]'
+      '[aria-label="Close Google Compute Engine"]',
     );
 
     if (!closeButton) {
@@ -76,7 +76,7 @@ describe('Cloud provider filter list', () => {
     renderWithRouter(
       <CloudProviderFilterListWithState
         init={[CloudProviderName.AWS, CloudProviderName.GCP]}
-      />
+      />,
     );
 
     expect(screen.getByText('AWS')).toBeInTheDocument();
@@ -92,7 +92,7 @@ describe('Cloud provider filter list', () => {
     expect(screen.queryByText('Google Compute Engine')).not.toBeInTheDocument();
 
     expect(
-      screen.queryByRole('button', { name: /clear filters/i })
+      screen.queryByRole('button', { name: /clear filters/i }),
     ).not.toBeInTheDocument();
   });
 });

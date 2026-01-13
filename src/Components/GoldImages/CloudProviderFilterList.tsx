@@ -8,7 +8,7 @@ export const CloudProviderFilterList = () => {
   const [cloudProviderFilter, setCloudProviderFilter] =
     useQueryParamInformedAtom<CloudProviderName[]>(
       cloudProviderFilterData,
-      'cloudProvider'
+      'cloudProvider',
     );
 
   return (

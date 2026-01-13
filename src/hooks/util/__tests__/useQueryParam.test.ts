@@ -144,7 +144,7 @@ describe('query param informed hook', () => {
       const params = generateQueryParamsForData(data, key);
 
       expect(params.get(key)).toBe(
-        encodeURIComponent(JSON.stringify('hello world'))
+        encodeURIComponent(JSON.stringify('hello world')),
       );
     });
   });

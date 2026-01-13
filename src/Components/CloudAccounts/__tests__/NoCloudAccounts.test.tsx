@@ -12,7 +12,7 @@ describe('NoCloudAccounts', () => {
     render(
       <MemoryRouter>
         <NoCloudAccounts />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
   it('renders the empty state title', () => {

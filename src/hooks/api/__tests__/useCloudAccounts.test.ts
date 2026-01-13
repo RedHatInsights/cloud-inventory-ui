@@ -27,11 +27,11 @@ describe('useCloudAccounts', () => {
           total: 1,
         },
       },
-      true
+      true,
     );
     const { result } = renderHook(
       () => useCloudAccounts({ limit: 10, offset: 0 }),
-      { wrapper: mocks.wrapper }
+      { wrapper: mocks.wrapper },
     );
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(result.current.data?.body).toHaveLength(1);
@@ -49,11 +49,11 @@ describe('useCloudAccounts', () => {
           total: 0,
         },
       },
-      true
+      true,
     );
     const { result } = renderHook(
       () => useCloudAccounts({ limit: 10, offset: 0 }),
-      { wrapper: mocks.wrapper }
+      { wrapper: mocks.wrapper },
     );
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(result.current.data?.body).toEqual([]);
@@ -70,11 +70,11 @@ describe('useCloudAccounts', () => {
           total: 42,
         },
       },
-      true
+      true,
     );
     const { result } = renderHook(
       () => useCloudAccounts({ limit: 5, offset: 10 }),
-      { wrapper: mocks.wrapper }
+      { wrapper: mocks.wrapper },
     );
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(result.current.data?.pagination.total).toBe(42);
@@ -83,21 +83,21 @@ describe('useCloudAccounts', () => {
     mocks.addMock(
       '/api/rhsm/v2/cloud_access_providers/accounts?limit=10&offset=0',
       {},
-      false
+      false,
     );
     const { result } = renderHook(
       () => useCloudAccounts({ limit: 10, offset: 0 }),
-      { wrapper: mocks.wrapper }
+      { wrapper: mocks.wrapper },
     );
     await waitFor(() => expect(result.current.isError).toBe(true));
   });
   it('enters error state on network failure', async () => {
     global.fetch = jest.fn(() =>
-      Promise.reject(new Error('Network error'))
+      Promise.reject(new Error('Network error')),
     ) as jest.Mock;
     const { result } = renderHook(
       () => useCloudAccounts({ limit: 10, offset: 0 }),
-      { wrapper: mocks.wrapper }
+      { wrapper: mocks.wrapper },
     );
     await waitFor(() => expect(result.current.isError).toBe(true));
   });
@@ -105,11 +105,11 @@ describe('useCloudAccounts', () => {
     mocks.addMock(
       '/api/rhsm/v2/cloud_access_providers/accounts?limit=10&offset=0',
       {},
-      true
+      true,
     );
     const { result } = renderHook(
       () => useCloudAccounts({ limit: 10, offset: 0 }),
-      { wrapper: mocks.wrapper }
+      { wrapper: mocks.wrapper },
     );
     expect(result.current.isLoading).toBe(true);
   });

@@ -20,7 +20,7 @@ function useInitializeFromQueryParam<T>(key: string, setter: (v: T) => void) {
 
 export function generateQueryParamsForData<T>(
   data: T,
-  key: string
+  key: string,
 ): URLSearchParams {
   const params = new URLSearchParams();
   params.set(key, encodeURIComponent(JSON.stringify(data)));

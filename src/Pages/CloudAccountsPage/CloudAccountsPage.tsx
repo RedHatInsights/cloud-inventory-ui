@@ -22,12 +22,12 @@ import { SortByDirection } from '@patternfly/react-table';
 export const CloudAccountsPage = () => {
   const [pagination, setPagination] = useQueryParamInformedAtom(
     CloudAccountsPaginationData,
-    'pagination'
+    'pagination',
   );
 
   const [sortBy, setSortBy] = useQueryParamInformedState<string | undefined>(
     undefined,
-    'cloudAccountsActiveSortBy'
+    'cloudAccountsActiveSortBy',
   );
   const [sortDir, setSortDir] = useQueryParamInformedState<
     SortByDirection | undefined

@@ -49,14 +49,14 @@ const fetchCloudAccounts = async ({
     params.set('sort_direction', sortDirection);
   }
   const response = await fetch(
-    `/api/rhsm/v2/cloud_access_providers/accounts?${params.toString()}`
+    `/api/rhsm/v2/cloud_access_providers/accounts?${params.toString()}`,
   );
 
   if (!response.ok) {
     throw new HttpError(
       `Something went wrong`,
       response.status,
-      response.statusText
+      response.statusText,
     );
   }
   const json = await response.json();

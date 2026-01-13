@@ -168,7 +168,7 @@ export function useApiBasedTableSort(
     setSortBy,
     setSortDir,
     lookup,
-  }: ApiBasedTableSortOptions
+  }: ApiBasedTableSortOptions,
 ): ApiBasedTableSortResult {
   const [activeSortIndex, setActiveSortIndex] = useQueryParamInformedState<
     number | undefined
@@ -176,12 +176,12 @@ export function useApiBasedTableSort(
   const [activeSortDirection, setActiveSortDirection] =
     useQueryParamInformedState<SortByDirection | undefined>(
       initialSort?.dir,
-      `${key}ActiveSortDir`
+      `${key}ActiveSortDir`,
     );
 
   useEffect(() => {
     const i = Object.keys(lookup).find(
-      (key) => lookup[parseInt(key)] == sortBy
+      (key) => lookup[parseInt(key)] == sortBy,
     );
     setActiveSortIndex(i ? parseInt(i) : undefined);
     setActiveSortDirection(sortDir);

@@ -10,7 +10,7 @@ describe('Gold images toolbar', () => {
         goldImages={{
           aws: { provider: CloudProviderName.AWS, goldImages: [] },
         }}
-      />
+      />,
     );
 
     expect(
