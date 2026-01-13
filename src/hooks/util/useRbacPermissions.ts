@@ -13,7 +13,7 @@ export const useRbacPermission = () => {
 
       return {
         canReadCloudAccess: permissions.includes(
-          'subscriptions:cloud_access:read'
+          'subscriptions:cloud_access:read',
         ),
       };
     },

@@ -9,11 +9,11 @@ describe('Table sort hook', () => {
   it("doesn't sort initially", async () => {
     const initialData = [{ test: 2 }, { test: 1 }, { test: 3 }];
     const { result } = renderHookWithRouter(() =>
-      useTableSort(initialData, 'data')
+      useTableSort(initialData, 'data'),
     );
 
     (await waitFor(() => expect(result.current.sorted))).toStrictEqual(
-      initialData
+      initialData,
     );
   });
 
@@ -21,7 +21,7 @@ describe('Table sort hook', () => {
     const initialData = [{ test: 2 }, { test: 1 }, { test: 3 }];
     const sortedData = initialData.sort((a, b) => (a.test < b.test ? 1 : 0));
     const { result } = renderHookWithRouter(() =>
-      useTableSort(initialData, 'data')
+      useTableSort(initialData, 'data'),
     );
 
     if (result.current.getSortParams(0).onSort == undefined) {
@@ -35,12 +35,12 @@ describe('Table sort hook', () => {
           null as unknown as MouseEvent,
           0,
           SortByDirection.asc,
-          null as unknown as IExtraColumnData
-        )
+          null as unknown as IExtraColumnData,
+        ),
     );
 
     (await waitFor(() => expect(result.current.sorted))).toStrictEqual(
-      sortedData
+      sortedData,
     );
   });
 
@@ -50,11 +50,11 @@ describe('Table sort hook', () => {
     const { result } = renderHookWithRouter(() =>
       useTableSort(initialData, 'data', {
         initialSort: { dir: SortByDirection.asc, index: 0 },
-      })
+      }),
     );
 
     (await waitFor(() => expect(result.current.sorted))).toStrictEqual(
-      sortedData
+      sortedData,
     );
   });
 
@@ -64,11 +64,11 @@ describe('Table sort hook', () => {
     const { result } = renderHookWithRouter(() =>
       useTableSort(initialData, 'data', {
         initialSort: { dir: SortByDirection.asc, index: 0 },
-      })
+      }),
     );
 
     (await waitFor(() => expect(result.current.sorted))).toStrictEqual(
-      sortedData
+      sortedData,
     );
   });
 
@@ -78,8 +78,8 @@ describe('Table sort hook', () => {
       renderHookWithRouter(() =>
         useTableSort(initialData, 'data', {
           initialSort: { dir: SortByDirection.asc, index: 0 },
-        })
-      )
+        }),
+      ),
     ).rejects.toThrow(/Unsupported type/);
   });
 
@@ -89,8 +89,8 @@ describe('Table sort hook', () => {
       renderHookWithRouter(() =>
         useTableSort(initialData, 'data', {
           initialSort: { dir: SortByDirection.asc, index: 0 },
-        })
-      )
+        }),
+      ),
     ).rejects.toThrow(/Invalid comparison/);
   });
 
@@ -99,11 +99,11 @@ describe('Table sort hook', () => {
     renderHookWithRouter(() =>
       useTableSort(initialData, 'data', {
         initialSort: { dir: SortByDirection.asc, index: 0 },
-      })
+      }),
     );
 
     (await waitFor(() => expect(window.location.search))).toEqual(
-      '?dataActiveSortDir=%2522asc%2522'
+      '?dataActiveSortDir=%2522asc%2522',
     );
   });
 });

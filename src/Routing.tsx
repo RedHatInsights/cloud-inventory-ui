@@ -13,16 +13,16 @@ const HelloPage = lazy(
   () =>
     import(
       /* webpackChunkName: "HelloCloudInventoryPage" */ './Pages/HelloCloudInventoryPage/HelloCloudInventoryPage'
-    )
+    ),
 );
 const OopsPage = lazy(
-  () => import(/* webpackChunkName: "OopsPage" */ './Pages/OopsPage/OopsPage')
+  () => import(/* webpackChunkName: "OopsPage" */ './Pages/OopsPage/OopsPage'),
 );
 const NoPermissionsPage = lazy(
   () =>
     import(
       /* webpackChunkName: "NoPermissionsPage" */ './Pages/NoPermissionsPage/NoPermissionsPage'
-    )
+    ),
 );
 
 interface RouteDefinition {

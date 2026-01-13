@@ -25,7 +25,9 @@ describe('Cloud provider filter list', () => {
 
   it('only renderWithRouters selected filters', () => {
     renderWithRouter(
-      <CloudProviderFilterListWithState init={['AWS', 'Google Cloud Engine']} />
+      <CloudProviderFilterListWithState
+        init={['AWS', 'Google Cloud Engine']}
+      />,
     );
 
     expect(screen.queryByText('AWS')).toBeInTheDocument();
@@ -41,14 +43,16 @@ describe('Cloud provider filter list', () => {
 
   it('removes filter when "x" is clicked', () => {
     const { container } = renderWithRouter(
-      <CloudProviderFilterListWithState init={['AWS', 'Google Cloud Engine']} />
+      <CloudProviderFilterListWithState
+        init={['AWS', 'Google Cloud Engine']}
+      />,
     );
 
     expect(screen.queryByText('AWS')).toBeInTheDocument();
     expect(screen.queryByText('Google Cloud Engine')).toBeInTheDocument();
 
     const closeButton = container.querySelector(
-      '[aria-label="Close Google Cloud Engine"]'
+      '[aria-label="Close Google Cloud Engine"]',
     );
 
     if (!closeButton) {
@@ -63,7 +67,9 @@ describe('Cloud provider filter list', () => {
 
   it('clears all filters when "clear filters" is clicked', () => {
     const { container } = renderWithRouter(
-      <CloudProviderFilterListWithState init={['AWS', 'Google Cloud Engine']} />
+      <CloudProviderFilterListWithState
+        init={['AWS', 'Google Cloud Engine']}
+      />,
     );
 
     expect(screen.queryByText('Cloud provider')).toBeInTheDocument();

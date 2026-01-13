@@ -20,7 +20,7 @@ function useInitializeFromQueryParam<T>(key: string, setter: (v: T) => void) {
 
 function useUpdateQueryParams<T>(
   key: string,
-  setter: (v: T) => void
+  setter: (v: T) => void,
 ): (v: T) => void {
   const [searchParams, setSearchParams] = useSearchParams();
   return function (v: T) {
@@ -32,7 +32,7 @@ function useUpdateQueryParams<T>(
 
 export function useQueryParamInformedAtom<T>(
   atom: PrimitiveAtom<T>,
-  key: string
+  key: string,
 ): [Awaited<T>, (v: T) => void] {
   const [atomValue, setAtom] = useAtom(atom);
 
@@ -44,7 +44,7 @@ export function useQueryParamInformedAtom<T>(
 
 export function useQueryParamInformedState<T>(
   init: T,
-  key: string
+  key: string,
 ): [T, (v: T) => void] {
   const [state, setState] = useState(init);
 

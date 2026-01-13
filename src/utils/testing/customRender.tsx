@@ -25,7 +25,7 @@ const RouterProvider = ({ children }: { children: React.ReactNode }) => {
  */
 const renderWithRouter = (
   ui: ReactElement,
-  options?: Omit<RenderOptions, 'wrapper'>
+  options?: Omit<RenderOptions, 'wrapper'>,
 ) => {
   return render(ui, { wrapper: RouterProvider, ...options });
 };
@@ -38,10 +38,10 @@ function renderHookWithRouter<
   Props,
   Q extends Queries = typeof queries,
   Container extends Element | DocumentFragment = HTMLElement,
-  BaseElement extends Element | DocumentFragment = Container
+  BaseElement extends Element | DocumentFragment = Container,
 >(
   render: (initialProps: Props) => Result,
-  options?: RenderHookOptions<Props, Q, Container, BaseElement>
+  options?: RenderHookOptions<Props, Q, Container, BaseElement>,
 ): RenderHookResult<Result, Props> {
   const ProvidedWrapper = options?.wrapper;
   const CustomWrapper = ProvidedWrapper

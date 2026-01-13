@@ -7,11 +7,11 @@ describe('Gold images toolbar', () => {
     const { container } = renderWithRouter(
       <GoldImagesToolbar
         goldImages={{ test: { provider: 'test', goldImages: [] } }}
-      />
+      />,
     );
 
     expect(
-      container.querySelector('[data-ouia-component-type="PF6/Toolbar"]')
+      container.querySelector('[data-ouia-component-type="PF6/Toolbar"]'),
     ).not.toBeNull();
   });
 });

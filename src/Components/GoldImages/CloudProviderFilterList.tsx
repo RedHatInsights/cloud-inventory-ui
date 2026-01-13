@@ -16,8 +16,8 @@ export const CloudProviderFilterList = () => {
             onClose={() => {
               setCloudProviderFilter(
                 cloudProviderFilter.filter(
-                  (existing) => cloudProvider != existing
-                )
+                  (existing) => cloudProvider != existing,
+                ),
               );
             }}
           >
