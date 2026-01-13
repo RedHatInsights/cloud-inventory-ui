@@ -13,7 +13,7 @@ describe('Gold Images hook', () => {
       {
         body: { AWS: { provider: 'AWS', goldImages: [] } },
       },
-      true
+      true,
     );
 
     const { result } = renderHook(() => useGoldImages(), {

@@ -10,11 +10,11 @@ describe('Gold images toolbar', () => {
         goldImages={{
           aws: { provider: CloudProviderName.AWS, goldImages: [] },
         }}
-      />
+      />,
     );
 
     expect(
-      container.querySelector('[data-ouia-component-type="PF6/Toolbar"]')
+      container.querySelector('[data-ouia-component-type="PF6/Toolbar"]'),
     ).not.toBeNull();
   });
 });

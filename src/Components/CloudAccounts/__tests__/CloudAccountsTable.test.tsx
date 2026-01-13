@@ -38,11 +38,11 @@ const TestTableComponent = ({ accounts }: { accounts: CloudAccount[] }) => {
       setAccounts(
         stateAccounts.sort((a, b) => {
           const result = a[sortBy as keyof CloudAccount].localeCompare(
-            b[sortBy as keyof CloudAccount]
+            b[sortBy as keyof CloudAccount],
           );
 
           return sortDir == SortByDirection.asc ? result : result * -1;
-        })
+        }),
       );
   }, [sortBy, sortDir]);
 
@@ -73,7 +73,7 @@ describe('CloudAccountsTable', () => {
   it('renders the table', () => {
     renderTable(makeAccounts(3));
     expect(
-      screen.getByRole('grid', { name: /cloud accounts table/i })
+      screen.getByRole('grid', { name: /cloud accounts table/i }),
     ).toBeInTheDocument();
   });
 
@@ -131,8 +131,8 @@ describe('CloudAccountsTable', () => {
       expect(
         String(
           container.querySelector('tbody')?.firstChild?.childNodes[0]
-            .textContent
-        )
+            .textContent,
+        ),
       ).toBe('acct-0');
 
       // flip
@@ -140,8 +140,8 @@ describe('CloudAccountsTable', () => {
       expect(
         String(
           container.querySelector('tbody')?.firstChild?.childNodes[0]
-            .textContent
-        )
+            .textContent,
+        ),
       ).toBe('acct-2');
     });
 
@@ -151,8 +151,8 @@ describe('CloudAccountsTable', () => {
       expect(
         String(
           container.querySelector('tbody')?.firstChild?.childNodes[1]
-            .textContent
-        )
+            .textContent,
+        ),
       ).toBe('AWS');
 
       // flip
@@ -160,32 +160,32 @@ describe('CloudAccountsTable', () => {
       expect(
         String(
           container.querySelector('tbody')?.firstChild?.childNodes[1]
-            .textContent
-        )
+            .textContent,
+        ),
       ).toBe('Google Compute Engine');
     });
 
     it('by gold image', () => {
       const { container } = renderTable(makeAccounts(3));
       fireEvent.click(
-        screen.getByRole('button', { name: /gold image access/i })
+        screen.getByRole('button', { name: /gold image access/i }),
       );
       expect(
         String(
           container.querySelector('tbody')?.firstChild?.childNodes[2]
-            .textContent
-        )
+            .textContent,
+        ),
       ).toBe('Failed');
 
       // flip
       fireEvent.click(
-        screen.getByRole('button', { name: /gold image access/i })
+        screen.getByRole('button', { name: /gold image access/i }),
       );
       expect(
         String(
           container.querySelector('tbody')?.firstChild?.childNodes[2]
-            .textContent
-        )
+            .textContent,
+        ),
       ).toBe('Granted');
     });
 
@@ -195,8 +195,8 @@ describe('CloudAccountsTable', () => {
       expect(
         String(
           container.querySelector('tbody')?.firstChild?.childNodes[3]
-            .textContent
-        )
+            .textContent,
+        ),
       ).toBe('Formatted:2024-01-01');
 
       // flip
@@ -204,8 +204,8 @@ describe('CloudAccountsTable', () => {
       expect(
         String(
           container.querySelector('tbody')?.firstChild?.childNodes[3]
-            .textContent
-        )
+            .textContent,
+        ),
       ).toBe('Formatted:2024-01-03');
     });
   });

@@ -16,7 +16,7 @@ jest.mock('react-router-dom', () => ({
 }));
 
 const { ComponentWithQueryClient, queryClient } = ManipulatableQueryWrapper(
-  <CloudAccountsPage />
+  <CloudAccountsPage />,
 );
 
 beforeEach(() => {
@@ -50,13 +50,13 @@ it('renders cloud accounts page', async () => {
         limit: 10,
         offset: 0,
       },
-    }
+    },
   );
 
   renderWithRouter(<ComponentWithQueryClient />);
 
   await waitFor(() =>
-    expect(screen.getByText('Cloud Accounts')).toBeInTheDocument()
+    expect(screen.getByText('Cloud Accounts')).toBeInTheDocument(),
   );
 });
 
@@ -77,7 +77,7 @@ it('shows empty state when no accounts exist', async () => {
         limit: 10,
         offset: 0,
       },
-    }
+    },
   );
   renderWithRouter(<ComponentWithQueryClient />);
 

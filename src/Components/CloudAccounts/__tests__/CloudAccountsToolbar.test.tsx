@@ -7,7 +7,7 @@ describe('CloudAccountsToolbar', () => {
     const { container } = renderWithRouter(<CloudAccountsToolbar />);
 
     expect(
-      container.querySelector('[data-ouia-component-type="PF6/Toolbar"]')
+      container.querySelector('[data-ouia-component-type="PF6/Toolbar"]'),
     ).not.toBeNull();
   });
 
@@ -15,7 +15,7 @@ describe('CloudAccountsToolbar', () => {
     const { container } = renderWithRouter(<CloudAccountsToolbar />);
 
     expect(
-      container.querySelector('[data-ouia-component-type="PF6/Pagination"]')
+      container.querySelector('[data-ouia-component-type="PF6/Pagination"]'),
     ).not.toBeNull();
   });
 });

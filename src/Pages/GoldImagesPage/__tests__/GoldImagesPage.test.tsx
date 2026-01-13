@@ -15,7 +15,7 @@ jest.mock('react-router-dom', () => ({
 }));
 
 const { ComponentWithQueryClient, queryClient } = ManipulatableQueryWrapper(
-  <GoldImagesPage />
+  <GoldImagesPage />,
 );
 
 describe('Gold images page', () => {
@@ -31,7 +31,7 @@ describe('Gold images page', () => {
     renderWithRouter(<ComponentWithQueryClient />);
 
     await waitFor(() =>
-      expect(screen.queryByText('Gold Images')).toBeInTheDocument()
+      expect(screen.queryByText('Gold Images')).toBeInTheDocument(),
     );
   });
 
@@ -51,7 +51,7 @@ describe('Gold images page', () => {
     renderWithRouter(<ComponentWithQueryClient />);
 
     await waitFor(() =>
-      expect(screen.queryByText('No gold images')).toBeInTheDocument()
+      expect(screen.queryByText('No gold images')).toBeInTheDocument(),
     );
   });
 });

@@ -11,7 +11,7 @@ interface GoldImagesFilterBarProps {
 
 export const GoldImagesToolbar = ({ goldImages }: GoldImagesFilterBarProps) => {
   const cloudProviders = Object.values(goldImages).map(
-    (goldImage) => goldImage.provider
+    (goldImage) => goldImage.provider,
   );
 
   return (

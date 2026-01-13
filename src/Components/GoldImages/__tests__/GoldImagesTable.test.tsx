@@ -10,7 +10,7 @@ import { HydrateAtomsTestProvider } from '../../util/testing/HydrateAtomsTestPro
 import { cloudProviderFilterData } from '../../../state/goldImages';
 
 const goldImageTestData: (amount: number) => GoldImagesResponse = (
-  amount: number
+  amount: number,
 ) => {
   const providers = [
     CloudProviderName.AWS,
@@ -39,7 +39,7 @@ const goldImageTestData: (amount: number) => GoldImagesResponse = (
 describe('Gold images table', () => {
   it('renders', () => {
     const { container } = renderWithRouter(
-      <GoldImagesTable goldImages={goldImageTestData(3)} />
+      <GoldImagesTable goldImages={goldImageTestData(3)} />,
     );
 
     expect(container.querySelector('table')).toBeInTheDocument();
@@ -48,11 +48,11 @@ describe('Gold images table', () => {
   it('sorts', async () => {
     const goldImageData = goldImageTestData(3);
     const sortedGoldImageData = Object.values(goldImageData).sort((a, b) =>
-      a.provider.localeCompare(b.provider)
+      a.provider.localeCompare(b.provider),
     );
 
     const { container } = renderWithRouter(
-      <GoldImagesTable goldImages={goldImageData} />
+      <GoldImagesTable goldImages={goldImageData} />,
     );
 
     const sortButton = container.querySelector('button');
@@ -66,8 +66,8 @@ describe('Gold images table', () => {
     await waitFor(() =>
       expect(
         container.querySelector('tbody')?.firstChild?.firstChild?.firstChild
-          ?.textContent
-      ).toBe(sortedGoldImageData[sortedGoldImageData.length - 1].provider)
+          ?.textContent,
+      ).toBe(sortedGoldImageData[sortedGoldImageData.length - 1].provider),
     );
 
     fireEvent.click(sortButton);
@@ -75,14 +75,14 @@ describe('Gold images table', () => {
     await waitFor(() =>
       expect(
         container.querySelector('tbody')?.firstChild?.firstChild?.firstChild
-          ?.textContent
-      ).toBe(sortedGoldImageData[0].provider)
+          ?.textContent,
+      ).toBe(sortedGoldImageData[0].provider),
     );
   });
 
   it('applies pagination', () => {
     const { container } = renderWithRouter(
-      <GoldImagesTable goldImages={goldImageTestData(12)} />
+      <GoldImagesTable goldImages={goldImageTestData(12)} />,
     );
 
     expect(container.querySelector('tbody')?.childNodes.length).toBe(10);
@@ -98,13 +98,13 @@ describe('Gold images table', () => {
         ]}
       >
         <GoldImagesTable goldImages={goldImageData} />
-      </HydrateAtomsTestProvider>
+      </HydrateAtomsTestProvider>,
     );
 
     expect(container.querySelector('tbody')?.childNodes.length).toBe(1);
     expect(
       container.querySelector('tbody')?.firstChild?.firstChild?.firstChild
-        ?.textContent
+        ?.textContent,
     ).toBe(Object.values(goldImageData)[0].provider);
   });
 });

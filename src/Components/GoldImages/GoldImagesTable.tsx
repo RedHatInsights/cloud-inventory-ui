@@ -25,7 +25,7 @@ interface GoldImagesProps {
 export const GoldImagesTable = ({ goldImages }: GoldImagesProps) => {
   const [pageOptions, setGoldImagePagination] = useQueryParamInformedAtom(
     goldImagePaginationData,
-    'pagination'
+    'pagination',
   );
   const cloudProviderFilter = useAtomValue(cloudProviderFilterData);
 
@@ -33,7 +33,7 @@ export const GoldImagesTable = ({ goldImages }: GoldImagesProps) => {
     cloudProviderFilter.length == 0
       ? Object.values(goldImages)
       : Object.values(goldImages).filter((cloudProvider) =>
-          cloudProviderFilter.includes(cloudProvider.provider)
+          cloudProviderFilter.includes(cloudProvider.provider),
         );
 
   const { sorted, getSortParams } = useTableSort(
@@ -45,12 +45,12 @@ export const GoldImagesTable = ({ goldImages }: GoldImagesProps) => {
         dir: SortByDirection.asc,
         index: 0,
       },
-    }
+    },
   );
 
   const paginatedGoldImage = sorted.slice(
     (pageOptions.page - 1) * pageOptions.perPage,
-    pageOptions.page * pageOptions.perPage
+    pageOptions.page * pageOptions.perPage,
   );
 
   useEffect(() => {

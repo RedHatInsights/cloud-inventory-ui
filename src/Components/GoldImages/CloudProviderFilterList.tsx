@@ -8,7 +8,7 @@ export const CloudProviderFilterList = () => {
   const [cloudProviderFilter, setCloudProviderFilter] =
     useQueryParamInformedAtom<CloudProviderName[]>(
       cloudProviderFilterData,
-      'cloudProvider'
+      'cloudProvider',
     );
 
   return (
@@ -20,8 +20,8 @@ export const CloudProviderFilterList = () => {
             onClose={() => {
               setCloudProviderFilter(
                 cloudProviderFilter.filter(
-                  (existing) => cloudProvider != existing
-                )
+                  (existing) => cloudProvider != existing,
+                ),
               );
             }}
           >

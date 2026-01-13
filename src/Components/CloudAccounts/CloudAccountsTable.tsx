@@ -94,7 +94,7 @@ export const CloudAccountsTable = ({
                   pathname: '/subscriptions/cloud-inventory/gold-images',
                   search: generateQueryParamsForData(
                     [row.provider],
-                    'cloudProvider'
+                    'cloudProvider',
                   ).toString(),
                 }}
               >

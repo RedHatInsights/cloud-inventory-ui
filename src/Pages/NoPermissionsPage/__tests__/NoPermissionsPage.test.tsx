@@ -5,6 +5,6 @@ import { render, screen } from '@testing-library/react';
 it('Renders no permissions page', () => {
   render(<NoPermissionsPage />);
   expect(
-    screen.getByText('You do not have access to Cloud Inventory')
+    screen.getByText('You do not have access to Cloud Inventory'),
   ).toBeInTheDocument();
 });

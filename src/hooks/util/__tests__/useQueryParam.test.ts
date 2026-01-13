@@ -28,7 +28,7 @@ describe('query param informed hook', () => {
     mockURLSearchParams = new URLSearchParams({ num: '2' });
 
     const { result } = renderHookWithRouter(() =>
-      useQueryParamInformedAtom(customAtom, 'num')
+      useQueryParamInformedAtom(customAtom, 'num'),
     );
 
     expect(result.current[0]).toEqual(2);
@@ -38,7 +38,7 @@ describe('query param informed hook', () => {
     mockURLSearchParams = new URLSearchParams({ str: '"test"' });
 
     const { result } = renderHookWithRouter(() =>
-      useQueryParamInformedState('', 'str')
+      useQueryParamInformedState('', 'str'),
     );
 
     expect(result.current[0]).toEqual('test');
@@ -47,11 +47,11 @@ describe('query param informed hook', () => {
   it('uses default if no search is present', () => {
     const customAtom = atom<string>('defaultAtom');
     const { result: stateResult } = renderHookWithRouter(() =>
-      useQueryParamInformedState('defaultState', 'str')
+      useQueryParamInformedState('defaultState', 'str'),
     );
 
     const { result: atomResult } = renderHookWithRouter(() =>
-      useQueryParamInformedAtom(customAtom, 'num')
+      useQueryParamInformedAtom(customAtom, 'num'),
     );
 
     expect(stateResult.current[0]).toEqual('defaultState');
@@ -105,7 +105,7 @@ describe('query param informed hook', () => {
       const [state, setState] = useQueryParamInformedState(1, 'customState');
       const [atom, setAtom] = useQueryParamInformedAtom(
         customAtom,
-        'customAtom'
+        'customAtom',
       );
 
       useEffect(() => {
@@ -144,7 +144,7 @@ describe('query param informed hook', () => {
       const params = generateQueryParamsForData(data, key);
 
       expect(params.get(key)).toBe(
-        encodeURIComponent(JSON.stringify('hello world'))
+        encodeURIComponent(JSON.stringify('hello world')),
       );
     });
   });

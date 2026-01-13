@@ -21,7 +21,7 @@ describe('Gold Images Pagination', () => {
 
     expect(
       container.querySelector('.pf-v6-c-pagination__total-items')?.firstChild
-        ?.textContent
+        ?.textContent,
     ).toBe('0 - 0');
   });
 
@@ -29,11 +29,11 @@ describe('Gold Images Pagination', () => {
     const { container } = renderWithRouter(
       <GoldImagesPaginationWithState
         init={{ page: 1, perPage: 10, itemCount: 123 }}
-      />
+      />,
     );
 
     const nextButton = container.querySelector(
-      '[aria-label="Go to next page"]'
+      '[aria-label="Go to next page"]',
     );
 
     if (!nextButton) {
@@ -43,8 +43,8 @@ describe('Gold Images Pagination', () => {
     await waitFor(() =>
       expect(
         container.querySelector('.pf-v6-c-pagination__total-items')?.firstChild
-          ?.textContent
-      ).toBe('1 - 10')
+          ?.textContent,
+      ).toBe('1 - 10'),
     );
 
     fireEvent.click(nextButton);
@@ -52,8 +52,8 @@ describe('Gold Images Pagination', () => {
     await waitFor(() =>
       expect(
         container.querySelector('.pf-v6-c-pagination__total-items')?.firstChild
-          ?.textContent
-      ).toBe('11 - 20')
+          ?.textContent,
+      ).toBe('11 - 20'),
     );
   });
 
@@ -61,11 +61,11 @@ describe('Gold Images Pagination', () => {
     const { container } = renderWithRouter(
       <GoldImagesPaginationWithState
         init={{ page: 2, perPage: 10, itemCount: 123 }}
-      />
+      />,
     );
 
     const previousButton = container.querySelector(
-      '[aria-label="Go to previous page"]'
+      '[aria-label="Go to previous page"]',
     );
 
     if (!previousButton) {
@@ -75,8 +75,8 @@ describe('Gold Images Pagination', () => {
     await waitFor(() =>
       expect(
         container.querySelector('.pf-v6-c-pagination__total-items')?.firstChild
-          ?.textContent
-      ).toBe('11 - 20')
+          ?.textContent,
+      ).toBe('11 - 20'),
     );
 
     fireEvent.click(previousButton);
@@ -84,8 +84,8 @@ describe('Gold Images Pagination', () => {
     await waitFor(() =>
       expect(
         container.querySelector('.pf-v6-c-pagination__total-items')?.firstChild
-          ?.textContent
-      ).toBe('1 - 10')
+          ?.textContent,
+      ).toBe('1 - 10'),
     );
   });
 
@@ -93,11 +93,11 @@ describe('Gold Images Pagination', () => {
     const { container, queryByText } = renderWithRouter(
       <GoldImagesPaginationWithState
         init={{ page: 1, perPage: 10, itemCount: 123 }}
-      />
+      />,
     );
 
     const expandPageSelectionButton = container.querySelector(
-      '[data-ouia-component-type="PF6/MenuToggle"]'
+      '[data-ouia-component-type="PF6/MenuToggle"]',
     );
 
     if (!expandPageSelectionButton) {
@@ -107,14 +107,14 @@ describe('Gold Images Pagination', () => {
     await waitFor(() =>
       expect(
         container.querySelector('.pf-v6-c-pagination__total-items')?.firstChild
-          ?.textContent
-      ).toBe('1 - 10')
+          ?.textContent,
+      ).toBe('1 - 10'),
     );
 
     fireEvent.click(expandPageSelectionButton);
 
     const twentyPerPageSelectionButton = await waitFor(
-      () => queryByText('20 per page')?.parentElement?.parentElement
+      () => queryByText('20 per page')?.parentElement?.parentElement,
     );
 
     if (!twentyPerPageSelectionButton) {
@@ -126,8 +126,8 @@ describe('Gold Images Pagination', () => {
     await waitFor(() =>
       expect(
         container.querySelector('.pf-v6-c-pagination__total-items')?.firstChild
-          ?.textContent
-      ).toBe('1 - 20')
+          ?.textContent,
+      ).toBe('1 - 20'),
     );
   });
 });

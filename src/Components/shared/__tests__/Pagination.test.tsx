@@ -18,7 +18,7 @@ const setup = (
     perPage: number;
     itemCount: number;
     isCompact: boolean;
-  }>
+  }>,
 ) => {
   (useQueryParamInformedAtom as jest.Mock).mockReturnValue([
     {
@@ -29,7 +29,7 @@ const setup = (
     mockSetPagination,
   ]);
   return render(
-    <PaginationBase atom={testAtom} isCompact={override?.isCompact ?? false} />
+    <PaginationBase atom={testAtom} isCompact={override?.isCompact ?? false} />,
   );
 };
 describe('PaginationBase', () => {
@@ -39,11 +39,11 @@ describe('PaginationBase', () => {
   it('renders pagination with default values', () => {
     setup();
     expect(
-      screen.getByRole('button', { name: /go to next page/i })
+      screen.getByRole('button', { name: /go to next page/i }),
     ).toBeInTheDocument();
 
     expect(
-      screen.getByRole('button', { name: /go to previous page/i })
+      screen.getByRole('button', { name: /go to previous page/i }),
     ).toBeInTheDocument();
   });
   it('updates page when page is changed', () => {

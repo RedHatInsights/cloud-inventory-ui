@@ -21,14 +21,14 @@ export const enableMocks = () => {
       } else {
         return Promise.reject('No url mocked');
       }
-    }) as jest.Mock
+    }) as jest.Mock,
   );
 };
 
 export const mockApiResponse = (
   url: string,
   payload: unknown,
-  success: boolean
+  success: boolean,
 ) => {
   mockMap[url] = { body: payload, ok: success };
 };
@@ -54,7 +54,7 @@ export class RequestMocks {
         } else {
           return Promise.reject('No url mocked');
         }
-      }) as jest.Mock
+      }) as jest.Mock,
     );
 
     this.queryClient = new QueryClient({
