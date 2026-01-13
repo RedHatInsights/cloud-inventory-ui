@@ -2,10 +2,14 @@ import { Button, Label, LabelGroup } from '@patternfly/react-core';
 import React from 'react';
 import { cloudProviderFilterData } from '../../state/goldImages';
 import { useQueryParamInformedAtom } from '../../hooks/util/useQueryParam';
+import { CloudProviderName } from '../../hooks/api/useGoldImages';
 
 export const CloudProviderFilterList = () => {
   const [cloudProviderFilter, setCloudProviderFilter] =
-    useQueryParamInformedAtom(cloudProviderFilterData, 'cloudProvider');
+    useQueryParamInformedAtom<CloudProviderName[]>(
+      cloudProviderFilterData,
+      'cloudProvider'
+    );
 
   return (
     <>

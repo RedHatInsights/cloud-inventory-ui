@@ -1,6 +1,6 @@
 import { SortByDirection } from '@patternfly/react-table';
 import { ThSortType } from '@patternfly/react-table/dist/esm/components/Table/base/types';
-import { MouseEvent } from 'react';
+import { MouseEvent, useEffect } from 'react';
 import { useQueryParamInformedState } from '../useQueryParam';
 
 type Sortable<T extends { [s: string]: unknown }> = Array<T>;
@@ -30,6 +30,19 @@ interface TableSortOptions<T extends { [s: string]: unknown }> {
   rowTranslator?: SortableRowTranslator<T>;
   sortFunc?: SortFunc<T>;
   initialSort?: InitialSortOptions;
+}
+
+interface ApiBasedTableSortOptions {
+  initialSort?: InitialSortOptions;
+  sortBy?: string;
+  sortDir?: SortByDirection;
+  setSortDir: (dir: SortByDirection) => void;
+  setSortBy: (by: string) => void;
+  lookup: Record<number, string>;
+}
+
+interface ApiBasedTableSortResult {
+  getSortParams: (index: number) => ThSortType;
 }
 
 function defaultSortableRowTranslator<T extends { [s: string]: unknown }>(
@@ -128,6 +141,66 @@ export function useTableSort<T extends { [s: string]: unknown }>(
 
   return {
     sorted: sortFunc(data, activeSortDirection, activeSortIndex, rowTranslator),
+    getSortParams,
+  };
+}
+
+/**
+ * useApiBasedTableSort manages state and functionality for Patternfly tables,
+ * and triggers relevant sort state updated and returns the sort params to pass
+ * into the table itself.
+ *
+ * @param key string the keys to preface query param state with
+ * @param options ApiTableSortOptions options to specify for the sort
+ *    * initialSort? InitialSortOptions specify whether or not to sort initally, and how
+ *    * sortBy string|undefined the param to sort data by
+ *    * sortDir SortByDirection|undefined the direction to sort by
+ *    * setSortBy (string) => void the setter for the sort parameter
+ *    * setSortDir (SortByDirection) => void the setter for the sort direction
+ * @returns ApiBasedTableSortResult the getSortParams function to be used in the table column headers
+ */
+export function useApiBasedTableSort(
+  key: string,
+  {
+    initialSort = undefined,
+    sortBy,
+    sortDir,
+    setSortBy,
+    setSortDir,
+    lookup,
+  }: ApiBasedTableSortOptions
+): ApiBasedTableSortResult {
+  const [activeSortIndex, setActiveSortIndex] = useQueryParamInformedState<
+    number | undefined
+  >(initialSort?.index, `${key}ActiveSortIndex`);
+  const [activeSortDirection, setActiveSortDirection] =
+    useQueryParamInformedState<SortByDirection | undefined>(
+      initialSort?.dir,
+      `${key}ActiveSortDir`
+    );
+
+  useEffect(() => {
+    const i = Object.keys(lookup).find(
+      (key) => lookup[parseInt(key)] == sortBy
+    );
+    setActiveSortIndex(i ? parseInt(i) : undefined);
+    setActiveSortDirection(sortDir);
+  }, [sortBy, sortDir]);
+
+  const getSortParams = (index: number) => ({
+    sortBy: {
+      index: activeSortIndex,
+      direction: activeSortDirection,
+      defaultDirection: SortByDirection.asc,
+    },
+    onSort: (_event: MouseEvent, index: number, direction: SortByDirection) => {
+      setSortBy(lookup[index]);
+      setSortDir(direction);
+    },
+    columnIndex: index,
+  });
+
+  return {
     getSortParams,
   };
 }

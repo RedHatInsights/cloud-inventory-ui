@@ -68,9 +68,9 @@ export const GoldImagesTable = ({ goldImages }: GoldImagesProps) => {
         </Tr>
       </Thead>
       <Tbody>
-        {paginatedGoldImage.map((hyperscaler) => {
+        {paginatedGoldImage.map((hyperscaler, i) => {
           return (
-            <Tr key={hyperscaler.provider}>
+            <Tr key={`hyperscaler.provider-${i}`}>
               <Td>
                 <b>{hyperscaler.provider}</b>
                 {hyperscaler.goldImages.map((goldImage, i) => {

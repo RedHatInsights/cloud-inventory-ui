@@ -1,38 +1,9 @@
-import { Pagination } from '@patternfly/react-core';
 import React from 'react';
 import { goldImagePaginationData } from '../../state/goldImages';
-import { useQueryParamInformedAtom } from '../../hooks/util/useQueryParam';
+import { PaginationBase } from '../shared/PaginationBase';
 
-interface GoldImagesPaginationProps {
-  isCompact?: boolean;
-}
-
-export const GoldImagesPagination = ({
-  isCompact = false,
-}: GoldImagesPaginationProps) => {
-  const [{ perPage, page, itemCount }, setGoldImagePagination] =
-    useQueryParamInformedAtom(goldImagePaginationData, 'pagination');
-
+export const GoldImagesPagination = ({ isCompact = false }) => {
   return (
-    <Pagination
-      perPage={perPage}
-      page={page}
-      itemCount={itemCount}
-      isCompact={isCompact}
-      onSetPage={(_event, newPage) => {
-        setGoldImagePagination({
-          perPage,
-          itemCount,
-          page: newPage,
-        });
-      }}
-      onPerPageSelect={(_event, newPerPage, newPage) => {
-        setGoldImagePagination({
-          itemCount,
-          perPage: newPerPage,
-          page: newPage,
-        });
-      }}
-    />
+    <PaginationBase atom={goldImagePaginationData} isCompact={isCompact} />
   );
 };
