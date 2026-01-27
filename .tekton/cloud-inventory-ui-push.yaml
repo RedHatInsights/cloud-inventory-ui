@@ -24,7 +24,7 @@ spec:
   - name: revision
     value: '{{revision}}'
   - name: output-image
-    value: quay.io/redhat-user-workloads/teamnado-konflux-tenant/cloud-inventory-ui:{{revision}}
+    value: quay.io/redhat-user-workloads/teamnado-konflux-tenant/cloud-inventory-ui/cloud-inventory-ui:{{revision}}
   - name: dockerfile
     value: ./build-tools/Dockerfile
   pipelineRef:
