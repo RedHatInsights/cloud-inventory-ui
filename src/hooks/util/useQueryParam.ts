@@ -31,10 +31,15 @@ function useUpdateQueryParams<T>(
   key: string,
   setter: (v: T) => void,
 ): (v: T) => void {
-  const [searchParams, setSearchParams] = useSearchParams();
-  return function (v: T) {
-    searchParams.set(key, encodeURIComponent(JSON.stringify(v)));
-    setSearchParams(searchParams);
+  const [, setSearchParams] = useSearchParams();
+
+  return (v: T) => {
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      next.set(key, encodeURIComponent(JSON.stringify(v)));
+      return next;
+    });
+
     setter(v);
   };
 }

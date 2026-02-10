@@ -5,14 +5,25 @@ import {
   useQueryParamInformedAtom,
   useQueryParamInformedState,
 } from '../useQueryParam';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
+import { waitFor } from '@testing-library/react';
 
 jest.mock('react-router-dom', () => ({
   __esModule: true,
   ...jest.requireActual('react-router-dom'),
-  useSearchParams: (init: URLSearchParams) => {
-    if (init) return useState(init);
-    return useState(mockURLSearchParams);
+  useSearchParams: (init?: URLSearchParams) => {
+    if (init) {
+      mockURLSearchParams = new URLSearchParams(init);
+    }
+    const snapshot = new URLSearchParams(mockURLSearchParams);
+    type SetSearchParamsArg =
+      | URLSearchParams
+      | ((prev: URLSearchParams) => URLSearchParams);
+    const setSearchParams = (next: SetSearchParamsArg) => {
+      mockURLSearchParams =
+        typeof next === 'function' ? next(mockURLSearchParams) : next;
+    };
+    return [snapshot, setSearchParams] as const;
   },
 }));
 
@@ -56,6 +67,32 @@ describe('query param informed hook', () => {
 
     expect(stateResult.current[0]).toEqual('defaultState');
     expect(atomResult.current[0]).toEqual('defaultAtom');
+  });
+
+  it('does not override params when multiple query setters run back-to-back', async () => {
+    mockURLSearchParams = new URLSearchParams({ preExisting: 'value' });
+
+    const aAtom = atom<number>(0);
+    const bAtom = atom<number>(0);
+
+    renderHookWithRouter(() => {
+      const [, setA] = useQueryParamInformedAtom(aAtom, 'a');
+      const [, setB] = useQueryParamInformedAtom(bAtom, 'b');
+
+      useEffect(() => {
+        setA(1);
+        setB(2);
+      }, []);
+
+      return null;
+    });
+
+    await waitFor(() => {
+      expect(mockURLSearchParams.get('a')).toBe('1');
+      expect(mockURLSearchParams.get('b')).toBe('2');
+    });
+
+    expect(mockURLSearchParams.get('preExisting')).toBe('value');
   });
 
   it('updates the search query when atom is updated', () => {
