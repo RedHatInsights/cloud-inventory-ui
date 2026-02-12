@@ -90,14 +90,14 @@ describe('hasPaginationError', () => {
     expect(hasPaginationError(pagination)).toBe(true);
   });
 
-  it('returns false when exactly on boundary', () => {
+  it('returns true when exactly on boundary', () => {
     const pagination: PaginationData = {
       page: 3,
       perPage: 10,
-      itemCount: 30,
+      itemCount: 20,
     };
 
-    expect(hasPaginationError(pagination)).toBe(false);
+    expect(hasPaginationError(pagination)).toBe(true);
   });
 
   it('handles edge case with zero items', () => {

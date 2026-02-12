@@ -31,12 +31,7 @@ export const GoldImagesTable = ({ goldImages }: GoldImagesProps) => {
   );
   const cloudProviderFilter = useAtomValue(cloudProviderFilterData);
 
-  const [pagination, setPagination] = useQueryParamInformedAtom(
-    goldImagePaginationData,
-    'pagination',
-  );
-
-  const onInvalidPage = hasPaginationError(pagination);
+  const onInvalidPage = hasPaginationError(pageOptions);
 
   const filteredGoldImages =
     cloudProviderFilter.length == 0
@@ -69,41 +64,40 @@ export const GoldImagesTable = ({ goldImages }: GoldImagesProps) => {
     });
   }, [cloudProviderFilter, filteredGoldImages.length]);
 
+  if (onInvalidPage) {
+    return (
+      <PaginationError
+        pagination={pageOptions}
+        setPagination={setGoldImagePagination}
+      />
+    );
+  }
+
   return (
     <Table>
-      {onInvalidPage && (
-        <PaginationError
-          pagination={pagination}
-          setPagination={setPagination}
-        />
-      )}
-      {!onInvalidPage && (
-        <>
-          <Thead>
-            <Tr>
-              <Th sort={getSortParams(0)}>Cloud provider</Th>
+      <Thead>
+        <Tr>
+          <Th sort={getSortParams(0)}>Cloud provider</Th>
+        </Tr>
+      </Thead>
+      <Tbody>
+        {paginatedGoldImage.map((hyperscaler, i) => {
+          return (
+            <Tr key={`hyperscaler.provider-${i}`}>
+              <Td>
+                <b>{hyperscaler.provider}</b>
+                {hyperscaler.goldImages.map((goldImage, i) => {
+                  return (
+                    <Content key={i} className="pf-v6-u-ml-sm">
+                      {goldImage.description}
+                    </Content>
+                  );
+                })}
+              </Td>
             </Tr>
-          </Thead>
-          <Tbody>
-            {paginatedGoldImage.map((hyperscaler, i) => {
-              return (
-                <Tr key={`hyperscaler.provider-${i}`}>
-                  <Td>
-                    <b>{hyperscaler.provider}</b>
-                    {hyperscaler.goldImages.map((goldImage, i) => {
-                      return (
-                        <Content key={i} className="pf-v6-u-ml-sm">
-                          {goldImage.description}
-                        </Content>
-                      );
-                    })}
-                  </Td>
-                </Tr>
-              );
-            })}
-          </Tbody>
-        </>
-      )}
+          );
+        })}
+      </Tbody>
     </Table>
   );
 };

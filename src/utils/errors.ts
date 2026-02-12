@@ -11,7 +11,7 @@ class HttpError extends Error {
 }
 
 const hasPaginationError = (pagination: PaginationData) => {
-  return pagination.itemCount < (pagination.page - 1) * pagination.perPage;
+  return pagination.itemCount <= (pagination.page - 1) * pagination.perPage;
 };
 
 export { HttpError, hasPaginationError };
