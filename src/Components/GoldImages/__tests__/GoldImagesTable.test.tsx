@@ -116,9 +116,9 @@ describe('Gold images table', () => {
       <GoldImagesTable goldImages={goldImageTestData(25)} />,
     );
 
-    expect(
-      container.querySelector('table')?.textContent,
-    ).not.toMatch(/No results for current page/i);
+    expect(container.querySelector('table')?.textContent).not.toMatch(
+      /No results for current page/i,
+    );
   });
 
   it('renders pagination error when page exceeds item count', () => {

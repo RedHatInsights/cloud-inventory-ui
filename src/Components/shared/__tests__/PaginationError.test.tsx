@@ -18,7 +18,9 @@ describe('PaginationError', () => {
       />,
     );
 
-    expect(screen.getByText(/No results for current page/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/No results for current page/i),
+    ).toBeInTheDocument();
   });
 
   it('renders the return to page 1 button', () => {

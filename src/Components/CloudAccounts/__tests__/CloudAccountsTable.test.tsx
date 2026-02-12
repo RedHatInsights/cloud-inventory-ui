@@ -118,7 +118,10 @@ describe('CloudAccountsTable', () => {
     renderWithRouter(
       <HydrateAtomsTestProvider
         initialValues={[
-          [CloudAccountsPaginationData, { page: 10, perPage: 10, itemCount: 5 }],
+          [
+            CloudAccountsPaginationData,
+            { page: 10, perPage: 10, itemCount: 5 },
+          ],
         ]}
       >
         <CloudAccountsTable
@@ -144,7 +147,10 @@ describe('CloudAccountsTable', () => {
     renderWithRouter(
       <HydrateAtomsTestProvider
         initialValues={[
-          [CloudAccountsPaginationData, { page: 10, perPage: 10, itemCount: 5 }],
+          [
+            CloudAccountsPaginationData,
+            { page: 10, perPage: 10, itemCount: 5 },
+          ],
         ]}
       >
         <CloudAccountsTable
