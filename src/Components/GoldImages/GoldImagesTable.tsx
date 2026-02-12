@@ -17,6 +17,8 @@ import {
   goldImagePaginationData,
 } from '../../state/goldImages';
 import { useQueryParamInformedAtom } from '../../hooks/util/useQueryParam';
+import { hasPaginationError } from '../../utils/errors';
+import { PaginationError } from '../shared/PaginationError';
 
 interface GoldImagesProps {
   goldImages: GoldImagesResponse;
@@ -28,6 +30,13 @@ export const GoldImagesTable = ({ goldImages }: GoldImagesProps) => {
     'pagination',
   );
   const cloudProviderFilter = useAtomValue(cloudProviderFilterData);
+
+  const [pagination, setPagination] = useQueryParamInformedAtom(
+    goldImagePaginationData,
+    'pagination',
+  );
+
+  const onInvalidPage = hasPaginationError(pagination);
 
   const filteredGoldImages =
     cloudProviderFilter.length == 0
@@ -62,29 +71,39 @@ export const GoldImagesTable = ({ goldImages }: GoldImagesProps) => {
 
   return (
     <Table>
-      <Thead>
-        <Tr>
-          <Th sort={getSortParams(0)}>Cloud provider</Th>
-        </Tr>
-      </Thead>
-      <Tbody>
-        {paginatedGoldImage.map((hyperscaler, i) => {
-          return (
-            <Tr key={`hyperscaler.provider-${i}`}>
-              <Td>
-                <b>{hyperscaler.provider}</b>
-                {hyperscaler.goldImages.map((goldImage, i) => {
-                  return (
-                    <Content key={i} className="pf-v6-u-ml-sm">
-                      {goldImage.description}
-                    </Content>
-                  );
-                })}
-              </Td>
+      {onInvalidPage && (
+        <PaginationError
+          pagination={pagination}
+          setPagination={setPagination}
+        />
+      )}
+      {!onInvalidPage && (
+        <>
+          <Thead>
+            <Tr>
+              <Th sort={getSortParams(0)}>Cloud provider</Th>
             </Tr>
-          );
-        })}
-      </Tbody>
+          </Thead>
+          <Tbody>
+            {paginatedGoldImage.map((hyperscaler, i) => {
+              return (
+                <Tr key={`hyperscaler.provider-${i}`}>
+                  <Td>
+                    <b>{hyperscaler.provider}</b>
+                    {hyperscaler.goldImages.map((goldImage, i) => {
+                      return (
+                        <Content key={i} className="pf-v6-u-ml-sm">
+                          {goldImage.description}
+                        </Content>
+                      );
+                    })}
+                  </Td>
+                </Tr>
+              );
+            })}
+          </Tbody>
+        </>
+      )}
     </Table>
   );
 };

@@ -1,12 +1,7 @@
 import { atom } from 'jotai';
+import { PaginationData } from '../types/pagination';
 
-interface CloudAccountsPaginationData {
-  page: number;
-  perPage: number;
-  itemCount: number;
-}
-
-export const CloudAccountsPaginationData = atom<CloudAccountsPaginationData>({
+export const CloudAccountsPaginationData = atom<PaginationData>({
   page: 1,
   perPage: 10,
   itemCount: 0,

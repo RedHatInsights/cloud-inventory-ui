@@ -1,3 +1,5 @@
+import { PaginationData } from '../types/pagination';
+
 class HttpError extends Error {
   status: number;
   statusText: string;
@@ -8,4 +10,8 @@ class HttpError extends Error {
   }
 }
 
-export { HttpError };
+const hasPaginationError = (pagination: PaginationData) => {
+  return pagination.itemCount < (pagination.page - 1) * pagination.perPage;
+};
+
+export { HttpError, hasPaginationError };

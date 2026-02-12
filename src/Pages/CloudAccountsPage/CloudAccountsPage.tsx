@@ -18,6 +18,7 @@ import {
 } from '../../hooks/util/useQueryParam';
 import { CloudAccountsPaginationData } from '../../state/cloudAccounts';
 import { SortByDirection } from '@patternfly/react-table';
+import { hasPaginationError } from '../../utils/errors';
 
 export const CloudAccountsPage = () => {
   const [pagination, setPagination] = useQueryParamInformedAtom(
@@ -61,6 +62,8 @@ export const CloudAccountsPage = () => {
   const { data: permissions, isLoading: arePermissionsLoading } =
     useRbacPermission();
 
+  const shouldShowEmptyState = !hasAccounts && !hasPaginationError(pagination);
+
   if (arePermissionsLoading) return <Loading />;
   if (!permissions?.canReadCloudAccess)
     return <Navigate to={`../${Paths.NoPermissions}`} />;
@@ -75,8 +78,8 @@ export const CloudAccountsPage = () => {
       </PageHeader>
       <Section>
         <PageSection>
-          {!hasAccounts && <NoCloudAccounts />}
-          {hasAccounts && (
+          {shouldShowEmptyState && <NoCloudAccounts />}
+          {!shouldShowEmptyState && (
             <>
               <CloudAccountsToolbar />
               <CloudAccountsTable

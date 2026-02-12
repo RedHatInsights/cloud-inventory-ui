@@ -106,6 +106,61 @@ describe('CloudAccountsTable', () => {
     expect(screen.getAllByText('View Purchases')).toHaveLength(2);
   });
 
+  it('does not render pagination error when on valid page', () => {
+    renderTable(makeAccounts(25));
+    expect(
+      screen.queryByText(/No results for current page/i),
+    ).not.toBeInTheDocument();
+  });
+
+  it('renders pagination error when page exceeds item count', () => {
+    const accounts = makeAccounts(5);
+    renderWithRouter(
+      <HydrateAtomsTestProvider
+        initialValues={[
+          [CloudAccountsPaginationData, { page: 10, perPage: 10, itemCount: 5 }],
+        ]}
+      >
+        <CloudAccountsTable
+          cloudAccounts={accounts}
+          setSortBy={() => {}}
+          sortBy=""
+          sortDir={SortByDirection.asc}
+          setSortDir={() => {}}
+        />
+      </HydrateAtomsTestProvider>,
+    );
+
+    expect(
+      screen.getByText(/No results for current page/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /return to page 1/i }),
+    ).toBeInTheDocument();
+  });
+
+  it('does not render table content when pagination error is shown', () => {
+    const accounts = makeAccounts(5);
+    renderWithRouter(
+      <HydrateAtomsTestProvider
+        initialValues={[
+          [CloudAccountsPaginationData, { page: 10, perPage: 10, itemCount: 5 }],
+        ]}
+      >
+        <CloudAccountsTable
+          cloudAccounts={accounts}
+          setSortBy={() => {}}
+          sortBy=""
+          sortDir={SortByDirection.asc}
+          setSortDir={() => {}}
+        />
+      </HydrateAtomsTestProvider>,
+    );
+
+    expect(screen.queryByText('Cloud account')).not.toBeInTheDocument();
+    expect(screen.queryByText('Cloud provider')).not.toBeInTheDocument();
+  });
+
   describe('mapField', () => {
     it('maps providerAccountID to id', () => {
       expect(mapField('providerAccountID')).toBe('id');
