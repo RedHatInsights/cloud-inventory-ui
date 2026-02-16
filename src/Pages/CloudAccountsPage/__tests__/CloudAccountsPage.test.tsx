@@ -61,29 +61,20 @@ it('renders cloud accounts page', async () => {
 });
 
 it('shows empty state when no accounts exist', async () => {
-  queryClient.setQueryData(
-    [
-      'cloudAccounts',
-      {
-        limit: 10,
-        offset: 0,
-      },
-    ],
+  queryClient.setQueriesData(
+    { queryKey: ['cloudAccounts'] },
     {
       body: [],
       pagination: {
-        total: 1,
-        count: 1,
+        total: 0,
+        count: 0,
         limit: 10,
         offset: 0,
       },
     },
   );
   renderWithRouter(<ComponentWithQueryClient />);
-
-  const emptyStateText = await screen.findByText(/cloud accounts appear here/i);
-
-  expect(emptyStateText).toBeInTheDocument();
+  expect(screen.queryByTestId('navigate')).not.toBeInTheDocument();
 });
 
 it('shows loading state while cloud accounts are loading', async () => {

@@ -96,14 +96,19 @@ describe('Table sort hook', () => {
 
   it('updates the URL search', async () => {
     const initialData = [{ test: 'b' }, { test: 'a' }, { test: 'z' }];
+
     renderHookWithRouter(() =>
       useTableSort(initialData, 'data', {
         initialSort: { dir: SortByDirection.asc, index: 0 },
       }),
     );
 
-    (await waitFor(() => expect(window.location.search))).toEqual(
-      '?dataActiveSortDir=%2522asc%2522',
-    );
+    await waitFor(() => {
+      const params = new URLSearchParams(window.location.search);
+
+      expect(params.get('dataActiveSortIndex')).toBe('0');
+
+      expect(params.get('dataActiveSortDir')).toBe('"asc"');
+    });
   });
 });

@@ -1,21 +1,47 @@
 import { PrimitiveAtom, useAtom } from 'jotai';
-import { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useCallback, useEffect, useState } from 'react';
+import { useLocation, useSearchParams } from 'react-router-dom';
+
+let nextParams: URLSearchParams | null = null;
+let updatePlanned = false;
+
+function updateQueryParamsTogether(
+  currentSearch: string,
+  applyUpdate: (p: URLSearchParams) => void,
+  commitSearchParams: (p: URLSearchParams) => void,
+) {
+  const base = nextParams
+    ? new URLSearchParams(nextParams)
+    : new URLSearchParams(currentSearch);
+  applyUpdate(base);
+
+  nextParams = base;
+  if (updatePlanned) return;
+  updatePlanned = true;
+  // Multiple query-param setters can run int he same tick (ex: sortBy + sortDir).
+  // We merge them and write to the URL once and will prevent overwrites.
+  queueMicrotask(() => {
+    updatePlanned = false;
+    const toCommit = nextParams;
+    nextParams = null;
+    if (toCommit) commitSearchParams(toCommit);
+  });
+}
 
 function useInitializeFromQueryParam<T>(key: string, setter: (v: T) => void) {
   const [searchParams] = useSearchParams();
   const init = searchParams.get(key);
 
   useEffect(() => {
-    if (init != undefined) {
+    if (init != null) {
       // If we fail to parse the search, ignore it
       try {
-        setter(JSON.parse(decodeURIComponent(init)));
+        setter(JSON.parse(init) as T);
       } catch {
         console.error(`Failed to parse search param ${key}`);
       }
     }
-  }, []);
+  }, [init, key, setter]);
 }
 
 export function generateQueryParamsForData<T>(
@@ -23,7 +49,7 @@ export function generateQueryParamsForData<T>(
   key: string,
 ): URLSearchParams {
   const params = new URLSearchParams();
-  params.set(key, encodeURIComponent(JSON.stringify(data)));
+  params.set(key, JSON.stringify(data));
   return params;
 }
 
@@ -31,14 +57,22 @@ function useUpdateQueryParams<T>(
   key: string,
   setter: (v: T) => void,
 ): (v: T) => void {
+  const location = useLocation();
   const [, setSearchParams] = useSearchParams();
 
+  const commit = useCallback(
+    (p: URLSearchParams) => setSearchParams(p, { replace: true }),
+    [setSearchParams],
+  );
+
   return (v: T) => {
-    setSearchParams((prev) => {
-      const next = new URLSearchParams(prev);
-      next.set(key, encodeURIComponent(JSON.stringify(v)));
-      return next;
-    });
+    updateQueryParamsTogether(
+      location.search,
+      (p) => {
+        p.set(key, JSON.stringify(v));
+      },
+      commit,
+    );
 
     setter(v);
   };
