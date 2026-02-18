@@ -110,6 +110,16 @@ describe('hasPaginationError', () => {
     expect(hasPaginationError(pagination)).toBe(true);
   });
 
+  it('returns false when on page one with no data', () => {
+    const pagination: PaginationData = {
+      page: 1,
+      perPage: 10,
+      itemCount: 0,
+    };
+
+    expect(hasPaginationError(pagination)).toBe(false);
+  });
+
   it('handles different perPage values', () => {
     const pagination20: PaginationData = {
       page: 2,
