@@ -13,6 +13,7 @@ import { useRbacPermission } from '../../hooks/util/useRbacPermissions';
 import { Paths } from '../../utils/routing';
 import { NoCloudAccounts } from '../../Components/CloudAccounts/NoCloudAccounts';
 import {
+  useQueryParamBatchRef,
   useQueryParamInformedAtom,
   useQueryParamInformedState,
 } from '../../hooks/util/useQueryParam';
@@ -20,6 +21,8 @@ import { CloudAccountsPaginationData } from '../../state/cloudAccounts';
 import { SortByDirection } from '@patternfly/react-table';
 
 export const CloudAccountsPage = () => {
+  const batchRef = useQueryParamBatchRef();
+
   const [pagination, setPagination] = useQueryParamInformedAtom(
     CloudAccountsPaginationData,
     'pagination',
@@ -28,10 +31,11 @@ export const CloudAccountsPage = () => {
   const [sortBy, setSortBy] = useQueryParamInformedState<string | undefined>(
     undefined,
     'cloudAccountsActiveSortBy',
+    batchRef,
   );
   const [sortDir, setSortDir] = useQueryParamInformedState<
     SortByDirection | undefined
-  >(undefined, 'cloudAccountsActiveSortDir');
+  >(undefined, 'cloudAccountsActiveSortDir', batchRef);
 
   const { page, perPage } = pagination;
 

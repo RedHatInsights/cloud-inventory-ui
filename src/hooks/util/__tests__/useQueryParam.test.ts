@@ -1,6 +1,9 @@
 import { atom } from 'jotai';
 import { renderHookWithRouter } from '../../../utils/testing/customRender';
-import { generateQueryParamsForData } from '../useQueryParam';
+import {
+  generateQueryParamsForData,
+  useQueryParamBatchRef,
+} from '../useQueryParam';
 import {
   useQueryParamInformedAtom,
   useQueryParamInformedState,
@@ -8,43 +11,36 @@ import {
 import { useEffect } from 'react';
 import { waitFor } from '@testing-library/react';
 
+let mockURLSearchParams = new URLSearchParams();
+
 jest.mock('react-router-dom', () => ({
   __esModule: true,
   ...jest.requireActual('react-router-dom'),
 
-  useLocation: () => ({
-    pathname: '/',
-    search: `?${mockURLSearchParams?.toString?.() ?? ''}`,
-    hash: '',
-    state: null,
-    key: 'test',
-  }),
-
   useSearchParams: (init?: URLSearchParams) => {
-    if (init) {
-      mockURLSearchParams = new URLSearchParams(init);
-    }
+    if (init) mockURLSearchParams = new URLSearchParams(init.toString());
 
-    const snapshot = new URLSearchParams(mockURLSearchParams);
+    const snapshot = new URLSearchParams(mockURLSearchParams.toString());
 
     type SetSearchParamsArg =
       | URLSearchParams
       | ((prev: URLSearchParams) => URLSearchParams);
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const setSearchParams = (next: SetSearchParamsArg, ..._args: unknown[]) => {
-      mockURLSearchParams =
+    const setSearchParams = (next: SetSearchParamsArg, _opts?: unknown) => {
+      const resolved =
         typeof next === 'function' ? next(mockURLSearchParams) : next;
+
+      mockURLSearchParams = new URLSearchParams(resolved.toString());
     };
 
     return [snapshot, setSearchParams] as const;
   },
 }));
 
-let mockURLSearchParams: URLSearchParams;
-
-const flushMicrotasks = () =>
-  new Promise<void>((resolve) => queueMicrotask(() => resolve()));
+afterEach(() => {
+  mockURLSearchParams = new URLSearchParams();
+});
 
 describe('query param informed hook', () => {
   afterEach(() => {
@@ -86,32 +82,6 @@ describe('query param informed hook', () => {
     expect(atomResult.current[0]).toEqual('defaultAtom');
   });
 
-  it('does not override params when multiple query setters run back-to-back', async () => {
-    mockURLSearchParams = new URLSearchParams({ preExisting: 'value' });
-
-    const aAtom = atom<number>(0);
-    const bAtom = atom<number>(0);
-
-    renderHookWithRouter(() => {
-      const [, setA] = useQueryParamInformedAtom(aAtom, 'a');
-      const [, setB] = useQueryParamInformedAtom(bAtom, 'b');
-
-      useEffect(() => {
-        setA(1);
-        setB(2);
-      }, []);
-
-      return null;
-    });
-
-    await waitFor(() => {
-      expect(mockURLSearchParams.get('a')).toBe('1');
-      expect(mockURLSearchParams.get('b')).toBe('2');
-    });
-
-    expect(mockURLSearchParams.get('preExisting')).toBe('value');
-  });
-
   it('updates the search query when atom is updated', async () => {
     const customAtom = atom<number>(1);
     expect(mockURLSearchParams.get('num')).toBeNull();
@@ -123,14 +93,16 @@ describe('query param informed hook', () => {
         setA(2);
       }, []);
 
-      return [a, setA] as const;
+      return [a, setA];
     });
 
     expect(result.current[0]).toBe(2);
 
-    await flushMicrotasks();
-    expect(mockURLSearchParams.get('num')).toBe('2');
+    await waitFor(() => {
+      expect(mockURLSearchParams.get('num')).toBe('2');
+    });
   });
+
   it('updates the search query when state is updated', async () => {
     expect(mockURLSearchParams.get('num')).toBeNull();
 
@@ -141,13 +113,13 @@ describe('query param informed hook', () => {
         setA(2);
       }, []);
 
-      return [a, setA] as const;
+      return [a, setA];
     });
 
     expect(result.current[0]).toBe(2);
-
-    await flushMicrotasks();
-    expect(mockURLSearchParams.get('num')).toBe('2');
+    await waitFor(() => {
+      expect(mockURLSearchParams.get('num')).toBe('2');
+    });
   });
 
   it('preserves other search params', async () => {
@@ -156,10 +128,17 @@ describe('query param informed hook', () => {
     const customAtom = atom<number>(1);
 
     const { result } = renderHookWithRouter(() => {
-      const [state, setState] = useQueryParamInformedState(1, 'customState');
+      const batchRef = useQueryParamBatchRef();
+
+      const [state, setState] = useQueryParamInformedState(
+        1,
+        'customState',
+        batchRef,
+      );
       const [atomVal, setAtomVal] = useQueryParamInformedAtom(
         customAtom,
         'customAtom',
+        batchRef,
       );
 
       useEffect(() => {
@@ -167,28 +146,26 @@ describe('query param informed hook', () => {
         setAtomVal(2);
       }, []);
 
-      return [
-        [state, setState],
-        [atomVal, setAtomVal],
-      ] as const;
+      return { state, atomVal };
     });
 
-    expect(result.current[0][0]).toBe(2);
-    expect(result.current[1][0]).toBe(2);
+    expect(result.current.state).toBe(2);
+    expect(result.current.atomVal).toBe(2);
 
-    await flushMicrotasks();
-
-    expect(mockURLSearchParams.get('customState')).toBe('2');
-    expect(mockURLSearchParams.get('customAtom')).toBe('2');
-    expect(mockURLSearchParams.get('preExisting')).toEqual('value');
+    await waitFor(() => {
+      expect(mockURLSearchParams.get('customState')).toBe('2');
+      expect(mockURLSearchParams.get('customAtom')).toBe('2');
+      expect(mockURLSearchParams.get('preExisting')).toBe('value');
+    });
   });
 
   describe('generateQueryParamsForData', () => {
-    it('creates URLSearchParams with JSON value', () => {
+    it('creates URLSearchParams with encoded JSON value', () => {
       const data = { foo: 'bar', count: 2 };
       const key = 'testKey';
 
       const params = generateQueryParamsForData(data, key);
+
       expect(params).toBeInstanceOf(URLSearchParams);
       expect(params.get(key)).toBe(JSON.stringify(data));
     });
@@ -201,13 +178,5 @@ describe('query param informed hook', () => {
 
       expect(params.get(key)).toBe(JSON.stringify('hello world'));
     });
-  });
-  it('handles strings correctly', () => {
-    const data = 'hello world';
-    const key = 'str';
-
-    const params = generateQueryParamsForData(data, key);
-
-    expect(params.get(key)).toBe(JSON.stringify('hello world'));
   });
 });

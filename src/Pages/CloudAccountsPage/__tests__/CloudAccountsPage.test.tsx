@@ -61,20 +61,25 @@ it('renders cloud accounts page', async () => {
 });
 
 it('shows empty state when no accounts exist', async () => {
-  queryClient.setQueriesData(
-    { queryKey: ['cloudAccounts'] },
-    {
-      body: [],
-      pagination: {
-        total: 0,
-        count: 0,
-        limit: 10,
-        offset: 0,
-      },
+  queryClient.setQueryData(['rbacPermissions'], {
+    canReadCloudAccess: true,
+  });
+
+  queryClient.setQueryData(['cloudAccounts', { limit: 10, offset: 0 }], {
+    body: [],
+    pagination: {
+      total: 0,
+      count: 0,
+      limit: 10,
+      offset: 0,
     },
-  );
+  });
+
   renderWithRouter(<ComponentWithQueryClient />);
-  expect(screen.queryByTestId('navigate')).not.toBeInTheDocument();
+
+  expect(
+    screen.getByRole('link', { name: /integrations/i }),
+  ).toBeInTheDocument();
 });
 
 it('shows loading state while cloud accounts are loading', async () => {
