@@ -17,6 +17,8 @@ import {
   goldImagePaginationData,
 } from '../../state/goldImages';
 import { useQueryParamInformedAtom } from '../../hooks/util/useQueryParam';
+import { hasPaginationError } from '../../utils/errors';
+import { PaginationError } from '../shared/PaginationError';
 
 interface GoldImagesProps {
   goldImages: GoldImagesResponse;
@@ -28,6 +30,8 @@ export const GoldImagesTable = ({ goldImages }: GoldImagesProps) => {
     'pagination',
   );
   const cloudProviderFilter = useAtomValue(cloudProviderFilterData);
+
+  const onInvalidPage = hasPaginationError(pageOptions);
 
   const filteredGoldImages =
     cloudProviderFilter.length == 0
@@ -59,6 +63,15 @@ export const GoldImagesTable = ({ goldImages }: GoldImagesProps) => {
       itemCount: filteredGoldImages.length,
     });
   }, [cloudProviderFilter, filteredGoldImages.length]);
+
+  if (onInvalidPage) {
+    return (
+      <PaginationError
+        pagination={pageOptions}
+        setPagination={setGoldImagePagination}
+      />
+    );
+  }
 
   return (
     <Table>

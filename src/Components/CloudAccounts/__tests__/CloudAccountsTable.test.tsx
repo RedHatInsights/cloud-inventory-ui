@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { fireEvent, screen } from '@testing-library/react';
+import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { CloudAccountsTable, mapField } from '../CloudAccountsTable';
 import {
   CloudAccount,
@@ -104,6 +104,106 @@ describe('CloudAccountsTable', () => {
   it('renders View Purchases action', () => {
     renderTable(makeAccounts(2));
     expect(screen.getAllByText('View Purchases')).toHaveLength(2);
+  });
+
+  it('does not render pagination error when on valid page', () => {
+    renderTable(makeAccounts(25));
+    expect(
+      screen.queryByText(/No results for current page/i),
+    ).not.toBeInTheDocument();
+  });
+
+  it('renders pagination error when page exceeds item count', () => {
+    const accounts = makeAccounts(5);
+    renderWithRouter(
+      <HydrateAtomsTestProvider
+        initialValues={[
+          [
+            CloudAccountsPaginationData,
+            { page: 10, perPage: 10, itemCount: 5 },
+          ],
+        ]}
+      >
+        <CloudAccountsTable
+          cloudAccounts={accounts}
+          setSortBy={() => {}}
+          sortBy=""
+          sortDir={SortByDirection.asc}
+          setSortDir={() => {}}
+        />
+      </HydrateAtomsTestProvider>,
+    );
+
+    expect(
+      screen.getByText(/No results for current page/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /return to page 1/i }),
+    ).toBeInTheDocument();
+  });
+
+  it('does not render table content when pagination error is shown', () => {
+    const accounts = makeAccounts(5);
+    renderWithRouter(
+      <HydrateAtomsTestProvider
+        initialValues={[
+          [
+            CloudAccountsPaginationData,
+            { page: 10, perPage: 10, itemCount: 5 },
+          ],
+        ]}
+      >
+        <CloudAccountsTable
+          cloudAccounts={accounts}
+          setSortBy={() => {}}
+          sortBy=""
+          sortDir={SortByDirection.asc}
+          setSortDir={() => {}}
+        />
+      </HydrateAtomsTestProvider>,
+    );
+
+    expect(screen.queryByText('Cloud account')).not.toBeInTheDocument();
+    expect(screen.queryByText('Cloud provider')).not.toBeInTheDocument();
+  });
+
+  it('clears pagination error and returns to first page when clicking "Return to page 1"', async () => {
+    const accounts = makeAccounts(5);
+
+    renderWithRouter(
+      <HydrateAtomsTestProvider
+        initialValues={[
+          [
+            CloudAccountsPaginationData,
+            { page: 10, perPage: 10, itemCount: 5 },
+          ],
+        ]}
+      >
+        <CloudAccountsTable
+          cloudAccounts={accounts}
+          setSortBy={() => {}}
+          sortBy=""
+          sortDir={SortByDirection.asc}
+          setSortDir={() => {}}
+        />
+      </HydrateAtomsTestProvider>,
+    );
+
+    // Verify we start in the error state
+    expect(
+      screen.getByText(/No results for current page/i),
+    ).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: /return to page 1/i }));
+
+    // Error should be cleared
+    expect(
+      screen.queryByText(/No results for current page/i),
+    ).not.toBeInTheDocument();
+
+    await waitFor(() =>
+      expect(screen.getAllByText(accounts[0].shortName)[0]).toBeInTheDocument(),
+    );
   });
 
   describe('mapField', () => {

@@ -1,13 +1,8 @@
 import { atom } from 'jotai';
 import { CloudProviderName } from '../hooks/api/useGoldImages';
+import { PaginationData } from '../types/pagination';
 
-interface GoldImagePaginationData {
-  page: number;
-  perPage: number;
-  itemCount: number;
-}
-
-export const goldImagePaginationData = atom<GoldImagePaginationData>({
+export const goldImagePaginationData = atom<PaginationData>({
   page: 1,
   perPage: 10,
   itemCount: 0,

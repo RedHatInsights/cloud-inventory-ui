@@ -14,10 +14,18 @@ import { CloudAccount } from '../../hooks/api/useCloudAccounts';
 import { CloudAccountRow } from './types';
 import { CloudAccountStatus, getStatusIcon } from './GetStatusIcon';
 import { formatDate } from '../../hooks/util/dates';
-import { generateQueryParamsForData } from '../../hooks/util/useQueryParam';
+import {
+  generateQueryParamsForData,
+  useQueryParamInformedAtom,
+} from '../../hooks/util/useQueryParam';
 import { shortToFriendly } from '../../hooks/util/cloudProviderMaps';
-import { CloudAccountsSortField } from '../../state/cloudAccounts';
+import {
+  CloudAccountsPaginationData,
+  CloudAccountsSortField,
+} from '../../state/cloudAccounts';
 import { useApiBasedTableSort } from '../../hooks/util/tables/useTableSort';
+import { hasPaginationError } from '../../utils/errors';
+import { PaginationError } from '../shared/PaginationError';
 
 type CloudAccountProps = {
   cloudAccounts: CloudAccount[];
@@ -54,7 +62,13 @@ export const CloudAccountsTable = ({
     date: acct.dateAdded,
   }));
 
+  const [pagination, setPagination] = useQueryParamInformedAtom(
+    CloudAccountsPaginationData,
+    'pagination',
+  );
+
   const displayRows = rows;
+  const onInvalidPage = hasPaginationError(pagination);
 
   const { getSortParams } = useApiBasedTableSort('cloudAccountsSort', {
     sortBy,
@@ -68,6 +82,12 @@ export const CloudAccountsTable = ({
       3: 'dateAdded',
     },
   });
+
+  if (onInvalidPage) {
+    return (
+      <PaginationError pagination={pagination} setPagination={setPagination} />
+    );
+  }
 
   return (
     <Table aria-label="Cloud accounts table" variant="compact">

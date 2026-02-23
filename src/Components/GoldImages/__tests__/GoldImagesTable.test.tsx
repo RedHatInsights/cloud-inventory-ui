@@ -7,7 +7,10 @@ import {
 } from '../../../hooks/api/useGoldImages';
 import { GoldImagesTable } from '../GoldImagesTable';
 import { HydrateAtomsTestProvider } from '../../util/testing/HydrateAtomsTestProvider';
-import { cloudProviderFilterData } from '../../../state/goldImages';
+import {
+  cloudProviderFilterData,
+  goldImagePaginationData,
+} from '../../../state/goldImages';
 
 const goldImageTestData: (amount: number) => GoldImagesResponse = (
   amount: number,
@@ -106,5 +109,49 @@ describe('Gold images table', () => {
       container.querySelector('tbody')?.firstChild?.firstChild?.firstChild
         ?.textContent,
     ).toBe(Object.values(goldImageData)[0].provider);
+  });
+
+  it('does not render pagination error when on valid page', () => {
+    const { container } = renderWithRouter(
+      <GoldImagesTable goldImages={goldImageTestData(25)} />,
+    );
+
+    expect(container.querySelector('table')?.textContent).not.toMatch(
+      /No results for current page/i,
+    );
+  });
+
+  it('renders pagination error when page exceeds item count', () => {
+    const goldImageData = goldImageTestData(5);
+
+    const { container } = renderWithRouter(
+      <HydrateAtomsTestProvider
+        initialValues={[
+          [goldImagePaginationData, { page: 10, perPage: 10, itemCount: 5 }],
+        ]}
+      >
+        <GoldImagesTable goldImages={goldImageData} />
+      </HydrateAtomsTestProvider>,
+    );
+
+    expect(container.textContent).toMatch(/No results for current page/i);
+    expect(container.textContent).toMatch(/Return to page 1/i);
+  });
+
+  it('does not render table content when pagination error is shown', () => {
+    const goldImageData = goldImageTestData(5);
+
+    const { container } = renderWithRouter(
+      <HydrateAtomsTestProvider
+        initialValues={[
+          [goldImagePaginationData, { page: 10, perPage: 10, itemCount: 5 }],
+        ]}
+      >
+        <GoldImagesTable goldImages={goldImageData} />
+      </HydrateAtomsTestProvider>,
+    );
+
+    expect(container.querySelector('thead')).not.toBeInTheDocument();
+    expect(container.querySelector('tbody')).not.toBeInTheDocument();
   });
 });
