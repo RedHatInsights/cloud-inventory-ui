@@ -21,8 +21,6 @@ const { ComponentWithQueryClient, queryClient } = ManipulatableQueryWrapper(
 
 beforeEach(() => {
   queryClient.clear();
-  jest.restoreAllMocks();
-  queryClient.clear();
   queryClient.setQueryData(['rbacPermissions'], {
     canReadCloudAccess: true,
   });
