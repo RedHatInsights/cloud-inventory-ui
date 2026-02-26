@@ -21,7 +21,6 @@ const { ComponentWithQueryClient, queryClient } = ManipulatableQueryWrapper(
 
 beforeEach(() => {
   queryClient.clear();
-
   queryClient.setQueryData(['rbacPermissions'], {
     canReadCloudAccess: true,
   });
@@ -61,29 +60,19 @@ it('renders cloud accounts page', async () => {
 });
 
 it('shows empty state when no accounts exist', async () => {
-  queryClient.setQueryData(
-    [
-      'cloudAccounts',
-      {
-        limit: 10,
-        offset: 0,
-      },
-    ],
-    {
-      body: [],
-      pagination: {
-        total: 1,
-        count: 1,
-        limit: 10,
-        offset: 0,
-      },
-    },
-  );
+  queryClient.setQueryData(['rbacPermissions'], { canReadCloudAccess: true });
+
+  queryClient.setQueryData(['cloudAccounts', { limit: 10, offset: 0 }], {
+    body: [],
+    pagination: { total: 0, count: 0, limit: 10, offset: 0 },
+  });
+
   renderWithRouter(<ComponentWithQueryClient />);
 
-  const emptyStateText = await screen.findByText(/cloud accounts appear here/i);
-
-  expect(emptyStateText).toBeInTheDocument();
+  const integrationsLink = await screen.findByRole('link', {
+    name: /integrations/i,
+  });
+  expect(integrationsLink).toHaveAttribute('href', '/settings/integrations/');
 });
 
 it('shows loading state while cloud accounts are loading', async () => {
