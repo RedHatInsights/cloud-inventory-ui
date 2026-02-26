@@ -1,9 +1,6 @@
 import { atom } from 'jotai';
 import { renderHookWithRouter } from '../../../utils/testing/customRender';
-import {
-  generateQueryParamsForData,
-  useQueryParamBatchRef,
-} from '../useQueryParam';
+import { generateQueryParamsForData } from '../useQueryParam';
 import {
   useQueryParamInformedAtom,
   useQueryParamInformedState,
@@ -17,8 +14,21 @@ jest.mock('react-router-dom', () => ({
   __esModule: true,
   ...jest.requireActual('react-router-dom'),
 
+  useLocation: () => {
+    const qs = mockURLSearchParams.toString();
+    return {
+      pathname: '/',
+      search: qs ? `?${qs}` : '',
+      hash: '',
+      state: null,
+      key: 'test',
+    };
+  },
+
   useSearchParams: (init?: URLSearchParams) => {
-    if (init) mockURLSearchParams = new URLSearchParams(init.toString());
+    if (init) {
+      mockURLSearchParams = new URLSearchParams(init.toString());
+    }
 
     const snapshot = new URLSearchParams(mockURLSearchParams.toString());
 
@@ -27,7 +37,7 @@ jest.mock('react-router-dom', () => ({
       | ((prev: URLSearchParams) => URLSearchParams);
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const setSearchParams = (next: SetSearchParamsArg, _opts?: unknown) => {
+    const setSearchParams = (next: SetSearchParamsArg, ..._args: unknown[]) => {
       const resolved =
         typeof next === 'function' ? next(mockURLSearchParams) : next;
 
@@ -37,10 +47,6 @@ jest.mock('react-router-dom', () => ({
     return [snapshot, setSearchParams] as const;
   },
 }));
-
-afterEach(() => {
-  mockURLSearchParams = new URLSearchParams();
-});
 
 describe('query param informed hook', () => {
   afterEach(() => {
@@ -124,21 +130,13 @@ describe('query param informed hook', () => {
 
   it('preserves other search params', async () => {
     mockURLSearchParams = new URLSearchParams({ preExisting: 'value' });
-
     const customAtom = atom<number>(1);
 
     const { result } = renderHookWithRouter(() => {
-      const batchRef = useQueryParamBatchRef();
-
-      const [state, setState] = useQueryParamInformedState(
-        1,
-        'customState',
-        batchRef,
-      );
+      const [state, setState] = useQueryParamInformedState(1, 'customState');
       const [atomVal, setAtomVal] = useQueryParamInformedAtom(
         customAtom,
         'customAtom',
-        batchRef,
       );
 
       useEffect(() => {

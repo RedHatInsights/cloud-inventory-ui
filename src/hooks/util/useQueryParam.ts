@@ -1,42 +1,40 @@
 import { PrimitiveAtom, useAtom } from 'jotai';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useCallback, useEffect, useState } from 'react';
+import { useLocation, useSearchParams } from 'react-router-dom';
 
-export type QueryParamBatchRef = React.MutableRefObject<{
-  nextParams: URLSearchParams | null;
-  updatePlanned: boolean;
-}>;
-
-export function useQueryParamBatchRef(): QueryParamBatchRef {
-  return useRef({ nextParams: null, updatePlanned: false });
-}
+let nextParams: URLSearchParams | null = null;
+let updatePlanned = false;
 
 function updateQueryParamsTogether(
-  batchRef: QueryParamBatchRef,
-  currentParams: URLSearchParams,
+  currentSearch: string,
   applyUpdate: (p: URLSearchParams) => void,
-  commit: (p: URLSearchParams) => void,
+  commitSearchParams: (p: URLSearchParams) => void,
 ) {
-  const base = batchRef.current.nextParams
-    ? new URLSearchParams(batchRef.current.nextParams.toString())
-    : new URLSearchParams(currentParams.toString());
+  const base = nextParams
+    ? new URLSearchParams(nextParams.toString())
+    : new URLSearchParams(currentSearch);
   applyUpdate(base);
-  batchRef.current.nextParams = base;
-  if (batchRef.current.updatePlanned) return;
-  batchRef.current.updatePlanned = true;
+
+  nextParams = base;
+  if (updatePlanned) return;
+  updatePlanned = true;
+  // Multiple query-param setters can run in the same tick (ex: sortBy + sortDir).Expand commentComment on line R21Resolved
+  // We merge them and write to the URL once and will prevent overwrites.
   queueMicrotask(() => {
-    batchRef.current.updatePlanned = false;
-    const toCommit = batchRef.current.nextParams;
-    batchRef.current.nextParams = null;
-    if (toCommit) commit(toCommit);
+    updatePlanned = false;
+    const toCommit = nextParams;
+    nextParams = null;
+    if (toCommit) commitSearchParams(toCommit);
   });
 }
 
 function useInitializeFromQueryParam<T>(key: string, setter: (v: T) => void) {
   const [searchParams] = useSearchParams();
   const init = searchParams.get(key);
+
   useEffect(() => {
     if (init != null) {
+      // If we fail to parse the search, ignore it
       try {
         setter(JSON.parse(init) as T);
       } catch {
@@ -46,7 +44,10 @@ function useInitializeFromQueryParam<T>(key: string, setter: (v: T) => void) {
   }, [init, key, setter]);
 }
 
-export function generateQueryParamsForData<T>(data: T, key: string) {
+export function generateQueryParamsForData<T>(
+  data: T,
+  key: string,
+): URLSearchParams {
   const params = new URLSearchParams();
   params.set(key, JSON.stringify(data));
   return params;
@@ -55,29 +56,24 @@ export function generateQueryParamsForData<T>(data: T, key: string) {
 function useUpdateQueryParams<T>(
   key: string,
   setter: (v: T) => void,
-  batchRef?: QueryParamBatchRef,
-) {
-  const [searchParams, setSearchParams] = useSearchParams();
+): (v: T) => void {
+  const location = useLocation();
+  const [, setSearchParams] = useSearchParams();
+
   const commit = useCallback(
     (p: URLSearchParams) => setSearchParams(p, { replace: true }),
     [setSearchParams],
   );
 
-  const localRef = useRef<{
-    nextParams: URLSearchParams | null;
-    updatePlanned: boolean;
-  }>({
-    nextParams: null,
-    updatePlanned: false,
-  });
-  const refToUse = batchRef ?? localRef;
   return (v: T) => {
     updateQueryParamsTogether(
-      refToUse,
-      searchParams,
-      (p) => p.set(key, JSON.stringify(v)),
+      location.search,
+      (p) => {
+        p.set(key, JSON.stringify(v));
+      },
       commit,
     );
+
     setter(v);
   };
 }
@@ -85,21 +81,23 @@ function useUpdateQueryParams<T>(
 export function useQueryParamInformedAtom<T>(
   atom: PrimitiveAtom<T>,
   key: string,
-  batchRef?: QueryParamBatchRef,
 ): [Awaited<T>, (v: T) => void] {
   const [atomValue, setAtom] = useAtom(atom);
+
   useInitializeFromQueryParam(key, setAtom);
-  const queryParamWrappedSetter = useUpdateQueryParams(key, setAtom, batchRef);
+  const queryParamWrappedSetter = useUpdateQueryParams(key, setAtom);
+
   return [atomValue, queryParamWrappedSetter];
 }
 
 export function useQueryParamInformedState<T>(
   init: T,
   key: string,
-  batchRef?: QueryParamBatchRef,
 ): [T, (v: T) => void] {
   const [state, setState] = useState(init);
+
   useInitializeFromQueryParam(key, setState);
-  const queryParamWrappedSetter = useUpdateQueryParams(key, setState, batchRef);
+  const queryParamWrappedSetter = useUpdateQueryParams(key, setState);
+
   return [state, queryParamWrappedSetter];
 }
