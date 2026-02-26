@@ -7,23 +7,18 @@ import {
 } from '../useQueryParam';
 import { useEffect } from 'react';
 import { waitFor } from '@testing-library/react';
+import { __resetQueryParamBatchforTests } from '../useQueryParam';
 
 let mockURLSearchParams = new URLSearchParams();
+
+beforeEach(() => {
+  mockURLSearchParams = new URLSearchParams();
+  __resetQueryParamBatchforTests();
+});
 
 jest.mock('react-router-dom', () => ({
   __esModule: true,
   ...jest.requireActual('react-router-dom'),
-
-  useLocation: () => {
-    const qs = mockURLSearchParams.toString();
-    return {
-      pathname: '/',
-      search: qs ? `?${qs}` : '',
-      hash: '',
-      state: null,
-      key: 'test',
-    };
-  },
 
   useSearchParams: (init?: URLSearchParams) => {
     if (init) {

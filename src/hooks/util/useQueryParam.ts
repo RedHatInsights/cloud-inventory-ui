@@ -1,9 +1,14 @@
 import { PrimitiveAtom, useAtom } from 'jotai';
 import { useCallback, useEffect, useState } from 'react';
-import { useLocation, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 
 let nextParams: URLSearchParams | null = null;
 let updatePlanned = false;
+
+export function __resetQueryParamBatchforTests() {
+  nextParams = null;
+  updatePlanned = false;
+}
 
 function updateQueryParamsTogether(
   currentSearch: string,
@@ -57,8 +62,7 @@ function useUpdateQueryParams<T>(
   key: string,
   setter: (v: T) => void,
 ): (v: T) => void {
-  const location = useLocation();
-  const [, setSearchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const commit = useCallback(
     (p: URLSearchParams) => setSearchParams(p, { replace: true }),
@@ -67,10 +71,8 @@ function useUpdateQueryParams<T>(
 
   return (v: T) => {
     updateQueryParamsTogether(
-      location.search,
-      (p) => {
-        p.set(key, JSON.stringify(v));
-      },
+      searchParams.toString(),
+      (p) => p.set(key, JSON.stringify(v)),
       commit,
     );
 
