@@ -127,6 +127,10 @@ describe('query param informed hook', () => {
     mockURLSearchParams = new URLSearchParams({ preExisting: 'value' });
     const customAtom = atom<number>(1);
 
+    expect(mockURLSearchParams.get('customAtom')).toBeNull();
+    expect(mockURLSearchParams.get('customState')).toBeNull();
+    expect(mockURLSearchParams.get('preExisting')).toEqual('value');
+
     const { result } = renderHookWithRouter(() => {
       const [state, setState] = useQueryParamInformedState(1, 'customState');
       const [atomVal, setAtomVal] = useQueryParamInformedAtom(
