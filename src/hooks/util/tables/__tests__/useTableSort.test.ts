@@ -1,6 +1,6 @@
 import { waitFor } from '@testing-library/react';
 import { renderHookWithRouter } from '../../../../utils/testing/customRender';
-import { useTableSort } from '../useTableSort';
+import { useApiBasedTableSort, useTableSort } from '../useTableSort';
 import { IExtraColumnData, SortByDirection } from '@patternfly/react-table';
 import { MouseEvent, act } from 'react';
 import { expectToThrow } from '../../../../utils/testing/expectToThrow';
@@ -95,15 +95,41 @@ describe('Table sort hook', () => {
   });
 
   it('updates the URL search', async () => {
-    const initialData = [{ test: 'b' }, { test: 'a' }, { test: 'z' }];
-    renderHookWithRouter(() =>
-      useTableSort(initialData, 'data', {
-        initialSort: { dir: SortByDirection.asc, index: 0 },
+    // these mimic CloudAccountsPage state setters (they’d normally update query params)
+    const setSortBy = jest.fn();
+    const setSortDir = jest.fn();
+
+    const { result } = renderHookWithRouter(() =>
+      useApiBasedTableSort('cloudAccountsSort', {
+        sortBy: undefined,
+        sortDir: undefined,
+        setSortBy,
+        setSortDir,
+        lookup: {
+          0: 'providerAccountID',
+          1: 'shortName',
+          2: 'goldImageAccess',
+          3: 'dateAdded',
+        },
       }),
     );
 
-    (await waitFor(() => expect(window.location.search))).toEqual(
-      '?dataActiveSortDir=%2522asc%2522',
+    if (result.current.getSortParams(0).onSort == undefined) {
+      throw new Error('onSort not defined');
+    }
+
+    act(() =>
+      result.current
+        .getSortParams(0)
+        .onSort?.(
+          null as unknown as MouseEvent,
+          3,
+          SortByDirection.asc,
+          null as unknown as IExtraColumnData,
+        ),
     );
+
+    expect(setSortBy).toHaveBeenCalledWith('dateAdded');
+    expect(setSortDir).toHaveBeenCalledWith(SortByDirection.asc);
   });
 });

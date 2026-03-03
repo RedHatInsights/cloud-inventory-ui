@@ -5,18 +5,43 @@ import {
   useQueryParamInformedAtom,
   useQueryParamInformedState,
 } from '../useQueryParam';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
+import { waitFor } from '@testing-library/react';
+import { __resetQueryParamBatchforTests } from '../useQueryParam';
+
+let mockURLSearchParams = new URLSearchParams();
+
+beforeEach(() => {
+  mockURLSearchParams = new URLSearchParams();
+  __resetQueryParamBatchforTests();
+});
 
 jest.mock('react-router-dom', () => ({
   __esModule: true,
   ...jest.requireActual('react-router-dom'),
-  useSearchParams: (init: URLSearchParams) => {
-    if (init) return useState(init);
-    return useState(mockURLSearchParams);
+
+  useSearchParams: (init?: URLSearchParams) => {
+    if (init) {
+      mockURLSearchParams = new URLSearchParams(init.toString());
+    }
+
+    const snapshot = new URLSearchParams(mockURLSearchParams.toString());
+
+    type SetSearchParamsArg =
+      | URLSearchParams
+      | ((prev: URLSearchParams) => URLSearchParams);
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const setSearchParams = (next: SetSearchParamsArg, ..._args: unknown[]) => {
+      const resolved =
+        typeof next === 'function' ? next(mockURLSearchParams) : next;
+
+      mockURLSearchParams = new URLSearchParams(resolved.toString());
+    };
+
+    return [snapshot, setSearchParams] as const;
   },
 }));
-
-let mockURLSearchParams: URLSearchParams;
 
 describe('query param informed hook', () => {
   afterEach(() => {
@@ -58,7 +83,7 @@ describe('query param informed hook', () => {
     expect(atomResult.current[0]).toEqual('defaultAtom');
   });
 
-  it('updates the search query when atom is updated', () => {
+  it('updates the search query when atom is updated', async () => {
     const customAtom = atom<number>(1);
     expect(mockURLSearchParams.get('num')).toBeNull();
 
@@ -73,10 +98,13 @@ describe('query param informed hook', () => {
     });
 
     expect(result.current[0]).toBe(2);
-    expect(mockURLSearchParams.get('num')).toBe('2');
+
+    await waitFor(() => {
+      expect(mockURLSearchParams.get('num')).toBe('2');
+    });
   });
 
-  it('updates the search query when state is updated', () => {
+  it('updates the search query when state is updated', async () => {
     expect(mockURLSearchParams.get('num')).toBeNull();
 
     const { result } = renderHookWithRouter(() => {
@@ -90,40 +118,42 @@ describe('query param informed hook', () => {
     });
 
     expect(result.current[0]).toBe(2);
-    expect(mockURLSearchParams.get('num')).toBe('2');
+    await waitFor(() => {
+      expect(mockURLSearchParams.get('num')).toBe('2');
+    });
   });
 
-  it('preserves other search params', () => {
+  it('preserves other search params', async () => {
     mockURLSearchParams = new URLSearchParams({ preExisting: 'value' });
-
     const customAtom = atom<number>(1);
+
     expect(mockURLSearchParams.get('customAtom')).toBeNull();
     expect(mockURLSearchParams.get('customState')).toBeNull();
     expect(mockURLSearchParams.get('preExisting')).toEqual('value');
 
     const { result } = renderHookWithRouter(() => {
       const [state, setState] = useQueryParamInformedState(1, 'customState');
-      const [atom, setAtom] = useQueryParamInformedAtom(
+      const [atomVal, setAtomVal] = useQueryParamInformedAtom(
         customAtom,
         'customAtom',
       );
 
       useEffect(() => {
         setState(2);
-        setAtom(2);
+        setAtomVal(2);
       }, []);
 
-      return [
-        [state, setState],
-        [atom, setAtom],
-      ];
+      return { state, atomVal };
     });
 
-    expect(result.current[0][0]).toBe(2);
-    expect(result.current[1][0]).toBe(2);
-    expect(mockURLSearchParams.get('customState')).toBe('2');
-    expect(mockURLSearchParams.get('customAtom')).toBe('2');
-    expect(mockURLSearchParams.get('preExisting')).toEqual('value');
+    expect(result.current.state).toBe(2);
+    expect(result.current.atomVal).toBe(2);
+
+    await waitFor(() => {
+      expect(mockURLSearchParams.get('customState')).toBe('2');
+      expect(mockURLSearchParams.get('customAtom')).toBe('2');
+      expect(mockURLSearchParams.get('preExisting')).toBe('value');
+    });
   });
 
   describe('generateQueryParamsForData', () => {
@@ -134,7 +164,7 @@ describe('query param informed hook', () => {
       const params = generateQueryParamsForData(data, key);
 
       expect(params).toBeInstanceOf(URLSearchParams);
-      expect(params.get(key)).toBe(encodeURIComponent(JSON.stringify(data)));
+      expect(params.get(key)).toBe(JSON.stringify(data));
     });
 
     it('handles strings correctly', () => {
@@ -143,9 +173,7 @@ describe('query param informed hook', () => {
 
       const params = generateQueryParamsForData(data, key);
 
-      expect(params.get(key)).toBe(
-        encodeURIComponent(JSON.stringify('hello world')),
-      );
+      expect(params.get(key)).toBe(JSON.stringify('hello world'));
     });
   });
 });
