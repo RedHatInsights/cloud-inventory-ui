@@ -60,6 +60,7 @@ export const CloudAccountsTable = ({
     provider: shortToFriendly[acct.shortName],
     goldImage: acct.goldImageAccess as CloudAccountStatus,
     date: acct.dateAdded,
+    sourceID: acct.sourceID,
   }));
 
   const [pagination, setPagination] = useQueryParamInformedAtom(
@@ -104,9 +105,12 @@ export const CloudAccountsTable = ({
         {displayRows.map((row) => (
           <Tr key={row.id}>
             <Td>
-              <Button variant="link" isInline component="a" href="">
-                {row.id}
-              </Button>
+              {row.sourceID && (
+                <Link to={`/settings/integrations/detail/${row.sourceID}`}>
+                  {row.id}
+                </Link>
+              )}
+              {!row.sourceID && row.id}
             </Td>
             <Td>
               <Link

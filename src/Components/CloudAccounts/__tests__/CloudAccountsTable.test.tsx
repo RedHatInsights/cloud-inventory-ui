@@ -18,7 +18,10 @@ jest.mock('../../../hooks/util/dates', () => ({
   formatDate: (d: string) => `Formatted:${d}`,
 }));
 
-const makeAccounts = (count: number): CloudAccount[] =>
+const makeAccounts = (
+  count: number,
+  hasSourceId: boolean = true,
+): CloudAccount[] =>
   Array.from({ length: count }).map((_, i) => ({
     providerAccountID: `acct-${i}`,
     shortName:
@@ -26,6 +29,7 @@ const makeAccounts = (count: number): CloudAccount[] =>
     providerLabel: i % 2 === 0 ? 'AWS' : 'Google Cloud',
     goldImageAccess: i % 2 === 0 ? 'Granted' : 'Failed',
     dateAdded: `2024-01-${String(i + 1).padStart(2, '0')}`,
+    sourceID: hasSourceId ? 'source-id' : undefined,
   }));
 
 const TestTableComponent = ({ accounts }: { accounts: CloudAccount[] }) => {
@@ -37,9 +41,18 @@ const TestTableComponent = ({ accounts }: { accounts: CloudAccount[] }) => {
     if (sortBy != '')
       setAccounts(
         stateAccounts.sort((a, b) => {
-          const result = a[sortBy as keyof CloudAccount].localeCompare(
-            b[sortBy as keyof CloudAccount],
-          );
+          const aVal = a[sortBy as keyof CloudAccount];
+          const bVal = b[sortBy as keyof CloudAccount];
+
+          let result = 0;
+
+          if (!aVal) {
+            result = -1;
+          } else if (!bVal) {
+            result = 1;
+          } else {
+            result = aVal.localeCompare(bVal);
+          }
 
           return sortDir == SortByDirection.asc ? result : result * -1;
         }),
@@ -96,9 +109,18 @@ describe('CloudAccountsTable', () => {
     expect(screen.getAllByText(/Formatted:/)).toHaveLength(2);
   });
 
-  it('renders cloud account ID as a link', () => {
+  it('renders cloud account ID as link to integrations when source ID is present', () => {
     renderTable(makeAccounts(1));
-    expect(screen.getByText('acct-0').closest('a')).toBeTruthy();
+    expect(screen.getByText('acct-0')).toBeInTheDocument();
+    expect(screen.getByText('acct-0').closest('a')?.href).toContain(
+      '/settings/integrations/detail/source-id',
+    );
+  });
+
+  it('renders cloud account ID as plain text when source ID is not present', () => {
+    renderTable(makeAccounts(1, false));
+    expect(screen.getByText('acct-0').closest('a')).not.toBeInTheDocument();
+    expect(screen.getByText('acct-0')).toBeInTheDocument();
   });
 
   it('renders View Purchases action', () => {
