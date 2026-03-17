@@ -6,5 +6,5 @@ export interface CloudAccountRow {
   provider: CloudProviderName;
   goldImage: CloudAccountStatus;
   date: string;
-  [key: string]: string;
+  sourceID?: string;
 }

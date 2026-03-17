@@ -13,6 +13,7 @@ export type CloudAccount = {
   goldImageAccess: 'Granted' | 'Requested' | 'Failed';
   dateAdded: string;
   providerLabel: string;
+  sourceID?: string;
   shortName: CloudProviderShortname;
 };
 
