@@ -1,5 +1,12 @@
 import { atom } from 'jotai';
 import { PaginationData } from '../types/pagination';
+import { CloudProviderShortname } from '../hooks/api/useCloudAccounts';
+
+export const cloudProviderFilterData = atom<CloudProviderShortname[]>([]);
+
+export const goldImageStatusFilterData = atom<string[]>([]);
+
+export const cloudAccountIDFilterData = atom<string>('');
 
 export const CloudAccountsPaginationData = atom<PaginationData>({
   page: 1,

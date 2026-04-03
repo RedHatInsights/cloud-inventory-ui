@@ -5,7 +5,10 @@ import { Section } from '@redhat-cloud-services/frontend-components/Section';
 import { PageHeader } from '@redhat-cloud-services/frontend-components/PageHeader';
 import { CloudAccountsPagination } from '../../Components/CloudAccounts/CloudAccountsPagination';
 import { CloudAccountsToolbar } from '../../Components/CloudAccounts/CloudAccountsToolbar';
-import { useCloudAccounts } from '../../hooks/api/useCloudAccounts';
+import {
+  CloudProviderShortname,
+  useCloudAccounts,
+} from '../../hooks/api/useCloudAccounts';
 import { Unavailable } from '@redhat-cloud-services/frontend-components/Unavailable';
 import { Navigate } from 'react-router-dom';
 import { Loading } from '../../Components/util/Loading';
@@ -16,9 +19,15 @@ import {
   useQueryParamInformedAtom,
   useQueryParamInformedState,
 } from '../../hooks/util/useQueryParam';
-import { CloudAccountsPaginationData } from '../../state/cloudAccounts';
+import {
+  CloudAccountsPaginationData,
+  cloudAccountIDFilterData,
+  cloudProviderFilterData,
+  goldImageStatusFilterData,
+} from '../../state/cloudAccounts';
 import { SortByDirection } from '@patternfly/react-table';
 import { hasPaginationError } from '../../utils/errors';
+import { useAtom, useAtomValue } from 'jotai';
 
 export const CloudAccountsPage = () => {
   const [pagination, setPagination] = useQueryParamInformedAtom(
@@ -36,6 +45,14 @@ export const CloudAccountsPage = () => {
 
   const { page, perPage } = pagination;
 
+  const selectedProviders = useAtomValue(cloudProviderFilterData);
+  const selectedStatuses = useAtomValue(goldImageStatusFilterData);
+  const accountIDSearch = useAtomValue(cloudAccountIDFilterData);
+
+  const [, setProviders] = useAtom(cloudProviderFilterData);
+  const [, setStatuses] = useAtom(goldImageStatusFilterData);
+  const [, setAccountID] = useAtom(cloudAccountIDFilterData);
+
   const {
     data: cloudAccountsResponse,
     isError: isCloudAccountsError,
@@ -45,9 +62,19 @@ export const CloudAccountsPage = () => {
     offset: (page - 1) * perPage,
     sortField: sortBy,
     sortDirection: sortDir,
+    shortName: selectedProviders,
+    goldImageAccess: selectedStatuses,
+    providerAccountID: accountIDSearch,
   });
 
   const accounts = cloudAccountsResponse?.body ?? [];
+  const availableProviders = Array.from(
+    new Set(accounts.map((acc) => acc.shortName)),
+  ) as CloudProviderShortname[];
+
+  const availableStatuses = Array.from(
+    new Set(accounts.map((acc) => acc.goldImageAccess)),
+  ).filter(Boolean) as string[];
 
   const hasAccounts = accounts.length > 0;
   useEffect(() => {
@@ -71,6 +98,13 @@ export const CloudAccountsPage = () => {
   if (areCloudAccountsLoading) return <Loading />;
   if (isCloudAccountsError) return <Unavailable />;
 
+  const handleClearAll = () => {
+    setProviders([]);
+    setStatuses([]);
+    setAccountID('');
+    setPagination({ ...pagination, page: 1 });
+  };
+
   return (
     <>
       <PageHeader>
@@ -81,7 +115,11 @@ export const CloudAccountsPage = () => {
           {shouldShowEmptyState && <NoCloudAccounts />}
           {!shouldShowEmptyState && (
             <>
-              <CloudAccountsToolbar />
+              <CloudAccountsToolbar
+                onClearAll={handleClearAll}
+                availableProviders={availableProviders}
+                availableStatuses={availableStatuses}
+              />
               <CloudAccountsTable
                 cloudAccounts={accounts}
                 sortBy={sortBy}
