@@ -44,7 +44,7 @@ export const GoldImageAccessFilter = ({
       toggle={(toggleRef: Ref<MenuToggleElement>) => (
         <MenuToggle
           ref={toggleRef}
-          onClick={() => setIsOpen(!isOpen)}
+          onClick={() => setIsOpen((prev) => !prev)}
           isExpanded={isOpen}
           {...(selectedStatuses.length > 0 && {
             badge: selectedStatuses.length,

@@ -17,6 +17,8 @@ interface CloudProviderSharedFilterSelectProps<T extends string> {
   selectOptions: T[];
   labelMap?: Record<string, string>;
   isSplitButton?: boolean;
+  toggleLabel?: string;
+  splitButtonLabel?: string;
 }
 
 export const CloudProviderSharedFilterSelect = <T extends string>({
@@ -25,6 +27,8 @@ export const CloudProviderSharedFilterSelect = <T extends string>({
   selectOptions,
   labelMap,
   isSplitButton = true,
+  toggleLabel = 'Filter',
+  splitButtonLabel = 'Select',
 }: CloudProviderSharedFilterSelectProps<T>) => {
   const [isFilterExpanded, setIsFilterExpanded] = useState(false);
   const [selectedProviders, setSelectedProviders] = useQueryParamInformedAtom<
@@ -64,12 +68,12 @@ export const CloudProviderSharedFilterSelect = <T extends string>({
                   key="label"
                   onClick={() => setIsFilterExpanded(!isFilterExpanded)}
                 >
-                  Cloud Provider
+                  {splitButtonLabel}
                 </MenuToggleAction>,
               ],
             })}
           >
-            {'Filter by cloud provider'}
+            {toggleLabel}
           </MenuToggle>
         )}
       >

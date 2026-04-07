@@ -38,6 +38,27 @@ interface CloudAccountsToolbarProps {
 
 type FilterCategory = 'ID' | 'Provider' | 'Status';
 
+const FILTER_CONFIG: Record<
+  FilterCategory,
+  {
+    selectLabel: string;
+    toolbarCategoryName: string;
+  }
+> = {
+  ID: {
+    selectLabel: 'Cloud account',
+    toolbarCategoryName: 'Cloud account',
+  },
+  Provider: {
+    selectLabel: 'Cloud provider',
+    toolbarCategoryName: 'Cloud provider',
+  },
+  Status: {
+    selectLabel: 'Gold image access',
+    toolbarCategoryName: 'Gold image access',
+  },
+};
+
 export const CloudAccountsToolbar: React.FC<CloudAccountsToolbarProps> = ({
   onClearAll,
   availableProviders,
@@ -60,10 +81,12 @@ export const CloudAccountsToolbar: React.FC<CloudAccountsToolbarProps> = ({
   );
 
   const onCategorySelect = (
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    _event: any,
+    _event: React.MouseEvent | undefined,
     value: string | number | undefined,
   ) => {
+    if (!value) {
+      return;
+    }
     setActiveCategory(value as FilterCategory);
     setIsCategoryDropdownOpen(false);
   };
@@ -71,52 +94,55 @@ export const CloudAccountsToolbar: React.FC<CloudAccountsToolbarProps> = ({
   const categoryToggle = (toggleRef: React.Ref<MenuToggleElement>) => (
     <MenuToggle
       ref={toggleRef}
-      onClick={() => setIsCategoryDropdownOpen(!isCategoryDropdownOpen)}
+      onClick={() => setIsCategoryDropdownOpen((prev) => !prev)}
       isExpanded={isCategoryDropdownOpen}
       icon={<FilterIcon />}
     >
-      {activeCategory === 'ID' && 'Cloud account'}
-      {activeCategory === 'Provider' && 'Cloud provider'}
-      {activeCategory === 'Status' && 'Gold image access'}
+            {FILTER_CONFIG[activeCategory].selectLabel}
+          
     </MenuToggle>
   );
 
-  const onDeleteGroup = (category: string) => {
-    if (category === 'Cloud provider') setSelectedProviders([]);
-    if (category === 'Cloud account') setSelectedID('');
-    if (category === 'Gold image access') setSelectedStatuses([]);
+  const clearHandlers: Record<FilterCategory, () => void> = {
+    ID: () => setSelectedID(''),
+    Provider: () => setSelectedProviders([]),
+    Status: () => setSelectedStatuses([]),
+  };
+
+  const onDeleteGroup = (category: FilterCategory) => {
+    clearHandlers[category]();
   };
 
   const hasActiveFilters =
-    !!selectedID || selectedProviders.length > 0 || selectedStatuses.length > 0;
+    Boolean(selectedID) ||
+    selectedProviders.length > 0 ||
+    selectedStatuses.length > 0;
 
   return (
-    <Toolbar
-      id="cloud-accounts-toolbar"
-      clearAllFilters={onClearAll}
-      clearFiltersButtonText={
-        hasActiveFilters ? 'Clear all filters' : undefined
-      }
-    >
+    <Toolbar id="cloud-accounts-toolbar">
       <ToolbarContent>
         <ToolbarGroup variant="filter-group">
+                    
           <ToolbarItem>
+            {' '}
             <Select
               role="menu"
               onSelect={onCategorySelect}
               isOpen={isCategoryDropdownOpen}
-              onOpenChange={(isOpen) => setIsCategoryDropdownOpen(isOpen)}
+              onOpenChange={setIsCategoryDropdownOpen}
               toggle={categoryToggle}
             >
               <SelectList>
-                <SelectOption value="ID">Cloud account</SelectOption>
-                <SelectOption value="Provider">Cloud provider</SelectOption>
-                <SelectOption value="Status">Gold image access</SelectOption>
+                {(Object.keys(FILTER_CONFIG) as FilterCategory[]).map((key) => (
+                  <SelectOption key={key} value={key}>
+                    {FILTER_CONFIG[key].selectLabel}
+                  </SelectOption>
+                ))}
               </SelectList>
             </Select>
           </ToolbarItem>
           <ToolbarItem>
-            {activeCategory === 'ID' && <CloudAccountIDFilter />}
+                        {activeCategory === 'ID' && <CloudAccountIDFilter />}
             {activeCategory === 'Provider' && (
               <CloudProviderSharedFilterSelect
                 filterAtom={cloudProviderFilterData}
@@ -124,6 +150,7 @@ export const CloudAccountsToolbar: React.FC<CloudAccountsToolbarProps> = ({
                 selectOptions={availableProviders}
                 labelMap={ProviderLabelMap}
                 isSplitButton={false}
+                toggleLabel="Filter by cloud provider"
               />
             )}
             {activeCategory === 'Status' && (
@@ -138,9 +165,9 @@ export const CloudAccountsToolbar: React.FC<CloudAccountsToolbarProps> = ({
       <ToolbarContent>
         <ToolbarGroup variant="filter-group">
           <ToolbarFilter
-            categoryName="Cloud account"
+            categoryName={FILTER_CONFIG.ID.toolbarCategoryName}
             labels={[]}
-            deleteLabelGroup={() => onDeleteGroup('Cloud account')}
+            deleteLabelGroup={() => onDeleteGroup('ID')}
           >
             {selectedID ? (
               <Label onClose={() => setSelectedID('')}>{selectedID}</Label>
@@ -149,9 +176,9 @@ export const CloudAccountsToolbar: React.FC<CloudAccountsToolbarProps> = ({
             )}
           </ToolbarFilter>
           <ToolbarFilter
-            categoryName="Cloud provider"
+            categoryName={FILTER_CONFIG.Provider.toolbarCategoryName}
             labels={[]}
-            deleteLabelGroup={() => onDeleteGroup('Cloud provider')}
+            deleteLabelGroup={() => onDeleteGroup('Provider')}
           >
             <CloudProviderSharedFilterList
               filterAtom={cloudProviderFilterData}
@@ -160,9 +187,9 @@ export const CloudAccountsToolbar: React.FC<CloudAccountsToolbarProps> = ({
             />
           </ToolbarFilter>
           <ToolbarFilter
-            categoryName="Gold image access"
+            categoryName={FILTER_CONFIG.Status.toolbarCategoryName}
             labels={[]}
-            deleteLabelGroup={() => onDeleteGroup('Gold image access')}
+            deleteLabelGroup={() => onDeleteGroup('Status')}
           >
             <CloudProviderSharedFilterList
               filterAtom={goldImageStatusFilterData}
@@ -174,7 +201,7 @@ export const CloudAccountsToolbar: React.FC<CloudAccountsToolbarProps> = ({
           <ToolbarGroup>
             <ToolbarItem>
               <Button variant="link" onClick={onClearAll} isInline>
-                Clear all filters
+                                Clear all filters               
               </Button>
             </ToolbarItem>
           </ToolbarGroup>
@@ -183,5 +210,3 @@ export const CloudAccountsToolbar: React.FC<CloudAccountsToolbarProps> = ({
     </Toolbar>
   );
 };
-
-export default CloudAccountsToolbar;

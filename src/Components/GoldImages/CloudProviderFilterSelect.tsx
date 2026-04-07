@@ -29,12 +29,12 @@ export const CloudProviderFilterSelect = ({
         return (
           <MenuToggle
             ref={toggleRef}
-            onClick={() => setIsFilterExpanded(!isFilterExpanded)}
+            onClick={() => setIsFilterExpanded((prev) => !prev)}
             isExpanded={isFilterExpanded}
             splitButtonItems={[
               <MenuToggleAction
                 key="label"
-                onClick={() => setIsFilterExpanded(!isFilterExpanded)}
+                onClick={() => setIsFilterExpanded((prev) => !prev)}
               >
                 Cloud Provider
               </MenuToggleAction>,
