@@ -1,73 +1,57 @@
 import React from 'react';
-import { fireEvent, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import { atom } from 'jotai';
-import { CloudProviderSharedFilterSelect } from '../CloudProviderSharedFilterSelect';
+import { CloudProviderSharedFilterList } from '../CloudProviderSharedFilterList';
 import { HydrateAtomsTestProvider } from '../../util/testing/HydrateAtomsTestProvider';
 import { renderWithRouter } from '../../../utils/testing/customRender';
+
 const testAtom = atom<string[]>([]);
 
-const FilterSelectWithState = ({
+const FilterListWithState = ({
   init = [] as string[],
-  isSplitButton = true,
+  labelMap = undefined as Record<string, string> | undefined,
 }) => (
   <HydrateAtomsTestProvider initialValues={[[testAtom, init]]}>
-    {' '}
-    <CloudProviderSharedFilterSelect
+    <CloudProviderSharedFilterList
       filterAtom={testAtom}
       queryParamKey="testParam"
-      selectOptions={['aws', 'gcp', 'azure']}
-      labelMap={{ aws: 'Amazon', gcp: 'Google', azure: 'Microsoft' }}
-      isSplitButton={isSplitButton}
+      labelMap={labelMap}
     />
-     {' '}
   </HydrateAtomsTestProvider>
 );
-describe('CloudProviderSharedFilterSelect', () => {
-  it('renders the toggle with the correct placeholder text', () => {
-    renderWithRouter(<FilterSelectWithState />);
-    expect(screen.getByText('Filter by cloud provider')).toBeInTheDocument();
+
+describe('CloudProviderSharedFilterList', () => {
+  it('returns null when no filters are present', () => {
+    const { container } = renderWithRouter(<FilterListWithState init={[]} />);
+
+    expect(container.firstChild).toBeNull();
   });
 
-  it('renders as a standard toggle when isSplitButton is false', () => {
-    renderWithRouter(<FilterSelectWithState isSplitButton={false} />);
-    expect(screen.queryByText('Cloud Provider')).not.toBeInTheDocument();
+  it('renders a Label for each active filter', () => {
+    renderWithRouter(<FilterListWithState init={['aws', 'gcp']} />);
+
+    expect(screen.getByText('aws')).toBeInTheDocument();
+    expect(screen.getByText('gcp')).toBeInTheDocument();
   });
 
-  it('displays mapped labels in the dropdown menu', () => {
-    renderWithRouter(<FilterSelectWithState />);
-    const toggle = screen.getByText('Filter by cloud provider');
-    fireEvent.click(toggle);
-    expect(screen.getByText('Amazon')).toBeInTheDocument();
-    expect(screen.getByText('Google')).toBeInTheDocument();
+  it('uses the labelMap to display readable names when provided', () => {
+    const customLabels = {
+      aws: 'Amazon Web Services',
+      gcp: 'Google Cloud Platform',
+    };
+
+    renderWithRouter(
+      <FilterListWithState init={['aws']} labelMap={customLabels} />,
+    );
+
+    expect(screen.getByText('Amazon Web Services')).toBeInTheDocument();
     expect(screen.queryByText('aws')).not.toBeInTheDocument();
   });
+  it('renders stacked labels when multiple filters are active', () => {
+    renderWithRouter(<FilterListWithState init={['aws', 'gcp', 'azure']} />);
 
-  it('toggles the menu open and closed', () => {
-    renderWithRouter(<FilterSelectWithState />);
-    const toggle = screen.getByText('Filter by cloud provider');
-    fireEvent.click(toggle);
-    expect(screen.getByRole('menu')).toBeInTheDocument();
-    fireEvent.click(toggle);
-    expect(screen.queryByRole('menu')).not.toBeInTheDocument();
-  });
-
-  it('displays all available provider options in the dropdown', () => {
-    renderWithRouter(<FilterSelectWithState />);
-
-    const toggle = screen.getByText('Filter by cloud provider');
-    fireEvent.click(toggle);
-
-    expect(screen.getByText('Amazon')).toBeInTheDocument();
-    expect(screen.getByText('Google')).toBeInTheDocument();
-    expect(screen.getByText('Microsoft')).toBeInTheDocument();
-  });
-
-  it('displays all available provider options in the dropdown', () => {
-    renderWithRouter(<FilterSelectWithState />);
-    const toggle = screen.getByText('Filter by cloud provider');
-    fireEvent.click(toggle);
-    expect(screen.getByText('Amazon')).toBeInTheDocument();
-    expect(screen.getByText('Google')).toBeInTheDocument();
-    expect(screen.getByText('Microsoft')).toBeInTheDocument();
+    expect(screen.getByText('aws')).toBeInTheDocument();
+    expect(screen.getByText('gcp')).toBeInTheDocument();
+    expect(screen.getByText('azure')).toBeInTheDocument();
   });
 });
