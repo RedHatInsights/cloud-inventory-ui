@@ -27,7 +27,6 @@ import {
 } from '../../state/cloudAccounts';
 import { SortByDirection } from '@patternfly/react-table';
 import { hasPaginationError } from '../../utils/errors';
-import { useAtom, useAtomValue } from 'jotai';
 
 export const CloudAccountsPage = () => {
   const [pagination, setPagination] = useQueryParamInformedAtom(
@@ -45,13 +44,20 @@ export const CloudAccountsPage = () => {
 
   const { page, perPage } = pagination;
 
-  const selectedProviders = useAtomValue(cloudProviderFilterData);
-  const selectedStatuses = useAtomValue(goldImageStatusFilterData);
-  const accountIDSearch = useAtomValue(cloudAccountIDFilterData);
+  const [selectedProviders, setProviders] = useQueryParamInformedAtom(
+    cloudProviderFilterData,
+    'shortName',
+  );
 
-  const [, setProviders] = useAtom(cloudProviderFilterData);
-  const [, setStatuses] = useAtom(goldImageStatusFilterData);
-  const [, setAccountID] = useAtom(cloudAccountIDFilterData);
+  const [selectedStatuses, setStatuses] = useQueryParamInformedAtom(
+    goldImageStatusFilterData,
+    'goldImageAccess',
+  );
+
+  const [accountIDSearch, setAccountID] = useQueryParamInformedAtom(
+    cloudAccountIDFilterData,
+    'providerAccountID',
+  );
 
   const {
     data: cloudAccountsResponse,
@@ -68,13 +74,14 @@ export const CloudAccountsPage = () => {
   });
 
   const accounts = cloudAccountsResponse?.body ?? [];
-  const availableProviders = Array.from(
-    new Set(accounts.map((acc) => acc.shortName)),
-  ) as CloudProviderShortname[];
 
-  const availableStatuses = Array.from(
-    new Set(accounts.map((acc) => acc.goldImageAccess)),
-  ).filter(Boolean) as string[];
+  const availableProviders: CloudProviderShortname[] = [
+    CloudProviderShortname.AWS,
+    CloudProviderShortname.GCP,
+    CloudProviderShortname.AZURE,
+  ];
+
+  const availableStatuses = ['Granted', 'Requested', 'Failed'];
 
   const hasAccounts = accounts.length > 0;
   useEffect(() => {
