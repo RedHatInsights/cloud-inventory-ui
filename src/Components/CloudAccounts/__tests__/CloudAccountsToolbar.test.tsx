@@ -6,6 +6,7 @@ import { HydrateAtomsTestProvider } from '../../util/testing/HydrateAtomsTestPro
 import { CloudAccountsToolbar } from '../CloudAccountsToolbar';
 import {
   cloudAccountIDFilterData,
+  cloudAccountsFilterCategoryData,
   cloudProviderFilterData,
   goldImageStatusFilterData,
 } from '../../../state/cloudAccounts';
@@ -73,21 +74,25 @@ const renderToolbar = ({
   selectedID = '',
   selectedProviders = [],
   selectedStatuses = [],
+  activeCategory = 'ID',
   onClearAll = jest.fn(),
 }: {
   selectedID?: string;
   selectedProviders?: string[];
   selectedStatuses?: string[];
+  activeCategory?: 'ID' | 'Provider' | 'Status';
   onClearAll?: jest.Mock;
 } = {}) =>
   renderWithRouter(
     <HydrateAtomsTestProvider
       initialValues={[
         [cloudAccountIDFilterData, selectedID],
+        [cloudAccountsFilterCategoryData, activeCategory],
         [cloudProviderFilterData, selectedProviders],
         [goldImageStatusFilterData, selectedStatuses],
       ]}
     >
+            
       <CloudAccountsToolbar
         onClearAll={onClearAll}
         availableProviders={[
@@ -96,6 +101,7 @@ const renderToolbar = ({
         ]}
         availableStatuses={['Granted', 'Failed']}
       />
+          
     </HydrateAtomsTestProvider>,
   );
 
@@ -164,9 +170,13 @@ describe('CloudAccountsToolbar', () => {
   });
 
   it('switches to provider filter when Cloud provider category is selected', () => {
-    renderToolbar();
+    renderToolbar({ activeCategory: 'ID' });
 
-    fireEvent.click(screen.getByRole('button', { name: /cloud account/i }));
+    const categoryToggle = screen.getByRole('button', {
+      name: /cloud account|cloud provider|gold image access/i,
+    });
+
+    fireEvent.click(categoryToggle);
     fireEvent.click(screen.getByText('Cloud provider'));
 
     expect(
@@ -178,9 +188,13 @@ describe('CloudAccountsToolbar', () => {
   });
 
   it('switches to status filter when Gold image access category is selected', () => {
-    renderToolbar();
+    renderToolbar({ activeCategory: 'ID' });
 
-    fireEvent.click(screen.getByRole('button', { name: /cloud account/i }));
+    const categoryToggle = screen.getByRole('button', {
+      name: /cloud account|cloud provider|gold image access/i,
+    });
+
+    fireEvent.click(categoryToggle);
     fireEvent.click(screen.getByText('Gold image access'));
 
     expect(screen.getByTestId('gold-image-access-filter')).toBeInTheDocument();

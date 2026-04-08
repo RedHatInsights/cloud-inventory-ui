@@ -1,8 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { SearchInput, ToolbarItem } from '@patternfly/react-core';
 import { useQueryParamInformedAtom } from '../../hooks/util/useQueryParam';
 import { cloudAccountIDFilterData } from '../../state/cloudAccounts';
-import { useDebouncedState } from '../../hooks/util/useDebouncedState';
 
 export const CloudAccountIDFilter = () => {
   const [accountIDFilter, setAccountIDFilter] = useQueryParamInformedAtom(
@@ -11,43 +10,30 @@ export const CloudAccountIDFilter = () => {
   );
 
   const [searchValue, setSearchValue] = useState(accountIDFilter || '');
-  const [debouncedValue, setDebouncedValue] = useDebouncedState(
-    accountIDFilter || '',
-    400,
-  );
-
-  const previousAccountIDFilter = useRef(accountIDFilter || '');
 
   useEffect(() => {
-    const nextAccountIDFilter = accountIDFilter || '';
-
-    if (previousAccountIDFilter.current !== nextAccountIDFilter) {
-      setSearchValue(nextAccountIDFilter);
-      previousAccountIDFilter.current = nextAccountIDFilter;
-    }
+    setSearchValue(accountIDFilter || '');
   }, [accountIDFilter]);
 
   useEffect(() => {
-    if (debouncedValue !== accountIDFilter) {
-      setAccountIDFilter(debouncedValue);
-    }
-  }, [debouncedValue, accountIDFilter, setAccountIDFilter]);
+    const timer = window.setTimeout(() => {
+      setAccountIDFilter(searchValue);
+    }, 400);
+
+    return () => window.clearTimeout(timer);
+  }, [searchValue, setAccountIDFilter]);
 
   return (
     <ToolbarItem>
             
       <SearchInput
-        placeholder="Filter by account ID"
+        aria-label="Filter by cloud account ID"
+        placeholder="Filter by cloud account ID"
         value={searchValue}
-        onChange={(_event, value) => {
-          setSearchValue(value);
-          setDebouncedValue(value);
-        }}
+        onChange={(_, value) => setSearchValue(value)}
         onClear={() => {
           setSearchValue('');
-          setDebouncedValue('');
           setAccountIDFilter('');
-          previousAccountIDFilter.current = '';
         }}
       />
           
