@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { SearchInput, ToolbarItem } from '@patternfly/react-core';
 import { useQueryParamInformedAtom } from '../../hooks/util/useQueryParam';
 import { cloudAccountIDFilterData } from '../../state/cloudAccounts';
+import { useDebouncedState } from '../../hooks/util/useDebouncedState';
 
 export const CloudAccountIDFilter = () => {
   const [accountIDFilter, setAccountIDFilter] = useQueryParamInformedAtom(
@@ -10,31 +11,46 @@ export const CloudAccountIDFilter = () => {
   );
 
   const [searchValue, setSearchValue] = useState(accountIDFilter || '');
+  const [debouncedValue, setDebouncedValue] = useDebouncedState(
+    accountIDFilter || '',
+    400,
+  );
+
+  const previousAccountIDFilter = useRef(accountIDFilter || '');
 
   useEffect(() => {
-    setSearchValue(accountIDFilter || '');
+    const nextAccountIDFilter = accountIDFilter || '';
+
+    if (previousAccountIDFilter.current !== nextAccountIDFilter) {
+      setSearchValue(nextAccountIDFilter);
+      previousAccountIDFilter.current = nextAccountIDFilter;
+    }
   }, [accountIDFilter]);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      if (searchValue !== accountIDFilter) {
-        setAccountIDFilter(searchValue);
-      }
-    }, 400);
-    return () => clearTimeout(timer);
-  }, [searchValue, accountIDFilter, setAccountIDFilter]);
+    if (debouncedValue !== accountIDFilter) {
+      setAccountIDFilter(debouncedValue);
+    }
+  }, [debouncedValue, accountIDFilter, setAccountIDFilter]);
 
   return (
     <ToolbarItem>
+            
       <SearchInput
         placeholder="Filter by account ID"
         value={searchValue}
-        onChange={(_event, value) => setSearchValue(value)}
+        onChange={(_event, value) => {
+          setSearchValue(value);
+          setDebouncedValue(value);
+        }}
         onClear={() => {
           setSearchValue('');
+          setDebouncedValue('');
           setAccountIDFilter('');
+          previousAccountIDFilter.current = '';
         }}
       />
+          
     </ToolbarItem>
   );
 };
