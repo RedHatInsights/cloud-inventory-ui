@@ -1,5 +1,5 @@
 import React from 'react';
-import { fireEvent, screen } from '@testing-library/react';
+import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { HydrateAtomsTestProvider } from '../../util/testing/HydrateAtomsTestProvider';
 import { renderWithRouter } from '../../../utils/testing/customRender';
 import { CloudAccountIDFilter } from '../CloudAccountIDFilter';
@@ -13,7 +13,7 @@ const CloudAccountIDFilterWithState = ({ initialValue = '' }) => (
   </HydrateAtomsTestProvider>
 );
 
-describe('CloudAccountIDFilter AC Tests', () => {
+describe('CloudAccountIDFilter filter', () => {
   it('displays the correct account id when state is "123"', () => {
     renderWithRouter(<CloudAccountIDFilterWithState initialValue="123" />);
 
@@ -31,19 +31,17 @@ describe('CloudAccountIDFilter AC Tests', () => {
     expect(input).toHaveValue('123');
   });
 
-  it('clears the input value when the "x" (reset) button is clicked', () => {
+  it('clears the input value when the "x" (reset) button is clicked', async () => {
     renderWithRouter(<CloudAccountIDFilterWithState initialValue="781" />);
-
     const input = screen.getByPlaceholderText(
       'Filter by account ID',
     ) as HTMLInputElement;
-
     expect(input.value).toBe('781');
-
     const clearButton = screen.getByRole('button', { name: /reset/i });
     fireEvent.click(clearButton);
-
-    expect(input.value).toBe('');
+    await waitFor(() => {
+      expect(input).toHaveValue('');
+    });
   });
 
   it('is empty when no initial value is provided', () => {
