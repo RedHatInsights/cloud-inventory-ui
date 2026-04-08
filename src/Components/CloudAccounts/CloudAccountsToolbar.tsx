@@ -20,6 +20,7 @@ import { CloudProviderSharedFilterList } from '../shared/CloudProviderSharedFilt
 import { CloudProviderSharedFilterSelect } from '../shared/CloudProviderSharedFilterSelect';
 import {
   cloudAccountIDFilterData,
+  cloudAccountsFilterCategoryData,
   cloudProviderFilterData,
   goldImageStatusFilterData,
 } from '../../state/cloudAccounts';
@@ -64,7 +65,10 @@ export const CloudAccountsToolbar: React.FC<CloudAccountsToolbarProps> = ({
   availableProviders,
   availableStatuses,
 }) => {
-  const [activeCategory, setActiveCategory] = useState<FilterCategory>('ID');
+  const [activeCategory, setActiveCategory] = useQueryParamInformedAtom(
+    cloudAccountsFilterCategoryData,
+    'filterCategory',
+  );
   const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
 
   const [selectedProviders, setSelectedProviders] = useQueryParamInformedAtom(
@@ -122,7 +126,6 @@ export const CloudAccountsToolbar: React.FC<CloudAccountsToolbarProps> = ({
     <Toolbar id="cloud-accounts-toolbar">
       <ToolbarContent>
         <ToolbarGroup variant="filter-group">
-                    
           <ToolbarItem>
             {' '}
             <Select
@@ -167,13 +170,13 @@ export const CloudAccountsToolbar: React.FC<CloudAccountsToolbarProps> = ({
           <ToolbarFilter
             categoryName={FILTER_CONFIG.ID.toolbarCategoryName}
             labels={[]}
-            deleteLabelGroup={() => onDeleteGroup('ID')}
+            deleteLabelGroup={() => setSelectedID('')}
           >
             {selectedID ? (
-              <Label onClose={() => setSelectedID('')}>{selectedID}</Label>
-            ) : (
-              <React.Fragment />
-            )}
+              <Label onClose={() => setSelectedID('')}>
+                      {selectedID}
+              </Label>
+            ) : null}
           </ToolbarFilter>
           <ToolbarFilter
             categoryName={FILTER_CONFIG.Provider.toolbarCategoryName}

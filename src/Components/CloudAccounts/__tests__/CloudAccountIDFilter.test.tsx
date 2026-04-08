@@ -18,14 +18,14 @@ describe('CloudAccountIDFilter filter', () => {
     renderWithRouter(<CloudAccountIDFilterWithState initialValue="123" />);
 
     const input = screen.getByPlaceholderText(
-      'Filter by account ID',
+      'Filter by cloud account ID',
     ) as HTMLInputElement;
     expect(input.value).toBe('123');
   });
 
   it('updates the input value when the user types "123"', () => {
     renderWithRouter(<CloudAccountIDFilterWithState />);
-    const input = screen.getByPlaceholderText('Filter by account ID');
+    const input = screen.getByPlaceholderText('Filter by cloud account ID');
 
     fireEvent.change(input, { target: { value: '123' } });
     expect(input).toHaveValue('123');
@@ -34,7 +34,7 @@ describe('CloudAccountIDFilter filter', () => {
   it('clears the input value when the "x" (reset) button is clicked', async () => {
     renderWithRouter(<CloudAccountIDFilterWithState initialValue="781" />);
     const input = screen.getByPlaceholderText(
-      'Filter by account ID',
+      'Filter by cloud account ID',
     ) as HTMLInputElement;
     expect(input.value).toBe('781');
     const clearButton = screen.getByRole('button', { name: /reset/i });
@@ -47,7 +47,7 @@ describe('CloudAccountIDFilter filter', () => {
   it('is empty when no initial value is provided', () => {
     renderWithRouter(<CloudAccountIDFilterWithState initialValue="" />);
 
-    const input = screen.getByPlaceholderText('Filter by account ID');
+    const input = screen.getByPlaceholderText('Filter by cloud account ID');
     expect(input).toHaveValue('');
     expect(
       screen.queryByRole('button', { name: /reset/i }),

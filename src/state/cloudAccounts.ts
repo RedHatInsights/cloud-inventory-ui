@@ -19,3 +19,7 @@ export type CloudAccountsSortField =
   | 'provider'
   | 'goldImageAccess'
   | 'dateAdded';
+
+export const cloudAccountsFilterCategoryData = atom<
+  'ID' | 'Provider' | 'Status'
+>('ID');
