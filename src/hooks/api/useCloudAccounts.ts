@@ -8,6 +8,18 @@ export enum CloudProviderShortname {
   AZURE = 'MSAZ',
 }
 
+export enum CloudProviderDisplayNames {
+  AWS = 'AWS',
+  GCP = 'Google Compute Engine',
+  AZURE = 'Microsoft Azure',
+}
+
+export const ProviderLabelMap: Record<string, string> = {
+  [CloudProviderShortname.AWS]: CloudProviderDisplayNames.AWS,
+  [CloudProviderShortname.GCP]: CloudProviderDisplayNames.GCP,
+  [CloudProviderShortname.AZURE]: CloudProviderDisplayNames.AZURE,
+};
+
 export type CloudAccount = {
   providerAccountID: string;
   goldImageAccess: 'Granted' | 'Requested' | 'Failed';
@@ -32,6 +44,9 @@ export type fetchCloudAccountsArgs = {
   offset: number;
   sortField?: string;
   sortDirection?: SortByDirection;
+  providerAccountID?: string;
+  shortName?: string[];
+  goldImageAccess?: string[];
 };
 
 const fetchCloudAccounts = async ({
@@ -39,6 +54,9 @@ const fetchCloudAccounts = async ({
   offset,
   sortField,
   sortDirection,
+  providerAccountID,
+  shortName,
+  goldImageAccess,
 }: fetchCloudAccountsArgs): Promise<CloudAccountsResponse> => {
   const params = new URLSearchParams({
     limit: String(limit),
@@ -49,6 +67,19 @@ const fetchCloudAccounts = async ({
     params.set('sort_by', sortField);
     params.set('sort_direction', sortDirection);
   }
+
+  if (providerAccountID) {
+    params.set('providerAccountID', providerAccountID);
+  }
+
+  if (shortName?.length) {
+    params.set('shortName', shortName.join(','));
+  }
+
+  if (goldImageAccess?.length) {
+    params.set('goldImageAccess', goldImageAccess.join(','));
+  }
+
   const response = await fetch(
     `/api/rhsm/v2/cloud_access_providers/accounts?${params.toString()}`,
   );
@@ -60,8 +91,8 @@ const fetchCloudAccounts = async ({
       response.statusText,
     );
   }
-  const json = await response.json();
 
+  const json = await response.json();
   return json as CloudAccountsResponse;
 };
 

@@ -5,7 +5,10 @@ import { Section } from '@redhat-cloud-services/frontend-components/Section';
 import { PageHeader } from '@redhat-cloud-services/frontend-components/PageHeader';
 import { CloudAccountsPagination } from '../../Components/CloudAccounts/CloudAccountsPagination';
 import { CloudAccountsToolbar } from '../../Components/CloudAccounts/CloudAccountsToolbar';
-import { useCloudAccounts } from '../../hooks/api/useCloudAccounts';
+import {
+  CloudProviderShortname,
+  useCloudAccounts,
+} from '../../hooks/api/useCloudAccounts';
 import { Unavailable } from '@redhat-cloud-services/frontend-components/Unavailable';
 import { Navigate } from 'react-router-dom';
 import { Loading } from '../../Components/util/Loading';
@@ -16,9 +19,15 @@ import {
   useQueryParamInformedAtom,
   useQueryParamInformedState,
 } from '../../hooks/util/useQueryParam';
-import { CloudAccountsPaginationData } from '../../state/cloudAccounts';
+import {
+  CloudAccountsPaginationData,
+  cloudAccountIDFilterData,
+  cloudProviderFilterData,
+  goldImageStatusFilterData,
+} from '../../state/cloudAccounts';
 import { SortByDirection } from '@patternfly/react-table';
 import { hasPaginationError } from '../../utils/errors';
+import NoSearchResults from '../../Components/EmptyState/NoSearchResults';
 
 export const CloudAccountsPage = () => {
   const [pagination, setPagination] = useQueryParamInformedAtom(
@@ -36,6 +45,21 @@ export const CloudAccountsPage = () => {
 
   const { page, perPage } = pagination;
 
+  const [selectedProviders, setProviders] = useQueryParamInformedAtom(
+    cloudProviderFilterData,
+    'shortName',
+  );
+
+  const [selectedStatuses, setStatuses] = useQueryParamInformedAtom(
+    goldImageStatusFilterData,
+    'goldImageAccess',
+  );
+
+  const [accountIDSearch, setAccountID] = useQueryParamInformedAtom(
+    cloudAccountIDFilterData,
+    'providerAccountID',
+  );
+
   const {
     data: cloudAccountsResponse,
     isError: isCloudAccountsError,
@@ -45,9 +69,20 @@ export const CloudAccountsPage = () => {
     offset: (page - 1) * perPage,
     sortField: sortBy,
     sortDirection: sortDir,
+    shortName: selectedProviders,
+    goldImageAccess: selectedStatuses,
+    providerAccountID: accountIDSearch,
   });
 
   const accounts = cloudAccountsResponse?.body ?? [];
+
+  const availableProviders: CloudProviderShortname[] = [
+    CloudProviderShortname.AWS,
+    CloudProviderShortname.GCP,
+    CloudProviderShortname.AZURE,
+  ];
+
+  const availableStatuses = ['Granted', 'Requested', 'Failed'];
 
   const hasAccounts = accounts.length > 0;
   useEffect(() => {
@@ -62,7 +97,14 @@ export const CloudAccountsPage = () => {
   const { data: permissions, isLoading: arePermissionsLoading } =
     useRbacPermission();
 
-  const shouldShowEmptyState = !hasAccounts && !hasPaginationError(pagination);
+  const hasActiveFilters =
+    selectedProviders.length > 0 ||
+    selectedStatuses.length > 0 ||
+    Boolean(accountIDSearch);
+
+  const shouldShowNoResults = !hasAccounts && hasActiveFilters;
+  const shouldShowEmptyState =
+    !hasAccounts && !hasActiveFilters && !hasPaginationError(pagination);
 
   if (arePermissionsLoading) return <Loading />;
   if (!permissions?.canReadCloudAccess)
@@ -71,30 +113,63 @@ export const CloudAccountsPage = () => {
   if (areCloudAccountsLoading) return <Loading />;
   if (isCloudAccountsError) return <Unavailable />;
 
+  const handleClearAll = () => {
+    setProviders([]);
+    setStatuses([]);
+    setAccountID('');
+    setPagination({ ...pagination, page: 1 });
+  };
+
   return (
     <>
+            
       <PageHeader>
-        <Content component="h1">Cloud Accounts</Content>
+                <Content component="h1">Cloud Accounts</Content>
+              
       </PageHeader>
+            
       <Section>
+                
         <PageSection>
-          {shouldShowEmptyState && <NoCloudAccounts />}
-          {!shouldShowEmptyState && (
+                    
+          {shouldShowEmptyState ? (
+            <NoCloudAccounts />
+          ) : (
             <>
-              <CloudAccountsToolbar />
-              <CloudAccountsTable
-                cloudAccounts={accounts}
-                sortBy={sortBy}
-                sortDir={sortDir}
-                setSortBy={setSortBy}
-                setSortDir={setSortDir}
+                            
+              <CloudAccountsToolbar
+                onClearAll={handleClearAll}
+                availableProviders={availableProviders}
+                availableStatuses={availableStatuses}
               />
-              <br />
-              <CloudAccountsPagination />
+                            
+              {shouldShowNoResults ? (
+                <NoSearchResults clearFilters={handleClearAll} />
+              ) : (
+                <>
+                                    
+                  <CloudAccountsTable
+                    cloudAccounts={accounts}
+                    sortBy={sortBy}
+                    sortDir={sortDir}
+                    setSortBy={setSortBy}
+                    setSortDir={setSortDir}
+                  />
+                                    
+                  <br />
+                                    
+                  <CloudAccountsPagination />
+                                  
+                </>
+              )}
+                          
             </>
           )}
+                  
         </PageSection>
+              
       </Section>
+          
     </>
   );
 };
