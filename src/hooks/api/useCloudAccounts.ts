@@ -72,8 +72,13 @@ const fetchCloudAccounts = async ({
     params.set('providerAccountID', providerAccountID);
   }
 
-  shortName?.forEach((val) => params.append('shortName', val));
-  goldImageAccess?.forEach((val) => params.append('goldImageAccess', val));
+  if (shortName?.length) {
+    params.set('shortName', shortName.join(','));
+  }
+
+  if (goldImageAccess?.length) {
+    params.set('goldImageAccess', goldImageAccess.join(','));
+  }
 
   const response = await fetch(
     `/api/rhsm/v2/cloud_access_providers/accounts?${params.toString()}`,
@@ -86,8 +91,8 @@ const fetchCloudAccounts = async ({
       response.statusText,
     );
   }
-  const json = await response.json();
 
+  const json = await response.json();
   return json as CloudAccountsResponse;
 };
 
