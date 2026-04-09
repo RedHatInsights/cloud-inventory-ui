@@ -1,12 +1,13 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "automergeSchedule": ["* * * * *"],
+  "updateNotScheduled": true,
   "tekton": {
     "enabled": true
   },
   "npm": {
     "enabled": true,
-    "schedule": ["* * 1 * *"]
+    "schedule": ["* * 1 * *"],
+    "automergeSchedule": ["* * * * *"]
   },
   "lockFileMaintenance": {
     "enabled": true,
