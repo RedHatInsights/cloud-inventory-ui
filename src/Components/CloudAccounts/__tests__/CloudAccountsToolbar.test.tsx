@@ -212,4 +212,94 @@ describe('CloudAccountsToolbar', () => {
     expect(screen.getByText(CloudProviderShortname.AWS)).toBeInTheDocument();
     expect(screen.getByText('Granted')).toBeInTheDocument();
   });
+
+  it('renders status filter when active category is Status on initial render', () => {
+    renderToolbar({ activeCategory: 'Status' });
+
+    expect(screen.getByTestId('gold-image-access-filter')).toBeInTheDocument();
+    expect(
+      screen.queryByTestId('cloud-account-id-filter'),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('cloud-provider-filter-select'),
+    ).not.toBeInTheDocument();
+  });
+
+  it('always renders compact pagination', () => {
+    renderToolbar();
+
+    expect(screen.getByTestId('cloud-accounts-pagination')).toBeInTheDocument();
+  });
+
+  it('shows clear all button when status filter is active', () => {
+    renderToolbar({ selectedStatuses: ['Granted'] });
+
+    expect(
+      screen.getByRole('button', { name: /clear all filters/i }),
+    ).toBeInTheDocument();
+  });
+
+  it('displays selected provider filters only when provider filters are present', () => {
+    renderToolbar({
+      selectedProviders: [CloudProviderShortname.AWS],
+    });
+
+    expect(screen.getByText(CloudProviderShortname.AWS)).toBeInTheDocument();
+    expect(screen.queryByText('Granted')).not.toBeInTheDocument();
+  });
+
+  it('displays selected status filters only when status filters are present', () => {
+    renderToolbar({
+      selectedStatuses: ['Granted'],
+    });
+
+    expect(screen.getByText('Granted')).toBeInTheDocument();
+    expect(
+      screen.queryByText(CloudProviderShortname.AWS),
+    ).not.toBeInTheDocument();
+  });
+
+  it('updates the category toggle label after selecting Provider', () => {
+    renderToolbar({ activeCategory: 'ID' });
+
+    const categoryToggle = screen.getByRole('button', {
+      name: /cloud account|cloud provider|gold image access/i,
+    });
+
+    fireEvent.click(categoryToggle);
+    fireEvent.click(screen.getByText('Cloud provider'));
+
+    expect(
+      screen.getByRole('button', { name: /cloud provider/i }),
+    ).toBeInTheDocument();
+  });
+
+  it('updates the category toggle label after selecting Gold image access', () => {
+    renderToolbar({ activeCategory: 'ID' });
+
+    const categoryToggle = screen.getByRole('button', {
+      name: /cloud account|cloud provider|gold image access/i,
+    });
+
+    fireEvent.click(categoryToggle);
+    fireEvent.click(screen.getByText('Gold image access'));
+
+    expect(
+      screen.getByRole('button', { name: /gold image access/i }),
+    ).toBeInTheDocument();
+  });
+
+  it('renders all filter category options in the dropdown when opened', () => {
+    renderToolbar();
+
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: /cloud account|cloud provider|gold image access/i,
+      }),
+    );
+
+    expect(screen.getByText('Cloud account')).toBeInTheDocument();
+    expect(screen.getByText('Cloud provider')).toBeInTheDocument();
+    expect(screen.getAllByText('Gold image access').length).toBeGreaterThan(0);
+  });
 });

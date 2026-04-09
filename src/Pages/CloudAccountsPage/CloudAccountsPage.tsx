@@ -27,6 +27,7 @@ import {
 } from '../../state/cloudAccounts';
 import { SortByDirection } from '@patternfly/react-table';
 import { hasPaginationError } from '../../utils/errors';
+import NoSearchResults from '../../Components/EmptyState/NoSearchResults';
 
 export const CloudAccountsPage = () => {
   const [pagination, setPagination] = useQueryParamInformedAtom(
@@ -96,7 +97,14 @@ export const CloudAccountsPage = () => {
   const { data: permissions, isLoading: arePermissionsLoading } =
     useRbacPermission();
 
-  const shouldShowEmptyState = !hasAccounts && !hasPaginationError(pagination);
+  const hasActiveFilters =
+    selectedProviders.length > 0 ||
+    selectedStatuses.length > 0 ||
+    Boolean(accountIDSearch);
+
+  const shouldShowNoResults = !hasAccounts && hasActiveFilters;
+  const shouldShowEmptyState =
+    !hasAccounts && !hasActiveFilters && !hasPaginationError(pagination);
 
   if (arePermissionsLoading) return <Loading />;
   if (!permissions?.canReadCloudAccess)
@@ -114,32 +122,54 @@ export const CloudAccountsPage = () => {
 
   return (
     <>
+            
       <PageHeader>
-        <Content component="h1">Cloud Accounts</Content>
+                <Content component="h1">Cloud Accounts</Content>
+              
       </PageHeader>
+            
       <Section>
+                
         <PageSection>
-          {shouldShowEmptyState && <NoCloudAccounts />}
-          {!shouldShowEmptyState && (
+                    
+          {shouldShowEmptyState ? (
+            <NoCloudAccounts />
+          ) : (
             <>
+                            
               <CloudAccountsToolbar
                 onClearAll={handleClearAll}
                 availableProviders={availableProviders}
                 availableStatuses={availableStatuses}
               />
-              <CloudAccountsTable
-                cloudAccounts={accounts}
-                sortBy={sortBy}
-                sortDir={sortDir}
-                setSortBy={setSortBy}
-                setSortDir={setSortDir}
-              />
-              <br />
-              <CloudAccountsPagination />
+                            
+              {shouldShowNoResults ? (
+                <NoSearchResults clearFilters={handleClearAll} />
+              ) : (
+                <>
+                                    
+                  <CloudAccountsTable
+                    cloudAccounts={accounts}
+                    sortBy={sortBy}
+                    sortDir={sortDir}
+                    setSortBy={setSortBy}
+                    setSortDir={setSortDir}
+                  />
+                                    
+                  <br />
+                                    
+                  <CloudAccountsPagination />
+                                  
+                </>
+              )}
+                          
             </>
           )}
+                  
         </PageSection>
+              
       </Section>
+          
     </>
   );
 };
