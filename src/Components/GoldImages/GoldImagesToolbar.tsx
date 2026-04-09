@@ -1,10 +1,9 @@
 import { Toolbar, ToolbarContent, ToolbarGroup } from '@patternfly/react-core';
 import React from 'react';
 import { GoldImagesResponse } from '../../hooks/api/useGoldImages';
+import { CloudProviderFilterSelect } from './CloudProviderFilterSelect';
 import { GoldImagesPagination } from './GoldImagesPagination';
-import { CloudProviderSharedFilterList } from '../shared/CloudProviderSharedFilterList';
-import { cloudProviderFilterData as goldImageAtom } from '../../state/goldImages';
-import { CloudProviderSharedFilterSelect } from '../shared/CloudProviderSharedFilterSelect';
+import { CloudProviderFilterList } from './CloudProviderFilterList';
 
 interface GoldImagesFilterBarProps {
   goldImages: GoldImagesResponse;
@@ -19,11 +18,7 @@ export const GoldImagesToolbar = ({ goldImages }: GoldImagesFilterBarProps) => {
     <>
       <Toolbar>
         <ToolbarContent>
-          <CloudProviderSharedFilterSelect
-            filterAtom={goldImageAtom}
-            queryParamKey="cloudProvider"
-            selectOptions={cloudProviders}
-          />
+          <CloudProviderFilterSelect cloudProviders={cloudProviders} />
           <ToolbarGroup align={{ default: 'alignEnd' }}>
             <GoldImagesPagination isCompact />
           </ToolbarGroup>
@@ -31,10 +26,7 @@ export const GoldImagesToolbar = ({ goldImages }: GoldImagesFilterBarProps) => {
       </Toolbar>
       <Toolbar>
         <ToolbarContent>
-          <CloudProviderSharedFilterList
-            filterAtom={goldImageAtom}
-            queryParamKey="cloudProvider"
-          />
+          <CloudProviderFilterList />
         </ToolbarContent>
       </Toolbar>
     </>
