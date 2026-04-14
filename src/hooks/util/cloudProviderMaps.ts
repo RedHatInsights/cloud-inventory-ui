@@ -1,4 +1,4 @@
-import { CloudProviderShortname } from '../api/useCloudAccounts';
+import { CloudProviderShortname } from '../../types/cloudAccountsTypes';
 import { CloudProviderName } from '../api/useGoldImages';
 
 export const shortToFriendly: Record<

@@ -26,12 +26,13 @@ export const GoldImageAccessFilter = ({
     _event: React.MouseEvent | undefined,
     value: string | number | undefined,
   ) => {
-    const selection = value as string;
-    if (selectedStatuses.includes(selection)) {
-      setSelectedStatuses(selectedStatuses.filter((s) => s !== selection));
-    } else {
-      setSelectedStatuses([...selectedStatuses, selection]);
+    if (!value || typeof value !== 'string') {
+      return;
     }
+    if (!selectedStatuses.includes(value)) {
+      setSelectedStatuses([...selectedStatuses, value]);
+    }
+    setIsOpen(false);
   };
 
   return (
@@ -40,7 +41,7 @@ export const GoldImageAccessFilter = ({
       isOpen={isOpen}
       selected={selectedStatuses}
       onSelect={onSelect}
-      onOpenChange={(isOpened) => setIsOpen(isOpened)}
+      onOpenChange={setIsOpen}
       toggle={(toggleRef: Ref<MenuToggleElement>) => (
         <MenuToggle
           ref={toggleRef}

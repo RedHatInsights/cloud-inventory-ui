@@ -80,10 +80,7 @@ it('shows empty state when no accounts exist', async () => {
     name: /integrations/i,
   });
 
-  expect(integrationsLink).toHaveAttribute(
-    'href',
-    expect.stringContaining('/settings/integrations'),
-  );
+  expect(integrationsLink).toHaveAttribute('href', '/settings/integrations/');
 });
 
 it('shows loading state while cloud accounts are loading', async () => {

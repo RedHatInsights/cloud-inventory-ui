@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { CloudAccountsTable, mapField } from '../CloudAccountsTable';
-import {
-  CloudAccount,
-  CloudProviderShortname,
-} from '../../../hooks/api/useCloudAccounts';
 import { CloudAccountsPaginationData } from '../../../state/cloudAccounts';
 import { HydrateAtomsTestProvider } from '../../util/testing/HydrateAtomsTestProvider';
 import { renderWithRouter } from '../../../utils/testing/customRender';
 import { SortByDirection } from '@patternfly/react-table';
+import {
+  CloudAccount,
+  CloudProviderShortname,
+} from '../../../types/cloudAccountsTypes';
 
 jest.mock('../../../Components/CloudAccounts/GetStatusIcon', () => ({
   getStatusIcon: () => <span data-testid="status-icon" />,
@@ -211,14 +211,12 @@ describe('CloudAccountsTable', () => {
       </HydrateAtomsTestProvider>,
     );
 
-    // Verify we start in the error state
     expect(
       screen.getByText(/No results for current page/i),
     ).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: /return to page 1/i }));
 
-    // Error should be cleared
     expect(
       screen.queryByText(/No results for current page/i),
     ).not.toBeInTheDocument();
@@ -257,7 +255,6 @@ describe('CloudAccountsTable', () => {
         ),
       ).toBe('acct-0');
 
-      // flip
       fireEvent.click(screen.getByRole('button', { name: /cloud account/i }));
       expect(
         String(
@@ -277,7 +274,6 @@ describe('CloudAccountsTable', () => {
         ),
       ).toBe('AWS');
 
-      // flip
       fireEvent.click(screen.getByRole('button', { name: /cloud provider/i }));
       expect(
         String(
@@ -299,7 +295,6 @@ describe('CloudAccountsTable', () => {
         ),
       ).toBe('Failed');
 
-      // flip
       fireEvent.click(
         screen.getByRole('button', { name: /gold image access/i }),
       );
@@ -321,7 +316,6 @@ describe('CloudAccountsTable', () => {
         ),
       ).toBe('Formatted:2024-01-01');
 
-      // flip
       fireEvent.click(screen.getByRole('button', { name: /date added/i }));
       expect(
         String(

@@ -8,20 +8,19 @@ export const CloudAccountIDFilter = () => {
     cloudAccountIDFilterData,
     'providerAccountID',
   );
-
   const [searchValue, setSearchValue] = useState(accountIDFilter || '');
+
+  useEffect(() => {
+    const timeout = window.setTimeout(() => {
+      setAccountIDFilter(searchValue);
+    }, 400);
+
+    return () => window.clearTimeout(timeout);
+  }, [searchValue, setAccountIDFilter]);
 
   useEffect(() => {
     setSearchValue(accountIDFilter || '');
   }, [accountIDFilter]);
-
-  useEffect(() => {
-    const timer = window.setTimeout(() => {
-      setAccountIDFilter(searchValue);
-    }, 400);
-
-    return () => window.clearTimeout(timer);
-  }, [searchValue, setAccountIDFilter]);
 
   return (
     <ToolbarItem>

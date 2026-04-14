@@ -10,7 +10,9 @@ const availableStatuses = ['available', 'pending', 'disabled'];
 
 const GoldImageAccessFilterWithState = ({ init = [] }: { init?: string[] }) => (
   <HydrateAtomsTestProvider initialValues={[[goldImageStatusFilterData, init]]}>
+        
     <GoldImageAccessFilter availableStatuses={availableStatuses} />
+      
   </HydrateAtomsTestProvider>
 );
 
@@ -24,7 +26,8 @@ const GoldImageAccessFilterWithStateObserver = ({
 
     return (
       <div data-testid="selected-statuses">
-        {JSON.stringify(selectedStatuses)}
+                {JSON.stringify(selectedStatuses)}
+              
       </div>
     );
   };
@@ -33,8 +36,11 @@ const GoldImageAccessFilterWithStateObserver = ({
     <HydrateAtomsTestProvider
       initialValues={[[goldImageStatusFilterData, init]]}
     >
+            
       <GoldImageAccessFilter availableStatuses={availableStatuses} />
+            
       <StateObserver />
+          
     </HydrateAtomsTestProvider>
   );
 };
@@ -81,7 +87,7 @@ describe('GoldImageAccessFilter', () => {
     });
   });
 
-  it('deselects a selected status', async () => {
+  it('does not remove a selected status when it is selected again from the menu', async () => {
     renderWithRouter(
       <GoldImageAccessFilterWithStateObserver init={['available']} />,
     );
@@ -98,22 +104,42 @@ describe('GoldImageAccessFilter', () => {
 
     await waitFor(() => {
       expect(
-        screen.getByRole('button', { name: 'Filter by status' }),
+        screen.getByRole('button', { name: 'Status' }),
       ).toBeInTheDocument();
-      expect(screen.getByTestId('selected-statuses')).toHaveTextContent('[]');
+      expect(screen.getByTestId('selected-statuses')).toHaveTextContent(
+        '["available"]',
+      );
     });
   });
 
-  it('supports multiple selected statuses', async () => {
+  it('supports multiple selected statuses by reopening the menu', async () => {
     renderWithRouter(<GoldImageAccessFilterWithStateObserver />);
 
-    fireEvent.click(screen.getByRole('button', { name: 'Filter by status' }));
+    fireEvent.click(
+      screen.getByRole('button', { name: /filter by status|status/i }),
+    );
 
     await waitFor(() => {
       expect(screen.getByText('available')).toBeInTheDocument();
     });
 
     fireEvent.click(screen.getByText('available'));
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole('button', { name: 'Status' }),
+      ).toBeInTheDocument();
+      expect(screen.getByTestId('selected-statuses')).toHaveTextContent(
+        '["available"]',
+      );
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Status' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('pending')).toBeInTheDocument();
+    });
+
     fireEvent.click(screen.getByText('pending'));
 
     await waitFor(() => {
@@ -132,5 +158,23 @@ describe('GoldImageAccessFilter', () => {
     );
 
     expect(screen.getByRole('button', { name: 'Status' })).toBeInTheDocument();
+  });
+
+  it('closes the menu after selecting a status', async () => {
+    renderWithRouter(<GoldImageAccessFilterWithStateObserver />);
+
+    fireEvent.click(
+      screen.getByRole('button', { name: /filter by status|status/i }),
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('available')).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByText('available'));
+
+    await waitFor(() => {
+      expect(screen.queryByText('pending')).not.toBeInTheDocument();
+    });
   });
 });

@@ -1,6 +1,6 @@
 import { atom } from 'jotai';
 import { PaginationData } from '../types/pagination';
-import { CloudProviderShortname } from '../hooks/api/useCloudAccounts';
+import { CloudProviderShortname } from '../types/cloudAccountsTypes';
 
 export const cloudProviderFilterData = atom<CloudProviderShortname[]>([]);
 

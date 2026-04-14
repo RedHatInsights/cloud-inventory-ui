@@ -10,7 +10,6 @@ import {
 } from '@patternfly/react-table';
 import { Button, Content } from '@patternfly/react-core';
 import { Link } from 'react-router-dom';
-import { CloudAccount } from '../../hooks/api/useCloudAccounts';
 import { CloudAccountRow } from './types';
 import { CloudAccountStatus, getStatusIcon } from './GetStatusIcon';
 import { formatDate } from '../../hooks/util/dates';
@@ -26,6 +25,7 @@ import {
 import { useApiBasedTableSort } from '../../hooks/util/tables/useTableSort';
 import { hasPaginationError } from '../../utils/errors';
 import { PaginationError } from '../shared/PaginationError';
+import { CloudAccount } from '../../types/cloudAccountsTypes';
 
 type CloudAccountProps = {
   cloudAccounts: CloudAccount[];

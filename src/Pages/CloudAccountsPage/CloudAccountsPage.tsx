@@ -5,10 +5,7 @@ import { Section } from '@redhat-cloud-services/frontend-components/Section';
 import { PageHeader } from '@redhat-cloud-services/frontend-components/PageHeader';
 import { CloudAccountsPagination } from '../../Components/CloudAccounts/CloudAccountsPagination';
 import { CloudAccountsToolbar } from '../../Components/CloudAccounts/CloudAccountsToolbar';
-import {
-  CloudProviderShortname,
-  useCloudAccounts,
-} from '../../hooks/api/useCloudAccounts';
+import { useCloudAccounts } from '../../hooks/api/useCloudAccounts';
 import { Unavailable } from '@redhat-cloud-services/frontend-components/Unavailable';
 import { Navigate } from 'react-router-dom';
 import { Loading } from '../../Components/util/Loading';
@@ -28,6 +25,7 @@ import {
 import { SortByDirection } from '@patternfly/react-table';
 import { hasPaginationError } from '../../utils/errors';
 import NoSearchResults from '../../Components/EmptyState/NoSearchResults';
+import { CloudProviderShortname } from '../../types/cloudAccountsTypes';
 
 export const CloudAccountsPage = () => {
   const [pagination, setPagination] = useQueryParamInformedAtom(
@@ -45,17 +43,17 @@ export const CloudAccountsPage = () => {
 
   const { page, perPage } = pagination;
 
-  const [selectedProviders, setProviders] = useQueryParamInformedAtom(
+  const [selectedProviders] = useQueryParamInformedAtom(
     cloudProviderFilterData,
     'shortName',
   );
 
-  const [selectedStatuses, setStatuses] = useQueryParamInformedAtom(
+  const [selectedStatuses] = useQueryParamInformedAtom(
     goldImageStatusFilterData,
     'goldImageAccess',
   );
 
-  const [accountIDSearch, setAccountID] = useQueryParamInformedAtom(
+  const [accountIDSearch] = useQueryParamInformedAtom(
     cloudAccountIDFilterData,
     'providerAccountID',
   );
@@ -85,6 +83,7 @@ export const CloudAccountsPage = () => {
   const availableStatuses = ['Granted', 'Requested', 'Failed'];
 
   const hasAccounts = accounts.length > 0;
+
   useEffect(() => {
     if (cloudAccountsResponse?.pagination) {
       setPagination({
@@ -100,7 +99,7 @@ export const CloudAccountsPage = () => {
   const hasActiveFilters =
     selectedProviders.length > 0 ||
     selectedStatuses.length > 0 ||
-    Boolean(accountIDSearch);
+    accountIDSearch !== '';
 
   const shouldShowNoResults = !hasAccounts && hasActiveFilters;
   const shouldShowEmptyState =
@@ -113,41 +112,25 @@ export const CloudAccountsPage = () => {
   if (areCloudAccountsLoading) return <Loading />;
   if (isCloudAccountsError) return <Unavailable />;
 
-  const handleClearAll = () => {
-    setProviders([]);
-    setStatuses([]);
-    setAccountID('');
-    setPagination({ ...pagination, page: 1 });
-  };
-
   return (
     <>
-            
       <PageHeader>
-                <Content component="h1">Cloud Accounts</Content>
-              
+         <Content component="h1">Cloud Accounts</Content>
       </PageHeader>
-            
       <Section>
-                
         <PageSection>
-                    
           {shouldShowEmptyState ? (
             <NoCloudAccounts />
           ) : (
             <>
-                            
               <CloudAccountsToolbar
-                onClearAll={handleClearAll}
                 availableProviders={availableProviders}
                 availableStatuses={availableStatuses}
               />
-                            
               {shouldShowNoResults ? (
-                <NoSearchResults clearFilters={handleClearAll} />
+                <NoSearchResults />
               ) : (
                 <>
-                                    
                   <CloudAccountsTable
                     cloudAccounts={accounts}
                     sortBy={sortBy}
@@ -155,21 +138,14 @@ export const CloudAccountsPage = () => {
                     setSortBy={setSortBy}
                     setSortDir={setSortDir}
                   />
-                                    
                   <br />
-                                    
                   <CloudAccountsPagination />
-                                  
                 </>
               )}
-                          
             </>
           )}
-                  
         </PageSection>
-              
       </Section>
-          
     </>
   );
 };
