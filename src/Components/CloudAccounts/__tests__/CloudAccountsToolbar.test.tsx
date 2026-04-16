@@ -11,12 +11,6 @@ import {
 } from '../../../state/cloudAccounts';
 import { CloudProviderShortname } from '../../../types/cloudAccountsTypes';
 
-jest.mock('../CloudAccountsPagination', () => ({
-  CloudAccountsPagination: () => (
-    <div data-testid="cloud-accounts-pagination">Pagination</div>
-  ),
-}));
-
 beforeEach(() => {
   window.history.pushState({}, '', '/');
 });
@@ -166,10 +160,12 @@ describe('CloudAccountsToolbar', () => {
     ).not.toBeInTheDocument();
   });
 
-  it('always renders compact pagination', () => {
-    renderToolbar();
+  it('renders the CloudAccountsPagination component', () => {
+    const { container } = renderToolbar();
 
-    expect(screen.getByTestId('cloud-accounts-pagination')).toBeInTheDocument();
+    expect(
+      container.querySelector('[data-ouia-component-type="PF6/Pagination"]'),
+    ).not.toBeNull();
   });
 
   it('shows clear all button when status filter is active', () => {

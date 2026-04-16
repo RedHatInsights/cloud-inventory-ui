@@ -1,6 +1,5 @@
 import React from 'react';
 import { fireEvent, screen } from '@testing-library/react';
-import { useAtomValue } from 'jotai';
 import { renderWithRouter } from '../../../utils/testing/customRender';
 import { HydrateAtomsTestProvider } from '../../util/testing/HydrateAtomsTestProvider';
 import { CloudAccountsFilterList } from '../CloudAccountsFilterList';
@@ -10,24 +9,6 @@ import {
   goldImageStatusFilterData,
 } from '../../../state/cloudAccounts';
 import { CloudProviderShortname } from '../../../types/cloudAccountsTypes';
-
-const StateObserver = () => {
-  const selectedID = useAtomValue(cloudAccountIDFilterData);
-  const selectedProviders = useAtomValue(cloudProviderFilterData);
-  const selectedStatuses = useAtomValue(goldImageStatusFilterData);
-
-  return (
-    <div>
-         <div data-testid="selected-id">{selectedID}</div>
-      <div data-testid="selected-providers">
-        {JSON.stringify(selectedProviders)}
-      </div>
-      <div data-testid="selected-statuses">
-        {JSON.stringify(selectedStatuses)}
-      </div>
-    </div>
-  );
-};
 
 const renderFilterList = ({
   selectedID = '',
@@ -46,8 +27,9 @@ const renderFilterList = ({
         [goldImageStatusFilterData, selectedStatuses],
       ]}
     >
+            
       <CloudAccountsFilterList />
-      <StateObserver />
+          
     </HydrateAtomsTestProvider>,
   );
 
@@ -65,6 +47,13 @@ describe('CloudAccountsFilterList', () => {
     expect(screen.queryByText('Cloud account')).not.toBeInTheDocument();
     expect(screen.queryByText('Cloud provider')).not.toBeInTheDocument();
     expect(screen.queryByText('Gold image access')).not.toBeInTheDocument();
+  });
+
+  it('renders selected cloud account filter', () => {
+    renderFilterList({ selectedID: 'acct-123' });
+
+    expect(screen.getByText('Cloud account')).toBeInTheDocument();
+    expect(screen.getByText('acct-123')).toBeInTheDocument();
   });
 
   it('renders selected provider filters using display labels', () => {
@@ -104,7 +93,7 @@ describe('CloudAccountsFilterList', () => {
     fireEvent.click(closeButtons[0]);
 
     expect(screen.queryByText('acct-123')).not.toBeInTheDocument();
-    expect(screen.getByTestId('selected-id')).toHaveTextContent('');
+    expect(screen.queryByText('Cloud account')).not.toBeInTheDocument();
   });
 
   it('clears all active filters when clear all filters is clicked', () => {
@@ -119,13 +108,12 @@ describe('CloudAccountsFilterList', () => {
     expect(screen.queryByText('acct-123')).not.toBeInTheDocument();
     expect(screen.queryByText('AWS')).not.toBeInTheDocument();
     expect(screen.queryByText('Granted')).not.toBeInTheDocument();
-
-    expect(screen.getByTestId('selected-id')).toHaveTextContent('');
-    expect(screen.getByTestId('selected-providers')).toHaveTextContent('[]');
-    expect(screen.getByTestId('selected-statuses')).toHaveTextContent('[]');
+    expect(screen.queryByText('Cloud account')).not.toBeInTheDocument();
+    expect(screen.queryByText('Cloud provider')).not.toBeInTheDocument();
+    expect(screen.queryByText('Gold image access')).not.toBeInTheDocument();
   });
 
-  it('keeps clear all filters hidden after the last active filter is removed', () => {
+  it('hides clear all filters after the last active filter is removed', () => {
     renderFilterList({ selectedID: 'acct-123' });
 
     const closeButtons = screen

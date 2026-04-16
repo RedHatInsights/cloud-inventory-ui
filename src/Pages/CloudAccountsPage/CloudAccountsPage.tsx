@@ -24,8 +24,8 @@ import {
 } from '../../state/cloudAccounts';
 import { SortByDirection } from '@patternfly/react-table';
 import { hasPaginationError } from '../../utils/errors';
-import NoSearchResults from '../../Components/EmptyState/NoSearchResults';
 import { CloudProviderShortname } from '../../types/cloudAccountsTypes';
+import { NoSearchResults } from '../../Components/EmptyState/NoSearchResults';
 
 export const CloudAccountsPage = () => {
   const [pagination, setPagination] = useQueryParamInformedAtom(
