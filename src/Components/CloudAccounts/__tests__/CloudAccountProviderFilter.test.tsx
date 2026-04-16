@@ -115,7 +115,7 @@ describe('CloudAccountProviderFilter', () => {
     });
   });
 
-  it('removes a selected provider when selected again', async () => {
+  it('adds another provider when selected from the dropdown', async () => {
     renderWithRouter(
       <CloudAccountProviderFilterWithStateObserver
         init={[CloudProviderShortname.AWS]}
@@ -123,17 +123,21 @@ describe('CloudAccountProviderFilter', () => {
     );
 
     fireEvent.click(
-      screen.getByRole('button', { name: /filter by cloud provider/i }),
+      screen.getByRole('button', {
+        name: /filter by cloud provider|cloud provider/i,
+      }),
     );
 
     await waitFor(() => {
-      expect(screen.getByText('AWS')).toBeInTheDocument();
+      expect(screen.getByText('Google Compute Engine')).toBeInTheDocument();
     });
 
-    fireEvent.click(screen.getByText('AWS'));
+    fireEvent.click(screen.getByText('Google Compute Engine'));
 
     await waitFor(() => {
-      expect(screen.getByTestId('selected-providers')).toHaveTextContent('[]');
+      expect(screen.getByTestId('selected-providers')).toHaveTextContent(
+        '["AWS","GCE"]',
+      );
     });
   });
 

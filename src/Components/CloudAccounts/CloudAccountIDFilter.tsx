@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { SearchInput, ToolbarItem } from '@patternfly/react-core';
 import { useQueryParamInformedAtom } from '../../hooks/util/useQueryParam';
 import { cloudAccountIDFilterData } from '../../state/cloudAccounts';
@@ -8,19 +8,27 @@ export const CloudAccountIDFilter = () => {
     cloudAccountIDFilterData,
     'providerAccountID',
   );
-  const [searchValue, setSearchValue] = useState(accountIDFilter || '');
+
+  const timerRef = useRef<ReturnType<typeof setTimeout>>();
 
   useEffect(() => {
-    const timeout = window.setTimeout(() => {
-      setAccountIDFilter(searchValue);
+    return () => {
+      clearTimeout(timerRef.current);
+    };
+  }, []);
+
+  const handleChange = (_: unknown, value: string) => {
+    clearTimeout(timerRef.current);
+
+    timerRef.current = setTimeout(() => {
+      setAccountIDFilter(value);
     }, 400);
+  };
 
-    return () => window.clearTimeout(timeout);
-  }, [searchValue, setAccountIDFilter]);
-
-  useEffect(() => {
-    setSearchValue(accountIDFilter || '');
-  }, [accountIDFilter]);
+  const handleClear = () => {
+    clearTimeout(timerRef.current);
+    setAccountIDFilter('');
+  };
 
   return (
     <ToolbarItem>
@@ -28,12 +36,9 @@ export const CloudAccountIDFilter = () => {
       <SearchInput
         aria-label="Filter by cloud account ID"
         placeholder="Filter by cloud account ID"
-        value={searchValue}
-        onChange={(_, value) => setSearchValue(value)}
-        onClear={() => {
-          setSearchValue('');
-          setAccountIDFilter('');
-        }}
+        value={accountIDFilter || ''}
+        onChange={handleChange}
+        onClear={handleClear}
       />
           
     </ToolbarItem>

@@ -36,18 +36,22 @@ export const CloudAccountProviderFilter: React.FC<
     value: string | number | undefined,
   ) => {
     if (!value || typeof value !== 'string') {
+      setIsOpen(false);
       return;
     }
 
     const provider = value as CloudProviderShortname;
-    const nextSelected = selectedProviders.includes(provider)
-      ? selectedProviders.filter((item) => item !== provider)
-      : [...selectedProviders, provider];
-    setSelectedProviders(nextSelected);
+
+    if (!selectedProviders.includes(provider)) {
+      setSelectedProviders([...selectedProviders, provider]);
+    }
+
+    setIsOpen(false);
   };
 
   return (
     <ToolbarItem>
+            
       <Select
         isOpen={isOpen}
         onOpenChange={setIsOpen}
@@ -59,22 +63,28 @@ export const CloudAccountProviderFilter: React.FC<
             onClick={onToggleClick}
             isExpanded={isOpen}
           >
-            Filter by cloud provider           
+                        Filter by cloud provider           
           </MenuToggle>
         )}
       >
+                
         <SelectList>
+                    
           {availableProviders.map((provider) => (
             <SelectOption
               key={provider}
               value={provider}
               isSelected={selectedProviders.includes(provider)}
             >
-              {ProviderLabelMap[provider] ?? provider}
+                            {ProviderLabelMap[provider] ?? provider}
+                          
             </SelectOption>
           ))}
+                  
         </SelectList>
+              
       </Select>
+          
     </ToolbarItem>
   );
 };
