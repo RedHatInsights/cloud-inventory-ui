@@ -15,6 +15,16 @@ jest.mock('react-router-dom', () => ({
   },
 }));
 
+const defaultQueryParams = {
+  limit: 10,
+  offset: 0,
+  sortField: undefined,
+  sortDirection: undefined,
+  shortName: [],
+  goldImageAccess: [],
+  providerAccountID: '',
+};
+
 const { ComponentWithQueryClient, queryClient } = ManipulatableQueryWrapper(
   <CloudAccountsPage />,
 );
@@ -25,44 +35,41 @@ beforeEach(() => {
     canReadCloudAccess: true,
   });
 });
+
+afterEach(() => {
+  queryClient.clear();
+  jest.clearAllMocks();
+});
+
 it('renders cloud accounts page', async () => {
-  queryClient.setQueryData(
-    [
-      'cloudAccounts',
+  queryClient.setQueryData(['cloudAccounts', defaultQueryParams], {
+    body: [
       {
-        limit: 10,
-        offset: 0,
+        providerAccountID: 'abc',
+        shortName: 'AWS',
+        goldImageAccess: 'Granted',
+        dateAdded: '2025-01-01',
       },
     ],
-    {
-      body: [
-        {
-          providerAccountID: 'abc',
-          shortName: 'AWS',
-          goldImageAccess: 'Granted',
-          dateAdded: '2025-01-01',
-        },
-      ],
-      pagination: {
-        total: 1,
-        count: 1,
-        limit: 10,
-        offset: 0,
-      },
+    pagination: {
+      total: 1,
+      count: 1,
+      limit: 10,
+      offset: 0,
     },
-  );
+  });
 
   renderWithRouter(<ComponentWithQueryClient />);
 
-  await waitFor(() =>
-    expect(screen.getByText('Cloud Accounts')).toBeInTheDocument(),
-  );
+  expect(await screen.findByText('Cloud Accounts')).toBeInTheDocument();
 });
 
 it('shows empty state when no accounts exist', async () => {
-  queryClient.setQueryData(['rbacPermissions'], { canReadCloudAccess: true });
+  queryClient.setQueryData(['rbacPermissions'], {
+    canReadCloudAccess: true,
+  });
 
-  queryClient.setQueryData(['cloudAccounts', { limit: 10, offset: 0 }], {
+  queryClient.setQueryData(['cloudAccounts', defaultQueryParams], {
     body: [],
     pagination: { total: 0, count: 0, limit: 10, offset: 0 },
   });
@@ -72,6 +79,7 @@ it('shows empty state when no accounts exist', async () => {
   const integrationsLink = await screen.findByRole('link', {
     name: /integrations/i,
   });
+
   expect(integrationsLink).toHaveAttribute('href', '/settings/integrations/');
 });
 

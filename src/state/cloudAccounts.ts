@@ -1,5 +1,12 @@
 import { atom } from 'jotai';
 import { PaginationData } from '../types/pagination';
+import { CloudProviderShortname } from '../types/cloudAccountsTypes';
+
+export const cloudProviderFilterData = atom<CloudProviderShortname[]>([]);
+
+export const goldImageStatusFilterData = atom<string[]>([]);
+
+export const cloudAccountIDFilterData = atom<string>('');
 
 export const CloudAccountsPaginationData = atom<PaginationData>({
   page: 1,
@@ -12,3 +19,7 @@ export type CloudAccountsSortField =
   | 'provider'
   | 'goldImageAccess'
   | 'dateAdded';
+
+export const cloudAccountsFilterCategoryData = atom<
+  'ID' | 'Provider' | 'Status'
+>('ID');

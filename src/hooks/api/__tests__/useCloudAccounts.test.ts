@@ -1,7 +1,8 @@
 import { renderHook, waitFor } from '@testing-library/react';
 import { RequestMocks } from '../../../Components/util/testing/mockApiResponse';
 import { useCloudAccounts } from '../useCloudAccounts';
-import { CloudProviderShortname } from '../useCloudAccounts';
+import { CloudProviderShortname } from '../../../types/cloudAccountsTypes';
+
 const mocks = new RequestMocks();
 describe('useCloudAccounts', () => {
   beforeEach(() => {

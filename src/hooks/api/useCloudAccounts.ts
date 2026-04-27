@@ -1,45 +1,19 @@
 import { useQuery } from '@tanstack/react-query';
 import { HttpError } from '../../utils/errors';
-import { SortByDirection } from '@patternfly/react-table';
-
-export enum CloudProviderShortname {
-  AWS = 'AWS',
-  GCP = 'GCE',
-  AZURE = 'MSAZ',
-}
-
-export type CloudAccount = {
-  providerAccountID: string;
-  goldImageAccess: 'Granted' | 'Requested' | 'Failed';
-  dateAdded: string;
-  providerLabel: string;
-  sourceID?: string;
-  shortName: CloudProviderShortname;
-};
-
-export type CloudAccountsResponse = {
-  body: CloudAccount[];
-  pagination: {
-    count: number;
-    limit: number;
-    offset: number;
-    total: number;
-  };
-};
-
-export type fetchCloudAccountsArgs = {
-  limit: number;
-  offset: number;
-  sortField?: string;
-  sortDirection?: SortByDirection;
-};
+import {
+  CloudAccountsResponse,
+  FetchCloudAccountsArgs,
+} from '../../types/cloudAccountsTypes';
 
 const fetchCloudAccounts = async ({
   limit,
   offset,
   sortField,
   sortDirection,
-}: fetchCloudAccountsArgs): Promise<CloudAccountsResponse> => {
+  providerAccountID,
+  shortName,
+  goldImageAccess,
+}: FetchCloudAccountsArgs): Promise<CloudAccountsResponse> => {
   const params = new URLSearchParams({
     limit: String(limit),
     offset: String(offset),
@@ -49,23 +23,36 @@ const fetchCloudAccounts = async ({
     params.set('sort_by', sortField);
     params.set('sort_direction', sortDirection);
   }
+
+  if (providerAccountID) {
+    params.set('providerAccountID', providerAccountID);
+  }
+
+  if (shortName?.length) {
+    params.set('shortName', shortName.join(','));
+  }
+
+  if (goldImageAccess?.length) {
+    params.set('goldImageAccess', goldImageAccess.join(','));
+  }
+
   const response = await fetch(
     `/api/rhsm/v2/cloud_access_providers/accounts?${params.toString()}`,
   );
 
   if (!response.ok) {
     throw new HttpError(
-      `Something went wrong`,
+      'Something went wrong',
       response.status,
       response.statusText,
     );
   }
-  const json = await response.json();
 
+  const json = await response.json();
   return json as CloudAccountsResponse;
 };
 
-export const useCloudAccounts = (args: fetchCloudAccountsArgs) => {
+export const useCloudAccounts = (args: FetchCloudAccountsArgs) => {
   return useQuery({
     queryKey: ['cloudAccounts', args],
     queryFn: () => fetchCloudAccounts(args),
