@@ -16,9 +16,14 @@ import {
   cloudProviderFilterData,
   goldImagePaginationData,
 } from '../../state/goldImages';
-import { useQueryParamInformedAtom } from '../../hooks/util/useQueryParam';
+import {
+  generateQueryParamsForData,
+  useQueryParamInformedAtom,
+} from '../../hooks/util/useQueryParam';
 import { hasPaginationError } from '../../utils/errors';
 import { PaginationError } from '../shared/PaginationError';
+import { Link } from 'react-router-dom';
+import { Paths } from '../../utils/routing';
 
 interface GoldImagesProps {
   goldImages: GoldImagesResponse;
@@ -93,6 +98,13 @@ export const GoldImagesTable = ({ goldImages }: GoldImagesProps) => {
                     </Content>
                   );
                 })}
+              </Td>
+              <Td modifier="fitContent">
+                <Link
+                  to={`../${Paths.CloudAccounts}?${generateQueryParamsForData([hyperscaler.provider], 'shortName').toString()}`}
+                >
+                  View cloud accounts
+                </Link>
               </Td>
             </Tr>
           );
