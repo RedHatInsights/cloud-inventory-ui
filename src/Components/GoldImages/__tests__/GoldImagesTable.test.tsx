@@ -11,6 +11,7 @@ import {
   cloudProviderFilterData,
   goldImagePaginationData,
 } from '../../../state/goldImages';
+import { Paths } from '../../../utils/routing';
 
 const goldImageTestData: (amount: number) => GoldImagesResponse = (
   amount: number,
@@ -164,7 +165,7 @@ describe('Gold images table', () => {
     expect(links).toHaveLength(3);
     expect(links[0]).toHaveAttribute(
       'href',
-      expect.stringContaining('cloud-accounts'),
+      expect.stringContaining(Paths.CloudAccounts),
     );
     expect(links[0]).toHaveAttribute(
       'href',
