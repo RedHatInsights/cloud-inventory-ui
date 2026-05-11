@@ -1,5 +1,8 @@
 import React, { useEffect } from 'react';
-import { GoldImagesResponse } from '../../hooks/api/useGoldImages';
+import {
+  CloudProviderName,
+  GoldImagesResponse,
+} from '../../hooks/api/useGoldImages';
 import {
   SortByDirection,
   Table,
@@ -16,9 +19,15 @@ import {
   cloudProviderFilterData,
   goldImagePaginationData,
 } from '../../state/goldImages';
-import { useQueryParamInformedAtom } from '../../hooks/util/useQueryParam';
+import {
+  generateQueryParamsForData,
+  useQueryParamInformedAtom,
+} from '../../hooks/util/useQueryParam';
 import { hasPaginationError } from '../../utils/errors';
 import { PaginationError } from '../shared/PaginationError';
+import { Link } from 'react-router-dom';
+import { Paths } from '../../utils/routing';
+import { CloudProviderShortname } from '../../types/cloudAccountsTypes';
 
 interface GoldImagesProps {
   goldImages: GoldImagesResponse;
@@ -57,6 +66,12 @@ export const GoldImagesTable = ({ goldImages }: GoldImagesProps) => {
     pageOptions.page * pageOptions.perPage,
   );
 
+  const goldImagesProviderToCloudAccountShortName = {
+    [CloudProviderName.AWS]: CloudProviderShortname.AWS,
+    [CloudProviderName.GCP]: CloudProviderShortname.GCP,
+    [CloudProviderName.AZURE]: CloudProviderShortname.AZURE,
+  };
+
   useEffect(() => {
     setGoldImagePagination({
       ...pageOptions,
@@ -93,6 +108,20 @@ export const GoldImagesTable = ({ goldImages }: GoldImagesProps) => {
                     </Content>
                   );
                 })}
+              </Td>
+              <Td modifier="fitContent">
+                <Link
+                  to={`../${Paths.CloudAccounts}?${generateQueryParamsForData(
+                    [
+                      goldImagesProviderToCloudAccountShortName[
+                        hyperscaler.provider
+                      ],
+                    ],
+                    'shortName',
+                  ).toString()}`}
+                >
+                    View cloud accounts
+                </Link>
               </Td>
             </Tr>
           );

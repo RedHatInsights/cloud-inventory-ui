@@ -6,7 +6,7 @@ import { Unavailable } from '@redhat-cloud-services/frontend-components/Unavaila
 import { PageHeader } from '@redhat-cloud-services/frontend-components/PageHeader';
 import { GoldImagesTable } from '../../Components/GoldImages/GoldImagesTable';
 import { useRbacPermission } from '../../hooks/util/useRbacPermissions';
-import { Navigate } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { Paths } from '../../utils/routing';
 import { GoldImagesToolbar } from '../../Components/GoldImages/GoldImagesToolbar';
 import { GoldImagesPagination } from '../../Components/GoldImages/GoldImagesPagination';
@@ -37,7 +37,9 @@ export const GoldImagesPage = () => {
         <Content component="h1">Gold Images</Content>
         <Content component="p">
           This is a listing of the gold images available to your organization,
-          based on your subscriptions. Learn more about gold images.
+          based on your subscriptions. Learn more about gold images. To see
+          which cloud accounts have gold image access enabled, view the list of
+          your <Link to={`../${Paths.CloudAccounts}`}>cloud accounts.</Link>
         </Content>
       </PageHeader>
       <Section>

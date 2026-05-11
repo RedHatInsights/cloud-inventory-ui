@@ -1,5 +1,5 @@
 import React from 'react';
-import { fireEvent, waitFor } from '@testing-library/react';
+import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { renderWithRouter } from '../../../utils/testing/customRender';
 import {
   CloudProviderName,
@@ -11,6 +11,7 @@ import {
   cloudProviderFilterData,
   goldImagePaginationData,
 } from '../../../state/goldImages';
+import { Paths } from '../../../utils/routing';
 
 const goldImageTestData: (amount: number) => GoldImagesResponse = (
   amount: number,
@@ -153,5 +154,23 @@ describe('Gold images table', () => {
 
     expect(container.querySelector('thead')).not.toBeInTheDocument();
     expect(container.querySelector('tbody')).not.toBeInTheDocument();
+  });
+  it('renders cloud accounts links for each provider', () => {
+    renderWithRouter(<GoldImagesTable goldImages={goldImageTestData(3)} />);
+
+    const links = screen.getAllByRole('link', {
+      name: /view cloud accounts/i,
+    });
+
+    expect(links).toHaveLength(3);
+    expect(links[0]).toHaveAttribute(
+      'href',
+      expect.stringContaining(Paths.CloudAccounts),
+    );
+    expect(links[0]).toHaveAttribute(
+      'href',
+      expect.stringContaining('shortName'),
+    );
+    expect(links[0]).toHaveAttribute('href', expect.stringContaining('AWS'));
   });
 });
