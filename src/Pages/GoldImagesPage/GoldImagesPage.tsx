@@ -31,6 +31,8 @@ export const GoldImagesPage = () => {
   if (areGoldImagesLoading) return <Loading />;
   if (isGoldImageError) return <Unavailable />;
 
+  const noGoldImages = !goldImages || Object.keys(goldImages).length == 0;
+
   return (
     <>
       <PageHeader>
@@ -44,10 +46,8 @@ export const GoldImagesPage = () => {
       </PageHeader>
       <Section>
         <PageSection>
-          {(!goldImages || Object.keys(goldImages).length == 0) && (
-            <NoGoldImages />
-          )}
-          {goldImages && (
+          {noGoldImages && <NoGoldImages />}
+          {!noGoldImages && (
             <>
               <GoldImagesToolbar goldImages={goldImages} />
               <GoldImagesTable goldImages={goldImages} />
