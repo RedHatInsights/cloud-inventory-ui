@@ -59,9 +59,9 @@ it('renders cloud accounts page', async () => {
     },
   });
 
-  renderWithRouter(<ComponentWithQueryClient />);
+  const { findByText } = renderWithRouter(<ComponentWithQueryClient />);
 
-  expect(await screen.findByText('Cloud Accounts')).toBeInTheDocument();
+  expect(await findByText('Cloud Accounts')).toBeInTheDocument();
 });
 
 it('shows empty state when no accounts exist', async () => {
