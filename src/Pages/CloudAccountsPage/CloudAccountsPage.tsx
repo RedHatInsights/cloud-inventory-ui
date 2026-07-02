@@ -9,7 +9,6 @@ import { useCloudAccounts } from '../../hooks/api/useCloudAccounts';
 import { Unavailable } from '@redhat-cloud-services/frontend-components/Unavailable';
 import { Navigate } from 'react-router-dom';
 import { Loading } from '../../Components/util/Loading';
-import { useRbacPermission } from '../../hooks/util/useRbacPermissions';
 import { Paths } from '../../utils/routing';
 import { NoCloudAccounts } from '../../Components/CloudAccounts/NoCloudAccounts';
 import {
@@ -26,6 +25,7 @@ import { SortByDirection } from '@patternfly/react-table';
 import { hasPaginationError } from '../../utils/errors';
 import { CloudProviderShortname } from '../../types/cloudAccountsTypes';
 import { NoSearchResults } from '../../Components/EmptyState/NoSearchResults';
+import { Relation, useHasRelation } from '../../hooks/util/useHasRelation';
 
 export const CloudAccountsPage = () => {
   const [pagination, setPagination] = useQueryParamInformedAtom(
@@ -93,8 +93,9 @@ export const CloudAccountsPage = () => {
     }
   }, [cloudAccountsResponse?.pagination?.total]);
 
-  const { data: permissions, isLoading: arePermissionsLoading } =
-    useRbacPermission();
+  const { has: canReadCloudAccess, isLoading } = useHasRelation(
+    Relation.CLOUD_ACCESS_VIEW,
+  );
 
   const hasActiveFilters =
     selectedProviders.length > 0 ||
@@ -105,9 +106,8 @@ export const CloudAccountsPage = () => {
   const shouldShowEmptyState =
     !hasAccounts && !hasActiveFilters && !hasPaginationError(pagination);
 
-  if (arePermissionsLoading) return <Loading />;
-  if (!permissions?.canReadCloudAccess)
-    return <Navigate to={`../${Paths.NoPermissions}`} />;
+  if (isLoading) return <Loading />;
+  if (!canReadCloudAccess) return <Navigate to={`../${Paths.NoPermissions}`} />;
 
   if (areCloudAccountsLoading) return <Loading />;
   if (isCloudAccountsError) return <Unavailable />;

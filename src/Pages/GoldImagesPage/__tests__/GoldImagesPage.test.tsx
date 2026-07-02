@@ -5,6 +5,7 @@ import React from 'react';
 import { ManipulatableQueryWrapper } from '../../../Components/util/testing/ManipulatableQueryWrapper';
 
 const mockNavigate = jest.fn();
+
 jest.mock('react-router-dom', () => ({
   __esModule: true,
   ...jest.requireActual('react-router-dom'),
@@ -14,30 +15,48 @@ jest.mock('react-router-dom', () => ({
   },
 }));
 
+jest.mock('@project-kessel/react-kessel-access-check', () => ({
+  fetchDefaultWorkspace: jest.fn(() => Promise.resolve({ id: 'org-id' })),
+  useAccessCheckContext: jest.fn(() => ({})),
+}));
+
+jest.mock('@project-kessel/react-kessel-access-check/core/api-client', () => ({
+  checkSelf: (...args: unknown[]) => mockNavigate(...args),
+}));
+
 const { ComponentWithQueryClient, queryClient } = ManipulatableQueryWrapper(
   <GoldImagesPage />,
 );
 
 describe('Gold images page', () => {
   beforeEach(() => {
+    queryClient.clear();
+
     queryClient.setQueryData(['goldImages'], {
       AWS: { provider: 'AWS', goldImages: [] },
     });
-    queryClient.setQueryData(['rbacPermissions'], { canReadCloudAccess: true });
+
+    mockNavigate.mockResolvedValue({
+      allowed: 'ALLOWED_TRUE',
+    });
+
     mockNavigate.mockClear();
+  });
+
+  afterEach(() => {
+    queryClient.clear();
+    jest.clearAllMocks();
   });
 
   it('renders', async () => {
     renderWithRouter(<ComponentWithQueryClient />);
 
-    await waitFor(() =>
-      expect(screen.queryByText('Gold Images')).toBeInTheDocument(),
-    );
+    expect(await screen.findByText('Gold Images')).toBeInTheDocument();
   });
 
   it('redirects on missing permission', async () => {
-    queryClient.setQueryData(['rbacPermissions'], {
-      canReadCloudAccess: false,
+    mockNavigate.mockResolvedValueOnce({
+      allowed: 'ALLOWED_FALSE',
     });
 
     renderWithRouter(<ComponentWithQueryClient />);
@@ -50,8 +69,6 @@ describe('Gold images page', () => {
 
     renderWithRouter(<ComponentWithQueryClient />);
 
-    await waitFor(() =>
-      expect(screen.queryByText('No gold images')).toBeInTheDocument(),
-    );
+    expect(await screen.findByText('No gold images')).toBeInTheDocument();
   });
 });
