@@ -3,6 +3,7 @@ import { screen, waitFor } from '@testing-library/react';
 import { CloudAccountsPage } from '../CloudAccountsPage';
 import { renderWithRouter } from '../../../utils/testing/customRender';
 import { ManipulatableQueryWrapper } from '../../../Components/util/testing/ManipulatableQueryWrapper';
+import { Paths } from '../../../utils/routing';
 
 const mockCheck = jest.fn();
 
@@ -13,6 +14,15 @@ jest.mock('@project-kessel/react-kessel-access-check', () => ({
 
 jest.mock('@project-kessel/react-kessel-access-check/core/api-client', () => ({
   checkSelf: (...args: unknown[]) => mockCheck(...args),
+}));
+
+jest.mock('react-router-dom', () => ({
+  __esModule: true,
+  ...jest.requireActual('react-router-dom'),
+  Navigate: ({ to }: { to: string }) => {
+    mockCheck(to);
+    return <div data-testid="navigate" />;
+  },
 }));
 
 const defaultQueryParams = {
@@ -98,6 +108,6 @@ it('redirects when user lacks permission', async () => {
   renderWithRouter(<ComponentWithQueryClient />);
 
   await waitFor(() => {
-    expect(mockCheck).toHaveBeenCalled();
+    expect(mockCheck).toHaveBeenCalledWith(`../${Paths.NoPermissions}`);
   });
 });

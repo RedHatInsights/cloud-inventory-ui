@@ -3,14 +3,15 @@ import { screen, waitFor } from '@testing-library/react';
 import { GoldImagesPage } from '../GoldImagesPage';
 import React from 'react';
 import { ManipulatableQueryWrapper } from '../../../Components/util/testing/ManipulatableQueryWrapper';
+import { Paths } from '../../../utils/routing';
 
 const mockCheck = jest.fn();
 
 jest.mock('react-router-dom', () => ({
   __esModule: true,
   ...jest.requireActual('react-router-dom'),
-  Navigate: () => {
-    mockCheck();
+  Navigate: ({ to }: { to: string }) => {
+    mockCheck(to);
     return <div data-testid="navigate" />;
   },
 }));
@@ -63,7 +64,9 @@ describe('Gold images page', () => {
 
     renderWithRouter(<ComponentWithQueryClient />);
 
-    await waitFor(() => expect(mockCheck).toHaveBeenCalled());
+    await waitFor(() => {
+      expect(mockCheck).toHaveBeenCalledWith(`../${Paths.NoPermissions}`);
+    });
   });
 
   it('renders empty state when no gold images are present', async () => {
