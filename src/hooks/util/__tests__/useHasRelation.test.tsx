@@ -1,87 +1,69 @@
-import { renderHook, waitFor } from '@testing-library/react';
-import {
-  fetchDefaultWorkspace,
-  useAccessCheckContext,
-} from '@project-kessel/react-kessel-access-check';
-import { checkSelf } from '@project-kessel/react-kessel-access-check/core/api-client';
-
+import React from 'react';
+import { render, waitFor } from '@testing-library/react';
+import { fetchDefaultWorkspace } from '@project-kessel/react-kessel-access-check';
+import { ManipulatableQueryWrapper } from '../../../Components/util/testing/ManipulatableQueryWrapper';
 import { Relation, useHasRelation } from '../useHasRelation';
-import { createQueryWrapper } from '../../../utils/testing/testHelpers';
-
-jest.mock('@project-kessel/react-kessel-access-check');
-jest.mock('@project-kessel/react-kessel-access-check/core/api-client');
-
+const mockCheck = jest.fn();
+jest.mock('@project-kessel/react-kessel-access-check', () => ({
+  fetchDefaultWorkspace: jest.fn(() => Promise.resolve({ id: 'org-id' })),
+  useAccessCheckContext: jest.fn(() => ({})),
+}));
+jest.mock('@project-kessel/react-kessel-access-check/core/api-client', () => ({
+  checkSelf: (...args: unknown[]) => mockCheck(...args),
+}));
 describe('useHasRelation', () => {
-  const mockCheckSelf = checkSelf as jest.Mock;
-  const mockFetchDefaultWorkspace = fetchDefaultWorkspace as jest.Mock;
-
-  const renderUseHasRelation = (relation = Relation.CLOUD_ACCESS_VIEW) =>
-    renderHook(() => useHasRelation(relation), {
-      wrapper: createQueryWrapper(),
-    });
-
+  let hookResult: ReturnType<typeof useHasRelation>;
+  const HookConsumer = ({ relation }: { relation: Relation }) => {
+    hookResult = useHasRelation(relation);
+    return null;
+  };
+  const { ComponentWithQueryClient, queryClient } = ManipulatableQueryWrapper(
+    <HookConsumer relation={Relation.CLOUD_ACCESS_VIEW} />,
+  );
   beforeEach(() => {
+    queryClient.clear();
     jest.clearAllMocks();
-
-    (useAccessCheckContext as jest.Mock).mockReturnValue({});
-    mockFetchDefaultWorkspace.mockResolvedValue({ id: 'org-123' });
+    mockCheck.mockResolvedValue({ allowed: 'ALLOWED_TRUE' });
   });
-
+  afterEach(() => {
+    queryClient.clear();
+  });
   it('returns true when access check passes', async () => {
-    mockCheckSelf.mockResolvedValue({ allowed: 'ALLOWED_TRUE' });
-
-    const { result } = renderUseHasRelation();
-
+    render(<ComponentWithQueryClient />);
     await waitFor(() => {
-      expect(result.current.has).toBe(true);
+      expect(hookResult.has).toBe(true);
     });
   });
-
   it('returns false while loading', () => {
-    mockCheckSelf.mockResolvedValue({ allowed: 'ALLOWED_TRUE' });
-
-    const { result } = renderUseHasRelation();
-
-    expect(result.current.isLoading).toBe(true);
-    expect(result.current.has).toBe(false);
+    render(<ComponentWithQueryClient />);
+    expect(hookResult.isLoading).toBe(true);
+    expect(hookResult.has).toBe(false);
   });
-
   it('returns false when access check fails', async () => {
-    mockCheckSelf.mockResolvedValue({ allowed: 'ALLOWED_FALSE' });
-
-    const { result } = renderUseHasRelation();
-
+    mockCheck.mockResolvedValue({ allowed: 'ALLOWED_FALSE' });
+    render(<ComponentWithQueryClient />);
     await waitFor(() => {
-      expect(result.current.isLoading).toBe(false);
+      expect(hookResult.isLoading).toBe(false);
     });
-
-    expect(result.current.has).toBe(false);
+    expect(hookResult.has).toBe(false);
   });
-
   it('calls fetchDefaultWorkspace with window origin', async () => {
-    mockCheckSelf.mockResolvedValue({ allowed: 'ALLOWED_TRUE' });
-
-    renderUseHasRelation();
-
+    render(<ComponentWithQueryClient />);
     await waitFor(() => {
-      expect(mockFetchDefaultWorkspace).toHaveBeenCalledWith(
+      expect(fetchDefaultWorkspace).toHaveBeenCalledWith(
         window.location.origin,
       );
     });
   });
-
   it('calls checkSelf with organization resource', async () => {
-    mockCheckSelf.mockResolvedValue({ allowed: 'ALLOWED_TRUE' });
-
-    renderUseHasRelation(Relation.CLOUD_ACCESS_VIEW);
-
+    render(<ComponentWithQueryClient />);
     await waitFor(() => {
-      expect(mockCheckSelf).toHaveBeenCalledWith(
+      expect(mockCheck).toHaveBeenCalledWith(
         {},
         {
           relation: Relation.CLOUD_ACCESS_VIEW,
           resource: {
-            id: 'org-123',
+            id: 'org-id',
             type: 'organization',
             reporter: { type: 'rbac' },
           },
@@ -89,41 +71,31 @@ describe('useHasRelation', () => {
       );
     });
   });
-
   it('returns false when default workspace fails', async () => {
-    mockFetchDefaultWorkspace.mockRejectedValue(new Error('workspace error'));
-
-    const { result } = renderUseHasRelation();
-
+    (fetchDefaultWorkspace as jest.Mock).mockRejectedValue(
+      new Error('workspace error'),
+    );
+    render(<ComponentWithQueryClient />);
     await waitFor(() => {
-      expect(result.current.isLoading).toBe(false);
+      expect(hookResult.isLoading).toBe(false);
     });
-
-    expect(result.current.has).toBe(false);
-    expect(mockCheckSelf).not.toHaveBeenCalled();
+    expect(hookResult.has).toBe(false);
+    expect(mockCheck).not.toHaveBeenCalled();
   });
-
   it('returns false on query error', async () => {
-    mockCheckSelf.mockRejectedValue(new Error('whoops'));
-
-    const { result } = renderUseHasRelation();
-
+    mockCheck.mockRejectedValue(new Error('whoops'));
+    render(<ComponentWithQueryClient />);
     await waitFor(() => {
-      expect(result.current.isLoading).toBe(false);
+      expect(hookResult.isLoading).toBe(false);
     });
-
-    expect(result.current.has).toBe(false);
+    expect(hookResult.has).toBe(false);
   });
-
   it('returns false on unexpected Kessel response', async () => {
-    mockCheckSelf.mockResolvedValue({ allowed: 'A_WEIRD_VALUE' });
-
-    const { result } = renderUseHasRelation();
-
+    mockCheck.mockResolvedValue({ allowed: 'A_WEIRD_VALUE' });
+    render(<ComponentWithQueryClient />);
     await waitFor(() => {
-      expect(result.current.isLoading).toBe(false);
+      expect(hookResult.isLoading).toBe(false);
     });
-
-    expect(result.current.has).toBe(false);
+    expect(hookResult.has).toBe(false);
   });
 });

@@ -8,8 +8,6 @@ import { useQuery } from '@tanstack/react-query';
 const QUERY_STALE_TIME = 5 * 60 * 1000;
 
 export enum Relation {
-  MANIFESTS_VIEW = 'subscriptions_manifest_view',
-  MANIFESTS_EDIT = 'subscriptions_manifest_edit',
   CLOUD_ACCESS_VIEW = 'subscriptions_cloud_access_view',
   CLOUD_ACCESS_EDIT = 'subscriptions_cloud_access_edit',
 }

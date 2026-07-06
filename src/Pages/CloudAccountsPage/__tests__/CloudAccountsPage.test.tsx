@@ -4,7 +4,7 @@ import { CloudAccountsPage } from '../CloudAccountsPage';
 import { renderWithRouter } from '../../../utils/testing/customRender';
 import { ManipulatableQueryWrapper } from '../../../Components/util/testing/ManipulatableQueryWrapper';
 
-const mockNavigate = jest.fn();
+const mockCheck = jest.fn();
 
 jest.mock('@project-kessel/react-kessel-access-check', () => ({
   fetchDefaultWorkspace: jest.fn(() => Promise.resolve({ id: 'org-id' })),
@@ -12,7 +12,7 @@ jest.mock('@project-kessel/react-kessel-access-check', () => ({
 }));
 
 jest.mock('@project-kessel/react-kessel-access-check/core/api-client', () => ({
-  checkSelf: (...args: unknown[]) => mockNavigate(...args),
+  checkSelf: (...args: unknown[]) => mockCheck(...args),
 }));
 
 const defaultQueryParams = {
@@ -32,7 +32,7 @@ const { ComponentWithQueryClient, queryClient } = ManipulatableQueryWrapper(
 beforeEach(() => {
   queryClient.clear();
 
-  mockNavigate.mockResolvedValue({
+  mockCheck.mockResolvedValue({
     allowed: 'ALLOWED_TRUE',
   });
 });
@@ -91,13 +91,13 @@ it('shows loading state while cloud accounts are loading', async () => {
 });
 
 it('redirects when user lacks permission', async () => {
-  mockNavigate.mockResolvedValueOnce({
+  mockCheck.mockResolvedValueOnce({
     allowed: 'ALLOWED_FALSE',
   });
 
   renderWithRouter(<ComponentWithQueryClient />);
 
   await waitFor(() => {
-    expect(mockNavigate).toHaveBeenCalled();
+    expect(mockCheck).toHaveBeenCalled();
   });
 });
