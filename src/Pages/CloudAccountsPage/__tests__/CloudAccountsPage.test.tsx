@@ -6,6 +6,7 @@ import { ManipulatableQueryWrapper } from '../../../Components/util/testing/Mani
 import { Paths } from '../../../utils/routing';
 
 const mockCheck = jest.fn();
+const mockNavigate = jest.fn();
 
 jest.mock('@project-kessel/react-kessel-access-check', () => ({
   fetchDefaultWorkspace: jest.fn(() => Promise.resolve({ id: 'org-id' })),
@@ -20,7 +21,7 @@ jest.mock('react-router-dom', () => ({
   __esModule: true,
   ...jest.requireActual('react-router-dom'),
   Navigate: ({ to }: { to: string }) => {
-    mockCheck(to);
+    mockNavigate(to);
     return <div data-testid="navigate" />;
   },
 }));
@@ -108,6 +109,6 @@ it('redirects when user lacks permission', async () => {
   renderWithRouter(<ComponentWithQueryClient />);
 
   await waitFor(() => {
-    expect(mockCheck).toHaveBeenCalledWith(`../${Paths.NoPermissions}`);
+    expect(mockNavigate).toHaveBeenCalledWith(`../${Paths.NoPermissions}`);
   });
 });

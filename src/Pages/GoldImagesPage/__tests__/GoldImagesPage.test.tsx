@@ -6,12 +6,13 @@ import { ManipulatableQueryWrapper } from '../../../Components/util/testing/Mani
 import { Paths } from '../../../utils/routing';
 
 const mockCheck = jest.fn();
+const mockNavigate = jest.fn();
 
 jest.mock('react-router-dom', () => ({
   __esModule: true,
   ...jest.requireActual('react-router-dom'),
   Navigate: ({ to }: { to: string }) => {
-    mockCheck(to);
+    mockNavigate(to);
     return <div data-testid="navigate" />;
   },
 }));
@@ -36,12 +37,12 @@ describe('Gold images page', () => {
     queryClient.setQueryData(['goldImages'], {
       AWS: { provider: 'AWS', goldImages: [] },
     });
+    mockCheck.mockClear();
+    mockNavigate.mockClear();
 
     mockCheck.mockResolvedValue({
       allowed: 'ALLOWED_TRUE',
     });
-
-    mockCheck.mockClear();
   });
 
   afterEach(() => {
@@ -65,7 +66,7 @@ describe('Gold images page', () => {
     renderWithRouter(<ComponentWithQueryClient />);
 
     await waitFor(() => {
-      expect(mockCheck).toHaveBeenCalledWith(`../${Paths.NoPermissions}`);
+      expect(mockNavigate).toHaveBeenCalledWith(`../${Paths.NoPermissions}`);
     });
   });
 
