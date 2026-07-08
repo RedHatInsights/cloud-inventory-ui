@@ -1,8 +1,6 @@
-import {
-  fetchDefaultWorkspace,
-  useAccessCheckContext,
-} from '@project-kessel/react-kessel-access-check';
+import { useAccessCheckContext } from '@project-kessel/react-kessel-access-check';
 import { checkSelf } from '@project-kessel/react-kessel-access-check/core/api-client';
+import useChrome from '@redhat-cloud-services/frontend-components/useChrome';
 import { useQuery } from '@tanstack/react-query';
 
 const QUERY_STALE_TIME = 5 * 60 * 1000;
@@ -17,27 +15,17 @@ interface HasRelationResult {
   isLoading: boolean;
 }
 
-const useDefaultWorkspace = () =>
-  useQuery({
-    queryKey: ['rbac', 'default-workspace'],
-    queryFn: async () => await fetchDefaultWorkspace(window.location.origin),
-    staleTime: QUERY_STALE_TIME,
-  });
-
 export const useHasRelation = (relation: Relation): HasRelationResult => {
   const accessCheckContext = useAccessCheckContext();
-
-  const {
-    data: defaultWorkspace,
-    isLoading: defaultWorkspaceIsLoading,
-    isError: defaultWorkspaceIsError,
-  } = useDefaultWorkspace();
+  const chrome = useChrome();
 
   const { data: has, isLoading: accessCheckIsLoading } = useQuery({
-    queryKey: ['kessel', relation, defaultWorkspace?.id],
+    queryKey: ['kessel', relation],
     queryFn: async () => {
-      if (!defaultWorkspace) {
-        throw new Error('default workspace does not exist');
+      const user = await chrome.auth.getUser();
+
+      if (!user) {
+        throw new Error('user does not exist');
       }
 
       return (
@@ -45,20 +33,19 @@ export const useHasRelation = (relation: Relation): HasRelationResult => {
           await checkSelf(accessCheckContext, {
             relation,
             resource: {
-              id: defaultWorkspace.id,
-              type: 'organization',
+              id: `redhat/${user.identity.org_id}`,
+              type: 'tenant',
               reporter: { type: 'rbac' },
             },
           })
         ).allowed === 'ALLOWED_TRUE'
       );
     },
-    enabled: !defaultWorkspaceIsLoading && !defaultWorkspaceIsError,
     staleTime: QUERY_STALE_TIME,
   });
 
   return {
     has: !!has,
-    isLoading: accessCheckIsLoading || defaultWorkspaceIsLoading,
+    isLoading: accessCheckIsLoading,
   };
 };
