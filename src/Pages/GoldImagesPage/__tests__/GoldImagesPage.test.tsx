@@ -3,15 +3,27 @@ import { screen, waitFor } from '@testing-library/react';
 import { GoldImagesPage } from '../GoldImagesPage';
 import React from 'react';
 import { ManipulatableQueryWrapper } from '../../../Components/util/testing/ManipulatableQueryWrapper';
+import { Paths } from '../../../utils/routing';
 
+const mockCheck = jest.fn();
 const mockNavigate = jest.fn();
+
 jest.mock('react-router-dom', () => ({
   __esModule: true,
   ...jest.requireActual('react-router-dom'),
-  Navigate: () => {
-    mockNavigate();
+  Navigate: ({ to }: { to: string }) => {
+    mockNavigate(to);
     return <div data-testid="navigate" />;
   },
+}));
+
+jest.mock('@project-kessel/react-kessel-access-check', () => ({
+  fetchDefaultWorkspace: jest.fn(() => Promise.resolve({ id: 'org-id' })),
+  useAccessCheckContext: jest.fn(() => ({})),
+}));
+
+jest.mock('@project-kessel/react-kessel-access-check/core/api-client', () => ({
+  checkSelf: (...args: unknown[]) => mockCheck(...args),
 }));
 
 const { ComponentWithQueryClient, queryClient } = ManipulatableQueryWrapper(
@@ -20,11 +32,22 @@ const { ComponentWithQueryClient, queryClient } = ManipulatableQueryWrapper(
 
 describe('Gold images page', () => {
   beforeEach(() => {
+    queryClient.clear();
+
     queryClient.setQueryData(['goldImages'], {
       AWS: { provider: 'AWS', goldImages: [] },
     });
-    queryClient.setQueryData(['rbacPermissions'], { canReadCloudAccess: true });
+    mockCheck.mockClear();
     mockNavigate.mockClear();
+
+    mockCheck.mockResolvedValue({
+      allowed: 'ALLOWED_TRUE',
+    });
+  });
+
+  afterEach(() => {
+    queryClient.clear();
+    jest.clearAllMocks();
   });
 
   it('renders', async () => {
@@ -36,13 +59,15 @@ describe('Gold images page', () => {
   });
 
   it('redirects on missing permission', async () => {
-    queryClient.setQueryData(['rbacPermissions'], {
-      canReadCloudAccess: false,
+    mockCheck.mockResolvedValueOnce({
+      allowed: 'ALLOWED_FALSE',
     });
 
     renderWithRouter(<ComponentWithQueryClient />);
 
-    await waitFor(() => expect(mockNavigate).toHaveBeenCalled());
+    await waitFor(() => {
+      expect(mockNavigate).toHaveBeenCalledWith(`../${Paths.NoPermissions}`);
+    });
   });
 
   it('renders empty state when no gold images are present', async () => {

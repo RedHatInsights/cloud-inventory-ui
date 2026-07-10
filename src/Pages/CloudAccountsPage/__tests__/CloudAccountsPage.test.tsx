@@ -3,14 +3,25 @@ import { screen, waitFor } from '@testing-library/react';
 import { CloudAccountsPage } from '../CloudAccountsPage';
 import { renderWithRouter } from '../../../utils/testing/customRender';
 import { ManipulatableQueryWrapper } from '../../../Components/util/testing/ManipulatableQueryWrapper';
+import { Paths } from '../../../utils/routing';
 
+const mockCheck = jest.fn();
 const mockNavigate = jest.fn();
+
+jest.mock('@project-kessel/react-kessel-access-check', () => ({
+  fetchDefaultWorkspace: jest.fn(() => Promise.resolve({ id: 'org-id' })),
+  useAccessCheckContext: jest.fn(() => ({})),
+}));
+
+jest.mock('@project-kessel/react-kessel-access-check/core/api-client', () => ({
+  checkSelf: (...args: unknown[]) => mockCheck(...args),
+}));
 
 jest.mock('react-router-dom', () => ({
   __esModule: true,
   ...jest.requireActual('react-router-dom'),
-  Navigate: () => {
-    mockNavigate();
+  Navigate: ({ to }: { to: string }) => {
+    mockNavigate(to);
     return <div data-testid="navigate" />;
   },
 }));
@@ -31,8 +42,9 @@ const { ComponentWithQueryClient, queryClient } = ManipulatableQueryWrapper(
 
 beforeEach(() => {
   queryClient.clear();
-  queryClient.setQueryData(['rbacPermissions'], {
-    canReadCloudAccess: true,
+
+  mockCheck.mockResolvedValue({
+    allowed: 'ALLOWED_TRUE',
   });
 });
 
@@ -65,10 +77,6 @@ it('renders cloud accounts page', async () => {
 });
 
 it('shows empty state when no accounts exist', async () => {
-  queryClient.setQueryData(['rbacPermissions'], {
-    canReadCloudAccess: true,
-  });
-
   queryClient.setQueryData(['cloudAccounts', defaultQueryParams], {
     body: [],
     pagination: { total: 0, count: 0, limit: 10, offset: 0 },
@@ -84,10 +92,6 @@ it('shows empty state when no accounts exist', async () => {
 });
 
 it('shows loading state while cloud accounts are loading', async () => {
-  queryClient.setQueryData(['rbacPermissions'], {
-    canReadCloudAccess: true,
-  });
-
   queryClient.setQueryDefaults(['cloudAccounts'], {
     queryFn: () => new Promise(() => {}),
   });
@@ -98,13 +102,13 @@ it('shows loading state while cloud accounts are loading', async () => {
 });
 
 it('redirects when user lacks permission', async () => {
-  queryClient.setQueryData(['rbacPermissions'], {
-    canReadCloudAccess: false,
+  mockCheck.mockResolvedValueOnce({
+    allowed: 'ALLOWED_FALSE',
   });
 
   renderWithRouter(<ComponentWithQueryClient />);
 
   await waitFor(() => {
-    expect(mockNavigate).toHaveBeenCalled();
+    expect(mockNavigate).toHaveBeenCalledWith(`../${Paths.NoPermissions}`);
   });
 });
