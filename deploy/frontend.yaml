@@ -54,6 +54,15 @@ objects:
             module: './RootApp'
             routes:
               - pathname: /subscriptions/cloud-inventory
+      serviceTiles:
+        - id: cloud-inventory
+          section: subscriptions
+          group: subscriptions
+          title: Cloud Inventory
+          href: /subscriptions/cloud-inventory
+          description: Manage your cloud subscriptions
+          icon: SubscriptionsIcon
+
 parameters:
   - name: ENV_NAME
     required: true
