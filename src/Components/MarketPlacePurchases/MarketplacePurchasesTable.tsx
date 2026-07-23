@@ -2,6 +2,7 @@ import React from 'react';
 import { Table, Tbody, Td, Th, Thead, Tr } from '@patternfly/react-table';
 import { formatDate } from '../../hooks/util/dates';
 import { MarketplacePurchase } from '../../hooks/api/useMarketplacePurchases';
+import { marketplaceToFriendly } from '../../hooks/util/cloudProviderMaps';
 type MarketplacePurchasesTableProps = {
   marketplacePurchases: MarketplacePurchase[];
 };
@@ -55,7 +56,10 @@ export const MarketplacePurchasesTable = ({
             <Td dataLabel="Marketplace account">
               {purchase.marketplaceAccount}
             </Td>
-            <Td dataLabel="Marketplace">{purchase.marketplace}</Td>
+            <Td dataLabel="Marketplace">
+              {marketplaceToFriendly[purchase.marketplace] ??
+                purchase.marketplace}
+            </Td>
             <Td dataLabel="Date added">{formatDate(purchase.startDate)}</Td>
           </Tr>
         ))}

@@ -38,11 +38,11 @@ describe('MarketplacePurchasesTable', () => {
 
     expect(screen.getByText('Offering 0')).toBeInTheDocument();
     expect(screen.getByText('account-0')).toBeInTheDocument();
-    expect(screen.getByText('aws_marketplace')).toBeInTheDocument();
+    expect(screen.getByText('AWS')).toBeInTheDocument();
 
     expect(screen.getByText('Offering 1')).toBeInTheDocument();
     expect(screen.getByText('account-1')).toBeInTheDocument();
-    expect(screen.getByText('azure_marketplace')).toBeInTheDocument();
+    expect(screen.getByText('Microsoft Azure')).toBeInTheDocument();
   });
 
   it('renders one row for each marketplace purchase', () => {

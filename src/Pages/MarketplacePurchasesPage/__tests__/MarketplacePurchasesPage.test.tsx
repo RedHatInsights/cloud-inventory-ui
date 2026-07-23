@@ -91,8 +91,8 @@ describe('Marketplace purchases page', () => {
       screen.getByText('252b3da5-a55b-4baf-aad0-186a8f3e6fcb'),
     ).toBeInTheDocument();
 
-    expect(screen.getByText('aws_marketplace')).toBeInTheDocument();
-    expect(screen.getByText('azure_marketplace')).toBeInTheDocument();
+    expect(screen.getByText('AWS')).toBeInTheDocument();
+    expect(screen.getByText('Microsoft Azure')).toBeInTheDocument();
   });
 
   it('renders one row for each marketplace purchase', async () => {
@@ -157,5 +157,18 @@ describe('Marketplace purchases page', () => {
         /marketplace purchases shows purchases made from AWS, Azure, Google Cloud, Red Hat Marketplace, and IBM Cloud Paks/i,
       ),
     ).toBeInTheDocument();
+  });
+  it('shows a loading state while marketplace purchases are loading', async () => {
+    queryClient.setQueryDefaults(['marketplacePurchases'], {
+      queryFn: () => new Promise(() => {}),
+    });
+
+    renderWithRouter(<ComponentWithQueryClient />);
+
+    expect(await screen.findByLabelText(/contents/i)).toBeInTheDocument();
+
+    expect(
+      screen.queryByText(/you have no marketplace purchases/i),
+    ).not.toBeInTheDocument();
   });
 });
