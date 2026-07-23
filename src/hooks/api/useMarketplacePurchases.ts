@@ -34,7 +34,7 @@ const fetchMarketplacePurchases = async ({
   });
 
   const response = await fetch(
-    `/api/rhsm/v2/marketplace_purchases?${params.toString()}`,
+    `/api/rhsm/v2/cloud_access_providers/marketplace_purchases?${params.toString()}`,
   );
 
   if (!response.ok) {

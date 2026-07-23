@@ -4,6 +4,9 @@ import { useMarketplacePurchases } from '../useMarketplacePurchases';
 
 const mocks = new RequestMocks();
 
+const marketplacePurchasesUrl =
+  '/api/rhsm/v2/cloud_access_providers/marketplace_purchases';
+
 describe('useMarketplacePurchases', () => {
   beforeEach(() => {
     mocks.reset();
@@ -11,7 +14,7 @@ describe('useMarketplacePurchases', () => {
 
   it('fetches marketplace purchases with provided limit and offset', async () => {
     mocks.addMock(
-      '/api/rhsm/v2/marketplace_purchases?limit=10&offset=0',
+      `${marketplacePurchasesUrl}?limit=10&offset=0`,
       {
         body: [
           {
@@ -43,7 +46,9 @@ describe('useMarketplacePurchases', () => {
       },
     );
 
-    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    await waitFor(() => {
+      expect(result.current.isSuccess).toBe(true);
+    });
 
     expect(result.current.data?.body).toHaveLength(1);
     expect(result.current.data?.body[0].offeringName).toBe(
@@ -54,7 +59,7 @@ describe('useMarketplacePurchases', () => {
 
   it('returns an empty list when no marketplace purchases exist', async () => {
     mocks.addMock(
-      '/api/rhsm/v2/marketplace_purchases?limit=10&offset=0',
+      `${marketplacePurchasesUrl}?limit=10&offset=0`,
       {
         body: [],
         pagination: {
@@ -78,14 +83,17 @@ describe('useMarketplacePurchases', () => {
       },
     );
 
-    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    await waitFor(() => {
+      expect(result.current.isSuccess).toBe(true);
+    });
 
     expect(result.current.data?.body).toEqual([]);
+    expect(result.current.data?.pagination.total).toBe(0);
   });
 
   it('exposes pagination metadata from the API', async () => {
     mocks.addMock(
-      '/api/rhsm/v2/marketplace_purchases?limit=5&offset=10',
+      `${marketplacePurchasesUrl}?limit=5&offset=10`,
       {
         body: [],
         pagination: {
@@ -109,7 +117,9 @@ describe('useMarketplacePurchases', () => {
       },
     );
 
-    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    await waitFor(() => {
+      expect(result.current.isSuccess).toBe(true);
+    });
 
     expect(result.current.data?.pagination).toStrictEqual({
       count: 5,
@@ -121,7 +131,7 @@ describe('useMarketplacePurchases', () => {
 
   it('returns all marketplace purchase fields from the API', async () => {
     mocks.addMock(
-      '/api/rhsm/v2/marketplace_purchases?limit=10&offset=0',
+      `${marketplacePurchasesUrl}?limit=10&offset=0`,
       {
         body: [
           {
@@ -154,7 +164,9 @@ describe('useMarketplacePurchases', () => {
       },
     );
 
-    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    await waitFor(() => {
+      expect(result.current.isSuccess).toBe(true);
+    });
 
     expect(result.current.data?.body[0]).toStrictEqual({
       offeringName:
@@ -167,11 +179,7 @@ describe('useMarketplacePurchases', () => {
   });
 
   it('enters error state on non-200 response', async () => {
-    mocks.addMock(
-      '/api/rhsm/v2/marketplace_purchases?limit=10&offset=0',
-      {},
-      false,
-    );
+    mocks.addMock(`${marketplacePurchasesUrl}?limit=10&offset=0`, {}, false);
 
     const { result } = renderHook(
       () =>
@@ -184,7 +192,9 @@ describe('useMarketplacePurchases', () => {
       },
     );
 
-    await waitFor(() => expect(result.current.isError).toBe(true));
+    await waitFor(() => {
+      expect(result.current.isError).toBe(true);
+    });
   });
 
   it('enters error state on network failure', async () => {
@@ -203,17 +213,15 @@ describe('useMarketplacePurchases', () => {
       },
     );
 
-    await waitFor(() => expect(result.current.isError).toBe(true));
+    await waitFor(() => {
+      expect(result.current.isError).toBe(true);
+    });
 
     fetchSpy.mockRestore();
   });
 
   it('starts in loading state', () => {
-    mocks.addMock(
-      '/api/rhsm/v2/marketplace_purchases?limit=10&offset=0',
-      {},
-      true,
-    );
+    mocks.addMock(`${marketplacePurchasesUrl}?limit=10&offset=0`, {}, true);
 
     const { result } = renderHook(
       () =>
