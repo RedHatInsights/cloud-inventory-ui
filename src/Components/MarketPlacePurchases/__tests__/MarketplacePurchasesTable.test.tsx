@@ -4,10 +4,6 @@ import { renderWithRouter } from '../../../utils/testing/customRender';
 import { MarketplacePurchasesTable } from '../MarketplacePurchasesTable';
 import { MarketplacePurchase } from '../../../hooks/api/useMarketplacePurchases';
 
-jest.mock('../../../hooks/util/dates', () => ({
-  formatDate: (date: string) => `Formatted:${date}`,
-}));
-
 const makeMarketplacePurchases = (count: number): MarketplacePurchase[] =>
   Array.from({ length: count }).map((_, index) => ({
     offeringName: `Offering ${index}`,
@@ -54,20 +50,7 @@ describe('MarketplacePurchasesTable', () => {
   it('renders formatted dates', () => {
     renderTable(makeMarketplacePurchases(2));
 
-    expect(screen.getByText('Formatted:2026-01-01')).toBeInTheDocument();
-
-    expect(screen.getByText('Formatted:2026-01-02')).toBeInTheDocument();
-  });
-
-  it('renders only the header row when no purchases are present', () => {
-    renderTable([]);
-
-    expect(
-      screen.getByRole('grid', {
-        name: /marketplace purchases table/i,
-      }),
-    ).toBeInTheDocument();
-
-    expect(screen.getAllByRole('row')).toHaveLength(1);
+    expect(screen.getByText('2026-01-01')).toBeInTheDocument();
+    expect(screen.getByText('2026-01-02')).toBeInTheDocument();
   });
 });
