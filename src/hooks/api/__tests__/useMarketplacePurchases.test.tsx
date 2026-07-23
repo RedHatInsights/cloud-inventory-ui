@@ -12,9 +12,13 @@ describe('useMarketplacePurchases', () => {
     mocks.reset();
   });
 
-  it('fetches marketplace purchases with provided limit and offset', async () => {
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  it('fetches marketplace purchases', async () => {
     mocks.addMock(
-      `${marketplacePurchasesUrl}?limit=10&offset=0`,
+      marketplacePurchasesUrl,
       {
         body: [
           {
@@ -35,16 +39,9 @@ describe('useMarketplacePurchases', () => {
       true,
     );
 
-    const { result } = renderHook(
-      () =>
-        useMarketplacePurchases({
-          limit: 10,
-          offset: 0,
-        }),
-      {
-        wrapper: mocks.wrapper,
-      },
-    );
+    const { result } = renderHook(() => useMarketplacePurchases(), {
+      wrapper: mocks.wrapper,
+    });
 
     await waitFor(() => {
       expect(result.current.isSuccess).toBe(true);
@@ -59,7 +56,7 @@ describe('useMarketplacePurchases', () => {
 
   it('returns an empty list when no marketplace purchases exist', async () => {
     mocks.addMock(
-      `${marketplacePurchasesUrl}?limit=10&offset=0`,
+      marketplacePurchasesUrl,
       {
         body: [],
         pagination: {
@@ -72,16 +69,9 @@ describe('useMarketplacePurchases', () => {
       true,
     );
 
-    const { result } = renderHook(
-      () =>
-        useMarketplacePurchases({
-          limit: 10,
-          offset: 0,
-        }),
-      {
-        wrapper: mocks.wrapper,
-      },
-    );
+    const { result } = renderHook(() => useMarketplacePurchases(), {
+      wrapper: mocks.wrapper,
+    });
 
     await waitFor(() => {
       expect(result.current.isSuccess).toBe(true);
@@ -91,31 +81,24 @@ describe('useMarketplacePurchases', () => {
     expect(result.current.data?.pagination.total).toBe(0);
   });
 
-  it('exposes pagination metadata from the API', async () => {
+  it('exposes pagination metadata returned by the API', async () => {
     mocks.addMock(
-      `${marketplacePurchasesUrl}?limit=5&offset=10`,
+      marketplacePurchasesUrl,
       {
         body: [],
         pagination: {
           count: 5,
-          limit: 5,
-          offset: 10,
+          limit: 10,
+          offset: 0,
           total: 42,
         },
       },
       true,
     );
 
-    const { result } = renderHook(
-      () =>
-        useMarketplacePurchases({
-          limit: 5,
-          offset: 10,
-        }),
-      {
-        wrapper: mocks.wrapper,
-      },
-    );
+    const { result } = renderHook(() => useMarketplacePurchases(), {
+      wrapper: mocks.wrapper,
+    });
 
     await waitFor(() => {
       expect(result.current.isSuccess).toBe(true);
@@ -123,15 +106,15 @@ describe('useMarketplacePurchases', () => {
 
     expect(result.current.data?.pagination).toStrictEqual({
       count: 5,
-      limit: 5,
-      offset: 10,
+      limit: 10,
+      offset: 0,
       total: 42,
     });
   });
 
   it('returns all marketplace purchase fields from the API', async () => {
     mocks.addMock(
-      `${marketplacePurchasesUrl}?limit=10&offset=0`,
+      marketplacePurchasesUrl,
       {
         body: [
           {
@@ -153,16 +136,9 @@ describe('useMarketplacePurchases', () => {
       true,
     );
 
-    const { result } = renderHook(
-      () =>
-        useMarketplacePurchases({
-          limit: 10,
-          offset: 0,
-        }),
-      {
-        wrapper: mocks.wrapper,
-      },
-    );
+    const { result } = renderHook(() => useMarketplacePurchases(), {
+      wrapper: mocks.wrapper,
+    });
 
     await waitFor(() => {
       expect(result.current.isSuccess).toBe(true);
@@ -178,19 +154,12 @@ describe('useMarketplacePurchases', () => {
     });
   });
 
-  it('enters error state on non-200 response', async () => {
-    mocks.addMock(`${marketplacePurchasesUrl}?limit=10&offset=0`, {}, false);
+  it('enters error state on a non-200 response', async () => {
+    mocks.addMock(marketplacePurchasesUrl, {}, false);
 
-    const { result } = renderHook(
-      () =>
-        useMarketplacePurchases({
-          limit: 10,
-          offset: 0,
-        }),
-      {
-        wrapper: mocks.wrapper,
-      },
-    );
+    const { result } = renderHook(() => useMarketplacePurchases(), {
+      wrapper: mocks.wrapper,
+    });
 
     await waitFor(() => {
       expect(result.current.isError).toBe(true);
@@ -198,41 +167,25 @@ describe('useMarketplacePurchases', () => {
   });
 
   it('enters error state on network failure', async () => {
-    const fetchSpy = jest
+    jest
       .spyOn(global, 'fetch')
       .mockRejectedValueOnce(new Error('Network error'));
 
-    const { result } = renderHook(
-      () =>
-        useMarketplacePurchases({
-          limit: 10,
-          offset: 0,
-        }),
-      {
-        wrapper: mocks.wrapper,
-      },
-    );
+    const { result } = renderHook(() => useMarketplacePurchases(), {
+      wrapper: mocks.wrapper,
+    });
 
     await waitFor(() => {
       expect(result.current.isError).toBe(true);
     });
-
-    fetchSpy.mockRestore();
   });
 
   it('starts in loading state', () => {
-    mocks.addMock(`${marketplacePurchasesUrl}?limit=10&offset=0`, {}, true);
+    mocks.addMock(marketplacePurchasesUrl, {}, true);
 
-    const { result } = renderHook(
-      () =>
-        useMarketplacePurchases({
-          limit: 10,
-          offset: 0,
-        }),
-      {
-        wrapper: mocks.wrapper,
-      },
-    );
+    const { result } = renderHook(() => useMarketplacePurchases(), {
+      wrapper: mocks.wrapper,
+    });
 
     expect(result.current.isLoading).toBe(true);
   });

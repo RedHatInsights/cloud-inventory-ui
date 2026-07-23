@@ -3,11 +3,18 @@ import { fireEvent, screen } from '@testing-library/react';
 import MarketplacePurchasesPage from '../MarketplacePurchasesPage';
 import { renderWithRouter } from '../../../utils/testing/customRender';
 import { ManipulatableQueryWrapper } from '../../../Components/util/testing/ManipulatableQueryWrapper';
+import { useHasRelation } from '../../../hooks/util/useHasRelation';
 
-const defaultQueryParams = {
-  limit: 10,
-  offset: 0,
-};
+jest.mock('../../../hooks/util/useHasRelation', () => ({
+  Relation: {
+    CLOUD_ACCESS_VIEW: 'cloud_access_view',
+  },
+  useHasRelation: jest.fn(),
+}));
+
+const mockedUseHasRelation = useHasRelation as jest.MockedFunction<
+  typeof useHasRelation
+>;
 
 const mockMarketplacePurchasesResponse = {
   pagination: {
@@ -42,6 +49,11 @@ const { ComponentWithQueryClient, queryClient } = ManipulatableQueryWrapper(
 describe('Marketplace purchases page', () => {
   beforeEach(() => {
     queryClient.clear();
+
+    mockedUseHasRelation.mockReturnValue({
+      has: true,
+      isLoading: false,
+    });
   });
 
   afterEach(() => {
@@ -51,7 +63,7 @@ describe('Marketplace purchases page', () => {
 
   it('renders the Marketplace Purchases page', async () => {
     queryClient.setQueryData(
-      ['marketplacePurchases', defaultQueryParams],
+      ['marketplacePurchases'],
       mockMarketplacePurchasesResponse,
     );
 
@@ -72,7 +84,7 @@ describe('Marketplace purchases page', () => {
 
   it('renders marketplace purchase data', async () => {
     queryClient.setQueryData(
-      ['marketplacePurchases', defaultQueryParams],
+      ['marketplacePurchases'],
       mockMarketplacePurchasesResponse,
     );
 
@@ -97,19 +109,19 @@ describe('Marketplace purchases page', () => {
 
   it('renders one row for each marketplace purchase', async () => {
     queryClient.setQueryData(
-      ['marketplacePurchases', defaultQueryParams],
+      ['marketplacePurchases'],
       mockMarketplacePurchasesResponse,
     );
 
     renderWithRouter(<ComponentWithQueryClient />);
 
-    await screen.findByText('Red Hat Enterprise Linux'); // One header row plus two purchase rows.
+    await screen.findByText('Red Hat Enterprise Linux');
 
     expect(screen.getAllByRole('row')).toHaveLength(3);
   });
 
   it('shows the empty state when no marketplace purchases exist', async () => {
-    queryClient.setQueryData(['marketplacePurchases', defaultQueryParams], {
+    queryClient.setQueryData(['marketplacePurchases'], {
       pagination: {
         offset: 0,
         limit: 10,
@@ -140,7 +152,7 @@ describe('Marketplace purchases page', () => {
 
   it('opens the Marketplace Purchases information popover', async () => {
     queryClient.setQueryData(
-      ['marketplacePurchases', defaultQueryParams],
+      ['marketplacePurchases'],
       mockMarketplacePurchasesResponse,
     );
 
@@ -154,13 +166,29 @@ describe('Marketplace purchases page', () => {
 
     expect(
       await screen.findByText(
-        /marketplace purchases shows purchases made from AWS, Azure, Google Cloud, Red Hat Marketplace, and IBM Cloud Paks/i,
+        /marketplace purchases shows purchases made through AWS, Microsoft Azure, Google Cloud, Red Hat Marketplace, and IBM Cloud/i,
       ),
     ).toBeInTheDocument();
   });
+
+  it('shows a loading state while permissions are loading', async () => {
+    mockedUseHasRelation.mockReturnValue({
+      has: false,
+      isLoading: true,
+    });
+
+    renderWithRouter(<ComponentWithQueryClient />);
+
+    expect(await screen.findByLabelText(/contents/i)).toBeInTheDocument();
+
+    expect(
+      screen.queryByText(/you have no marketplace purchases/i),
+    ).not.toBeInTheDocument();
+  });
+
   it('shows a loading state while marketplace purchases are loading', async () => {
     queryClient.setQueryDefaults(['marketplacePurchases'], {
-      queryFn: () => new Promise(() => {}),
+      queryFn: () => new Promise(() => undefined),
     });
 
     renderWithRouter(<ComponentWithQueryClient />);
