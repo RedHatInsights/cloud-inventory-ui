@@ -3,6 +3,9 @@ import { Table, Tbody, Td, Th, Thead, Tr } from '@patternfly/react-table';
 import { formatDate } from '../../hooks/util/dates';
 import { MarketplacePurchase } from '../../hooks/api/useMarketplacePurchases';
 import { marketplaceToFriendly } from '../../hooks/util/cloudProviderMaps';
+import { Link } from 'react-router-dom';
+import { Paths } from '../../utils/routing';
+import { generateQueryParamsForData } from '../../hooks/util/useQueryParam';
 type MarketplacePurchasesTableProps = {
   marketplacePurchases: MarketplacePurchase[];
 };
@@ -54,7 +57,11 @@ export const MarketplacePurchasesTable = ({
           >
             <Td dataLabel="Offering name">{purchase.offeringName}</Td>
             <Td dataLabel="Marketplace account">
-              {purchase.marketplaceAccount}
+              <Link
+                to={`../${Paths.CloudAccounts}?${generateQueryParamsForData([purchase.marketplaceAccount], 'providerAccountID')}`}
+              >
+                {purchase.marketplaceAccount}
+              </Link>
             </Td>
             <Td dataLabel="Marketplace">
               {marketplaceToFriendly[purchase.marketplace] ??
