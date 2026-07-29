@@ -15,7 +15,7 @@ import { hasPaginationError } from '../../utils/errors';
 import { Paths } from '../../utils/routing';
 import { MarketplacePurchasesPaginationData } from '../../state/marketplacePurchases';
 import { MarketplacePurchasesPagination } from '../../Components/MarketPlacePurchases/MarketplacePurchasesPagination';
-import { MarketplacePurchasesToolbar } from '../../Components/MarketPlacePurchases/MarkteplacePurchasesToolbar';
+import { MarketplacePurchasesToolbar } from '../../Components/MarketPlacePurchases/MarketplacePurchasesToolbar';
 
 const MarketplacePurchasesPage = () => {
   const [pagination, setPagination] = useQueryParamInformedAtom(

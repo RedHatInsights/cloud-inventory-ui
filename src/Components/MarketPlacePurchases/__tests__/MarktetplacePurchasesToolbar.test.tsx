@@ -3,7 +3,7 @@ import { fireEvent, screen } from '@testing-library/react';
 import { renderWithRouter } from '../../../utils/testing/customRender';
 import { HydrateAtomsTestProvider } from '../../util/testing/HydrateAtomsTestProvider';
 import { MarketplacePurchasesPaginationData } from '../../../state/marketplacePurchases';
-import { MarketplacePurchasesToolbar } from '../MarkteplacePurchasesToolbar';
+import { MarketplacePurchasesToolbar } from '../MarketplacePurchasesToolbar';
 
 beforeEach(() => {
   window.history.pushState({}, '', '/');
