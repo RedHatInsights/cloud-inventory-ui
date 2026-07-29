@@ -7,6 +7,13 @@ const mocks = new RequestMocks();
 const marketplacePurchasesUrl =
   '/api/rhsm/v2/cloud_access_providers/marketplace_purchases';
 
+const defaultArgs = {
+  limit: 10,
+  offset: 0,
+};
+
+const defaultMarketplacePurchasesUrl = `${marketplacePurchasesUrl}?limit=10&offset=0`;
+
 describe('useMarketplacePurchases', () => {
   beforeEach(() => {
     mocks.reset();
@@ -16,9 +23,9 @@ describe('useMarketplacePurchases', () => {
     jest.restoreAllMocks();
   });
 
-  it('fetches marketplace purchases', async () => {
+  it('fetches marketplace purchases with the provided limit and offset', async () => {
     mocks.addMock(
-      marketplacePurchasesUrl,
+      defaultMarketplacePurchasesUrl,
       {
         body: [
           {
@@ -39,7 +46,7 @@ describe('useMarketplacePurchases', () => {
       true,
     );
 
-    const { result } = renderHook(() => useMarketplacePurchases(), {
+    const { result } = renderHook(() => useMarketplacePurchases(defaultArgs), {
       wrapper: mocks.wrapper,
     });
 
@@ -56,7 +63,7 @@ describe('useMarketplacePurchases', () => {
 
   it('returns an empty list when no marketplace purchases exist', async () => {
     mocks.addMock(
-      marketplacePurchasesUrl,
+      defaultMarketplacePurchasesUrl,
       {
         body: [],
         pagination: {
@@ -69,7 +76,7 @@ describe('useMarketplacePurchases', () => {
       true,
     );
 
-    const { result } = renderHook(() => useMarketplacePurchases(), {
+    const { result } = renderHook(() => useMarketplacePurchases(defaultArgs), {
       wrapper: mocks.wrapper,
     });
 
@@ -82,21 +89,26 @@ describe('useMarketplacePurchases', () => {
   });
 
   it('exposes pagination metadata returned by the API', async () => {
+    const args = {
+      limit: 5,
+      offset: 10,
+    };
+
     mocks.addMock(
-      marketplacePurchasesUrl,
+      `${marketplacePurchasesUrl}?limit=5&offset=10`,
       {
         body: [],
         pagination: {
           count: 5,
-          limit: 10,
-          offset: 0,
+          limit: 5,
+          offset: 10,
           total: 42,
         },
       },
       true,
     );
 
-    const { result } = renderHook(() => useMarketplacePurchases(), {
+    const { result } = renderHook(() => useMarketplacePurchases(args), {
       wrapper: mocks.wrapper,
     });
 
@@ -106,15 +118,15 @@ describe('useMarketplacePurchases', () => {
 
     expect(result.current.data?.pagination).toStrictEqual({
       count: 5,
-      limit: 10,
-      offset: 0,
+      limit: 5,
+      offset: 10,
       total: 42,
     });
   });
 
   it('returns all marketplace purchase fields from the API', async () => {
     mocks.addMock(
-      marketplacePurchasesUrl,
+      defaultMarketplacePurchasesUrl,
       {
         body: [
           {
@@ -136,7 +148,7 @@ describe('useMarketplacePurchases', () => {
       true,
     );
 
-    const { result } = renderHook(() => useMarketplacePurchases(), {
+    const { result } = renderHook(() => useMarketplacePurchases(defaultArgs), {
       wrapper: mocks.wrapper,
     });
 
@@ -155,9 +167,9 @@ describe('useMarketplacePurchases', () => {
   });
 
   it('enters error state on a non-200 response', async () => {
-    mocks.addMock(marketplacePurchasesUrl, {}, false);
+    mocks.addMock(defaultMarketplacePurchasesUrl, {}, false);
 
-    const { result } = renderHook(() => useMarketplacePurchases(), {
+    const { result } = renderHook(() => useMarketplacePurchases(defaultArgs), {
       wrapper: mocks.wrapper,
     });
 
@@ -171,7 +183,7 @@ describe('useMarketplacePurchases', () => {
       .spyOn(global, 'fetch')
       .mockRejectedValueOnce(new Error('Network error'));
 
-    const { result } = renderHook(() => useMarketplacePurchases(), {
+    const { result } = renderHook(() => useMarketplacePurchases(defaultArgs), {
       wrapper: mocks.wrapper,
     });
 
@@ -181,9 +193,9 @@ describe('useMarketplacePurchases', () => {
   });
 
   it('starts in loading state', () => {
-    mocks.addMock(marketplacePurchasesUrl, {}, true);
+    mocks.addMock(defaultMarketplacePurchasesUrl, {}, true);
 
-    const { result } = renderHook(() => useMarketplacePurchases(), {
+    const { result } = renderHook(() => useMarketplacePurchases(defaultArgs), {
       wrapper: mocks.wrapper,
     });
 

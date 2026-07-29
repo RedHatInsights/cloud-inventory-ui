@@ -8,7 +8,6 @@ export type MarketplacePurchase = {
   startDate: string;
   skus: string[];
 };
-
 export type MarketplacePurchasesResponse = {
   pagination: {
     offset: number;
@@ -18,27 +17,35 @@ export type MarketplacePurchasesResponse = {
   };
   body: MarketplacePurchase[];
 };
-
-const fetchMarketplacePurchases =
-  async (): Promise<MarketplacePurchasesResponse> => {
-    const response = await fetch(
-      '/api/rhsm/v2/cloud_access_providers/marketplace_purchases',
+export type FetchMarketplacePurchasesArgs = {
+  limit: number;
+  offset: number;
+};
+const fetchMarketplacePurchases = async ({
+  limit,
+  offset,
+}: FetchMarketplacePurchasesArgs): Promise<MarketplacePurchasesResponse> => {
+  const params = new URLSearchParams({
+    limit: String(limit),
+    offset: String(offset),
+  });
+  const response = await fetch(
+    `/api/rhsm/v2/cloud_access_providers/marketplace_purchases?${params.toString()}`,
+  );
+  if (!response.ok) {
+    throw new HttpError(
+      'Something went wrong',
+      response.status,
+      response.statusText,
     );
-
-    if (!response.ok) {
-      throw new HttpError(
-        'Something went wrong',
-        response.status,
-        response.statusText,
-      );
-    }
-
-    return (await response.json()) as MarketplacePurchasesResponse;
-  };
-
-export const useMarketplacePurchases = () => {
+  }
+  return (await response.json()) as MarketplacePurchasesResponse;
+};
+export const useMarketplacePurchases = (
+  args: FetchMarketplacePurchasesArgs,
+) => {
   return useQuery({
-    queryKey: ['marketplacePurchases'],
-    queryFn: fetchMarketplacePurchases,
+    queryKey: ['marketplacePurchases', args.limit, args.offset],
+    queryFn: () => fetchMarketplacePurchases(args),
   });
 };

@@ -3,12 +3,31 @@ import { Table, Tbody, Td, Th, Thead, Tr } from '@patternfly/react-table';
 import { formatDate } from '../../hooks/util/dates';
 import { MarketplacePurchase } from '../../hooks/api/useMarketplacePurchases';
 import { marketplaceToFriendly } from '../../hooks/util/cloudProviderMaps';
+import { useQueryParamInformedAtom } from '../../hooks/util/useQueryParam';
+import { MarketplacePurchasesPaginationData } from '../../state/marketplacePurchases';
+import { hasPaginationError } from '../../utils/errors';
+import { PaginationError } from '../shared/PaginationError';
+
 type MarketplacePurchasesTableProps = {
   marketplacePurchases: MarketplacePurchase[];
 };
+
 export const MarketplacePurchasesTable = ({
   marketplacePurchases,
 }: MarketplacePurchasesTableProps) => {
+  const [pagination, setPagination] = useQueryParamInformedAtom(
+    MarketplacePurchasesPaginationData,
+    'pagination',
+  );
+
+  const onInvalidPage = hasPaginationError(pagination);
+
+  if (onInvalidPage) {
+    return (
+      <PaginationError pagination={pagination} setPagination={setPagination} />
+    );
+  }
+
   return (
     <Table aria-label="Marketplace purchases table" variant="compact">
       <Thead>
@@ -27,7 +46,7 @@ export const MarketplacePurchasesTable = ({
               },
             }}
           >
-            Marketplace account
+            Marketplace account           
           </Th>
           <Th>Marketplace</Th>
           <Th
@@ -43,7 +62,7 @@ export const MarketplacePurchasesTable = ({
               },
             }}
           >
-            Date added
+            Date added           
           </Th>
         </Tr>
       </Thead>
