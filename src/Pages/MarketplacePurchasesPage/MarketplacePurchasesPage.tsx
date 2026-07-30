@@ -24,19 +24,22 @@ const MarketplacePurchasesPage = () => {
   );
 
   const { page, perPage } = pagination;
+  const { has: canReadCloudAccess, isLoading: isPermissionsLoading } =
+    useHasRelation(Relation.CLOUD_ACCESS_VIEW);
+  const canFetchMarketplacePurchases =
+    !isPermissionsLoading && canReadCloudAccess;
 
   const {
     data: marketplacePurchasesResponse,
     isError: isMarketplacePurchasesError,
     isLoading: isMarketplacePurchasesLoading,
-  } = useMarketplacePurchases({
-    limit: perPage,
-    offset: (page - 1) * perPage,
-  });
-
-  const { has: canReadCloudAccess, isLoading: isPermissionsLoading } =
-    useHasRelation(Relation.CLOUD_ACCESS_VIEW);
-
+  } = useMarketplacePurchases(
+    {
+      limit: perPage,
+      offset: (page - 1) * perPage,
+    },
+    canFetchMarketplacePurchases,
+  );
   const marketplacePurchases = marketplacePurchasesResponse?.body ?? [];
   const hasMarketplacePurchases = marketplacePurchases.length > 0;
 

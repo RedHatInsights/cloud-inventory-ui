@@ -48,7 +48,7 @@ export const MarketplacePurchasesTable = ({
               },
             }}
           >
-            Marketplace account           
+            Marketplace account    
           </Th>
           <Th>Marketplace</Th>
           <Th
@@ -64,7 +64,7 @@ export const MarketplacePurchasesTable = ({
               },
             }}
           >
-            Date added           
+            Date added 
           </Th>
         </Tr>
       </Thead>

@@ -43,9 +43,11 @@ const fetchMarketplacePurchases = async ({
 };
 export const useMarketplacePurchases = (
   args: FetchMarketplacePurchasesArgs,
+  enabled = true,
 ) => {
   return useQuery({
     queryKey: ['marketplacePurchases', args.limit, args.offset],
     queryFn: () => fetchMarketplacePurchases(args),
+    enabled,
   });
 };
