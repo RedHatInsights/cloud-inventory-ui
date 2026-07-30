@@ -150,6 +150,8 @@ describe('MarketplacePurchasesTable', () => {
     await waitFor(() =>
       expect(screen.getByText(purchases[0].offeringName)).toBeInTheDocument(),
     );
+  });
+
   describe('cloud account link', () => {
     it('renders the link', () => {
       const marketplacePurchases = makeMarketplacePurchases(2);
@@ -161,6 +163,7 @@ describe('MarketplacePurchasesTable', () => {
           .getAttribute('href'),
       ).not.toBeNull();
     });
+
     it('renders the link with expected query params', () => {
       const marketplacePurchases = makeMarketplacePurchases(2);
       renderTable(marketplacePurchases);
