@@ -5,6 +5,7 @@ import { MarketplacePurchasesTable } from '../MarketplacePurchasesTable';
 import { MarketplacePurchase } from '../../../hooks/api/useMarketplacePurchases';
 import { HydrateAtomsTestProvider } from '../../../Components/util/testing/HydrateAtomsTestProvider';
 import { MarketplacePurchasesPaginationData } from '../../../state/marketplacePurchases';
+import { Paths } from '../../../utils/routing';
 
 const makeMarketplacePurchases = (count: number): MarketplacePurchase[] =>
   Array.from({ length: count }).map((_, index) => ({
@@ -149,5 +150,28 @@ describe('MarketplacePurchasesTable', () => {
     await waitFor(() =>
       expect(screen.getByText(purchases[0].offeringName)).toBeInTheDocument(),
     );
+  describe('cloud account link', () => {
+    it('renders the link', () => {
+      const marketplacePurchases = makeMarketplacePurchases(2);
+      renderTable(marketplacePurchases);
+
+      expect(
+        screen
+          .getByText(marketplacePurchases[0].marketplaceAccount)
+          .getAttribute('href'),
+      ).not.toBeNull();
+    });
+    it('renders the link with expected query params', () => {
+      const marketplacePurchases = makeMarketplacePurchases(2);
+      renderTable(marketplacePurchases);
+
+      expect(
+        screen
+          .getByText(marketplacePurchases[0].marketplaceAccount)
+          .getAttribute('href'),
+      ).toBe(
+        `/${Paths.CloudAccounts}?providerAccountID=${encodeURI(`["${marketplacePurchases[0].marketplaceAccount}"]`)}`,
+      );
+    });
   });
 });

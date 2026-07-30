@@ -7,7 +7,9 @@ import { useQueryParamInformedAtom } from '../../hooks/util/useQueryParam';
 import { MarketplacePurchasesPaginationData } from '../../state/marketplacePurchases';
 import { hasPaginationError } from '../../utils/errors';
 import { PaginationError } from '../shared/PaginationError';
-
+import { Link } from 'react-router-dom';
+import { Paths } from '../../utils/routing';
+import { generateQueryParamsForData } from '../../hooks/util/useQueryParam';
 type MarketplacePurchasesTableProps = {
   marketplacePurchases: MarketplacePurchase[];
 };
@@ -73,7 +75,11 @@ export const MarketplacePurchasesTable = ({
           >
             <Td dataLabel="Offering name">{purchase.offeringName}</Td>
             <Td dataLabel="Marketplace account">
-              {purchase.marketplaceAccount}
+              <Link
+                to={`../${Paths.CloudAccounts}?${generateQueryParamsForData([purchase.marketplaceAccount], 'providerAccountID')}`}
+              >
+                {purchase.marketplaceAccount}
+              </Link>
             </Td>
             <Td dataLabel="Marketplace">
               {marketplaceToFriendly[purchase.marketplace] ??
