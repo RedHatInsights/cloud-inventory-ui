@@ -8,6 +8,7 @@ export type MarketplacePurchase = {
   startDate: string;
   skus: string[];
 };
+
 export type MarketplacePurchasesResponse = {
   pagination: {
     offset: number;
@@ -17,10 +18,12 @@ export type MarketplacePurchasesResponse = {
   };
   body: MarketplacePurchase[];
 };
+
 export type FetchMarketplacePurchasesArgs = {
   limit: number;
   offset: number;
 };
+
 const fetchMarketplacePurchases = async ({
   limit,
   offset,
@@ -29,9 +32,14 @@ const fetchMarketplacePurchases = async ({
     limit: String(limit),
     offset: String(offset),
   });
+
+  params.set('sort_by', 'startDate');
+  params.set('sort_direction', 'desc');
+
   const response = await fetch(
     `/api/rhsm/v2/cloud_access_providers/marketplace_purchases?${params.toString()}`,
   );
+
   if (!response.ok) {
     throw new HttpError(
       'Something went wrong',
@@ -39,14 +47,16 @@ const fetchMarketplacePurchases = async ({
       response.statusText,
     );
   }
-  return (await response.json()) as MarketplacePurchasesResponse;
+  const json = await response.json();
+  return json as MarketplacePurchasesResponse;
 };
+
 export const useMarketplacePurchases = (
   args: FetchMarketplacePurchasesArgs,
   enabled = true,
 ) => {
   return useQuery({
-    queryKey: ['marketplacePurchases', args.limit, args.offset],
+    queryKey: ['marketplacePurchases', args],
     queryFn: () => fetchMarketplacePurchases(args),
     enabled,
   });

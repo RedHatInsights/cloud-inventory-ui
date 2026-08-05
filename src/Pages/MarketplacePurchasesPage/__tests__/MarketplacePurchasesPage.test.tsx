@@ -22,7 +22,10 @@ const defaultPagination = {
   itemCount: 0,
 };
 
-const marketplacePurchasesQueryKey = ['marketplacePurchases', 10, 0];
+const marketplacePurchasesQueryKey = [
+  'marketplacePurchases',
+  { limit: 10, offset: 0 },
+];
 const mockMarketplacePurchasesResponse = {
   pagination: {
     offset: 0,

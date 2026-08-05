@@ -12,7 +12,7 @@ const defaultArgs = {
   offset: 0,
 };
 
-const defaultMarketplacePurchasesUrl = `${marketplacePurchasesUrl}?limit=10&offset=0`;
+const defaultMarketplacePurchasesUrl = `${marketplacePurchasesUrl}?limit=10&offset=0&sort_by=startDate&sort_direction=desc`;
 
 describe('useMarketplacePurchases', () => {
   beforeEach(() => {
@@ -95,7 +95,7 @@ describe('useMarketplacePurchases', () => {
     };
 
     mocks.addMock(
-      `${marketplacePurchasesUrl}?limit=5&offset=10`,
+      `${marketplacePurchasesUrl}?limit=5&offset=10&sort_by=startDate&sort_direction=desc`,
       {
         body: [],
         pagination: {
