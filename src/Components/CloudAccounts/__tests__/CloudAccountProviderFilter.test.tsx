@@ -10,11 +10,11 @@ import { CloudProviderShortname } from '../../../types/cloudAccountsTypes';
 const availableProviders = [
   CloudProviderShortname.AWS,
   CloudProviderShortname.GCP,
-  CloudProviderShortname.AZURE,
+  CloudProviderShortname.AZURE
 ];
 
 const CloudAccountProviderFilterWithState = ({
-  init = [],
+  init = []
 }: {
   init?: CloudProviderShortname[];
 }) => (
@@ -24,7 +24,7 @@ const CloudAccountProviderFilterWithState = ({
 );
 
 const CloudAccountProviderFilterWithStateObserver = ({
-  init = [],
+  init = []
 }: {
   init?: CloudProviderShortname[];
 }) => {
@@ -55,17 +55,13 @@ describe('CloudAccountProviderFilter', () => {
   it('renders the provider filter toggle', () => {
     renderWithRouter(<CloudAccountProviderFilterWithState />);
 
-    expect(
-      screen.getByRole('button', { name: /filter by cloud provider/i }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /filter by cloud provider/i })).toBeInTheDocument();
   });
 
   it('renders available provider options when opened', async () => {
     renderWithRouter(<CloudAccountProviderFilterWithState />);
 
-    fireEvent.click(
-      screen.getByRole('button', { name: /filter by cloud provider/i }),
-    );
+    fireEvent.click(screen.getByRole('button', { name: /filter by cloud provider/i }));
 
     await waitFor(() => {
       expect(screen.getByText('AWS')).toBeInTheDocument();
@@ -77,9 +73,7 @@ describe('CloudAccountProviderFilter', () => {
   it('selects a provider', async () => {
     renderWithRouter(<CloudAccountProviderFilterWithStateObserver />);
 
-    fireEvent.click(
-      screen.getByRole('button', { name: /filter by cloud provider/i }),
-    );
+    fireEvent.click(screen.getByRole('button', { name: /filter by cloud provider/i }));
 
     await waitFor(() => {
       expect(screen.getByText('AWS')).toBeInTheDocument();
@@ -88,18 +82,14 @@ describe('CloudAccountProviderFilter', () => {
     fireEvent.click(screen.getByText('AWS'));
 
     await waitFor(() => {
-      expect(screen.getByTestId('selected-providers')).toHaveTextContent(
-        '["AWS"]',
-      );
+      expect(screen.getByTestId('selected-providers')).toHaveTextContent('["AWS"]');
     });
   });
 
   it('supports selecting multiple providers', async () => {
     renderWithRouter(<CloudAccountProviderFilterWithStateObserver />);
 
-    fireEvent.click(
-      screen.getByRole('button', { name: /filter by cloud provider/i }),
-    );
+    fireEvent.click(screen.getByRole('button', { name: /filter by cloud provider/i }));
 
     await waitFor(() => {
       expect(screen.getByText('AWS')).toBeInTheDocument();
@@ -109,23 +99,19 @@ describe('CloudAccountProviderFilter', () => {
     fireEvent.click(screen.getByText('Google Compute Engine'));
 
     await waitFor(() => {
-      expect(screen.getByTestId('selected-providers')).toHaveTextContent(
-        '["AWS","GCE"]',
-      );
+      expect(screen.getByTestId('selected-providers')).toHaveTextContent('["AWS","GCE"]');
     });
   });
 
   it('adds another provider when selected from the dropdown', async () => {
     renderWithRouter(
-      <CloudAccountProviderFilterWithStateObserver
-        init={[CloudProviderShortname.AWS]}
-      />,
+      <CloudAccountProviderFilterWithStateObserver init={[CloudProviderShortname.AWS]} />
     );
 
     fireEvent.click(
       screen.getByRole('button', {
-        name: /filter by cloud provider|cloud provider/i,
-      }),
+        name: /filter by cloud provider|cloud provider/i
+      })
     );
 
     await waitFor(() => {
@@ -135,22 +121,16 @@ describe('CloudAccountProviderFilter', () => {
     fireEvent.click(screen.getByText('Google Compute Engine'));
 
     await waitFor(() => {
-      expect(screen.getByTestId('selected-providers')).toHaveTextContent(
-        '["AWS","GCE"]',
-      );
+      expect(screen.getByTestId('selected-providers')).toHaveTextContent('["AWS","GCE"]');
     });
   });
 
   it('preserves existing selections and adds another provider', async () => {
     renderWithRouter(
-      <CloudAccountProviderFilterWithStateObserver
-        init={[CloudProviderShortname.AWS]}
-      />,
+      <CloudAccountProviderFilterWithStateObserver init={[CloudProviderShortname.AWS]} />
     );
 
-    fireEvent.click(
-      screen.getByRole('button', { name: /filter by cloud provider/i }),
-    );
+    fireEvent.click(screen.getByRole('button', { name: /filter by cloud provider/i }));
 
     await waitFor(() => {
       expect(screen.getByText('Google Compute Engine')).toBeInTheDocument();
@@ -159,18 +139,14 @@ describe('CloudAccountProviderFilter', () => {
     fireEvent.click(screen.getByText('Google Compute Engine'));
 
     await waitFor(() => {
-      expect(screen.getByTestId('selected-providers')).toHaveTextContent(
-        '["AWS","GCE"]',
-      );
+      expect(screen.getByTestId('selected-providers')).toHaveTextContent('["AWS","GCE"]');
     });
   });
 
   it('shows provider display labels instead of raw shortnames in the menu', async () => {
     renderWithRouter(<CloudAccountProviderFilterWithState />);
 
-    fireEvent.click(
-      screen.getByRole('button', { name: /filter by cloud provider/i }),
-    );
+    fireEvent.click(screen.getByRole('button', { name: /filter by cloud provider/i }));
 
     await waitFor(() => {
       expect(screen.getByText('Google Compute Engine')).toBeInTheDocument();

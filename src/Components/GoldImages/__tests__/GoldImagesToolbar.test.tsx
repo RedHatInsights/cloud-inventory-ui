@@ -8,13 +8,11 @@ describe('Gold images toolbar', () => {
     const { container } = renderWithRouter(
       <GoldImagesToolbar
         goldImages={{
-          aws: { provider: CloudProviderName.AWS, goldImages: [] },
+          aws: { provider: CloudProviderName.AWS, goldImages: [] }
         }}
-      />,
+      />
     );
 
-    expect(
-      container.querySelector('[data-ouia-component-type="PF6/Toolbar"]'),
-    ).not.toBeNull();
+    expect(container.querySelector('[data-ouia-component-type="PF6/Toolbar"]')).not.toBeNull();
   });
 });

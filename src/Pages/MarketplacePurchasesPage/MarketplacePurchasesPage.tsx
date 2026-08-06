@@ -20,25 +20,25 @@ import { MarketplacePurchasesToolbar } from '../../Components/MarketPlacePurchas
 const MarketplacePurchasesPage = () => {
   const [pagination, setPagination] = useQueryParamInformedAtom(
     MarketplacePurchasesPaginationData,
-    'pagination',
+    'pagination'
   );
 
   const { page, perPage } = pagination;
-  const { has: canReadCloudAccess, isLoading: isPermissionsLoading } =
-    useHasRelation(Relation.CLOUD_ACCESS_VIEW);
-  const canFetchMarketplacePurchases =
-    !isPermissionsLoading && canReadCloudAccess;
+  const { has: canReadCloudAccess, isLoading: isPermissionsLoading } = useHasRelation(
+    Relation.CLOUD_ACCESS_VIEW
+  );
+  const canFetchMarketplacePurchases = !isPermissionsLoading && canReadCloudAccess;
 
   const {
     data: marketplacePurchasesResponse,
     isError: isMarketplacePurchasesError,
-    isLoading: isMarketplacePurchasesLoading,
+    isLoading: isMarketplacePurchasesLoading
   } = useMarketplacePurchases(
     {
       limit: perPage,
-      offset: (page - 1) * perPage,
+      offset: (page - 1) * perPage
     },
-    canFetchMarketplacePurchases,
+    canFetchMarketplacePurchases
   );
   const marketplacePurchases = marketplacePurchasesResponse?.body ?? [];
   const hasMarketplacePurchases = marketplacePurchases.length > 0;
@@ -47,13 +47,12 @@ const MarketplacePurchasesPage = () => {
     if (marketplacePurchasesResponse?.pagination) {
       setPagination({
         ...pagination,
-        itemCount: marketplacePurchasesResponse.pagination.total,
+        itemCount: marketplacePurchasesResponse.pagination.total
       });
     }
   }, [marketplacePurchasesResponse?.pagination?.total]);
 
-  const shouldShowEmptyState =
-    !hasMarketplacePurchases && !hasPaginationError(pagination);
+  const shouldShowEmptyState = !hasMarketplacePurchases && !hasPaginationError(pagination);
 
   if (isPermissionsLoading) {
     return <Loading />;
@@ -97,9 +96,7 @@ const MarketplacePurchasesPage = () => {
           ) : (
             <>
               <MarketplacePurchasesToolbar />
-              <MarketplacePurchasesTable
-                marketplacePurchases={marketplacePurchases}
-              />
+              <MarketplacePurchasesTable marketplacePurchases={marketplacePurchases} />
               <br />
               <MarketplacePurchasesPagination />
             </>

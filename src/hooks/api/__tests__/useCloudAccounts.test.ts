@@ -18,22 +18,21 @@ describe('useCloudAccounts', () => {
             goldImageAccess: 'Granted',
             dateAdded: '2024-01-01',
             providerLabel: 'Amazon Web Services',
-            shortName: CloudProviderShortname.AWS,
-          },
+            shortName: CloudProviderShortname.AWS
+          }
         ],
         pagination: {
           count: 1,
           limit: 10,
           offset: 0,
-          total: 1,
-        },
+          total: 1
+        }
       },
-      true,
+      true
     );
-    const { result } = renderHook(
-      () => useCloudAccounts({ limit: 10, offset: 0 }),
-      { wrapper: mocks.wrapper },
-    );
+    const { result } = renderHook(() => useCloudAccounts({ limit: 10, offset: 0 }), {
+      wrapper: mocks.wrapper
+    });
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(result.current.data?.body).toHaveLength(1);
     expect(result.current.data?.pagination.total).toBe(1);
@@ -47,15 +46,14 @@ describe('useCloudAccounts', () => {
           count: 0,
           limit: 10,
           offset: 0,
-          total: 0,
-        },
+          total: 0
+        }
       },
-      true,
+      true
     );
-    const { result } = renderHook(
-      () => useCloudAccounts({ limit: 10, offset: 0 }),
-      { wrapper: mocks.wrapper },
-    );
+    const { result } = renderHook(() => useCloudAccounts({ limit: 10, offset: 0 }), {
+      wrapper: mocks.wrapper
+    });
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(result.current.data?.body).toEqual([]);
   });
@@ -68,50 +66,36 @@ describe('useCloudAccounts', () => {
           count: 5,
           limit: 5,
           offset: 10,
-          total: 42,
-        },
+          total: 42
+        }
       },
-      true,
+      true
     );
-    const { result } = renderHook(
-      () => useCloudAccounts({ limit: 5, offset: 10 }),
-      { wrapper: mocks.wrapper },
-    );
+    const { result } = renderHook(() => useCloudAccounts({ limit: 5, offset: 10 }), {
+      wrapper: mocks.wrapper
+    });
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(result.current.data?.pagination.total).toBe(42);
   });
   it('enters error state on non-200 response', async () => {
-    mocks.addMock(
-      '/api/rhsm/v2/cloud_access_providers/accounts?limit=10&offset=0',
-      {},
-      false,
-    );
-    const { result } = renderHook(
-      () => useCloudAccounts({ limit: 10, offset: 0 }),
-      { wrapper: mocks.wrapper },
-    );
+    mocks.addMock('/api/rhsm/v2/cloud_access_providers/accounts?limit=10&offset=0', {}, false);
+    const { result } = renderHook(() => useCloudAccounts({ limit: 10, offset: 0 }), {
+      wrapper: mocks.wrapper
+    });
     await waitFor(() => expect(result.current.isError).toBe(true));
   });
   it('enters error state on network failure', async () => {
-    global.fetch = jest.fn(() =>
-      Promise.reject(new Error('Network error')),
-    ) as jest.Mock;
-    const { result } = renderHook(
-      () => useCloudAccounts({ limit: 10, offset: 0 }),
-      { wrapper: mocks.wrapper },
-    );
+    global.fetch = jest.fn(() => Promise.reject(new Error('Network error'))) as jest.Mock;
+    const { result } = renderHook(() => useCloudAccounts({ limit: 10, offset: 0 }), {
+      wrapper: mocks.wrapper
+    });
     await waitFor(() => expect(result.current.isError).toBe(true));
   });
   it('starts in loading state', () => {
-    mocks.addMock(
-      '/api/rhsm/v2/cloud_access_providers/accounts?limit=10&offset=0',
-      {},
-      true,
-    );
-    const { result } = renderHook(
-      () => useCloudAccounts({ limit: 10, offset: 0 }),
-      { wrapper: mocks.wrapper },
-    );
+    mocks.addMock('/api/rhsm/v2/cloud_access_providers/accounts?limit=10&offset=0', {}, true);
+    const { result } = renderHook(() => useCloudAccounts({ limit: 10, offset: 0 }), {
+      wrapper: mocks.wrapper
+    });
     expect(result.current.isLoading).toBe(true);
   });
 });

@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import { NoMarketplacePurchases } from '../NoMarketplacePurchases';
 
 jest.mock('@patternfly/react-icons', () => ({
-  CubesIcon: () => <div data-testid="mock-cubes-icon" />,
+  CubesIcon: () => <div data-testid="mock-cubes-icon" />
 }));
 
 describe('NoMarketplacePurchases', () => {
@@ -12,17 +12,15 @@ describe('NoMarketplacePurchases', () => {
 
     expect(
       screen.getByRole('heading', {
-        level: 4,
-      }),
+        level: 4
+      })
     ).toHaveTextContent('No Marketplace Purchases Available');
   });
 
   it('renders the empty state body', () => {
     render(<NoMarketplacePurchases />);
 
-    expect(
-      screen.getByText(/you have no marketplace purchases/i),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/you have no marketplace purchases/i)).toBeInTheDocument();
   });
 
   it('renders the cubes icon', () => {

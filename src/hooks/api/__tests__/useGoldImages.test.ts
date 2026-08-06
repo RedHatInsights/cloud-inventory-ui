@@ -11,19 +11,19 @@ describe('Gold Images hook', () => {
     mocks.addMock(
       '/api/rhsm/v2/cloud_access_providers/gold_images',
       {
-        body: { AWS: { provider: 'AWS', goldImages: [] } },
+        body: { AWS: { provider: 'AWS', goldImages: [] } }
       },
-      true,
+      true
     );
 
     const { result } = renderHook(() => useGoldImages(), {
-      wrapper: mocks.wrapper,
+      wrapper: mocks.wrapper
     });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
     expect(result.current.data).toStrictEqual({
-      AWS: { provider: 'AWS', goldImages: [] },
+      AWS: { provider: 'AWS', goldImages: [] }
     });
   });
 
@@ -31,7 +31,7 @@ describe('Gold Images hook', () => {
     mocks.addMock('/api/rhsm/v2/cloud_access_providers/gold_images', {}, false);
 
     const { result } = renderHook(() => useGoldImages(), {
-      wrapper: mocks.wrapper,
+      wrapper: mocks.wrapper
     });
 
     await waitFor(() => expect(result.current.isLoading).toBe(false));

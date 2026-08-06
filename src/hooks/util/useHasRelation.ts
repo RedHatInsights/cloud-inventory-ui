@@ -7,7 +7,7 @@ const QUERY_STALE_TIME = 5 * 60 * 1000;
 
 export enum Relation {
   CLOUD_ACCESS_VIEW = 'subscriptions_cloud_access_view',
-  CLOUD_ACCESS_EDIT = 'subscriptions_cloud_access_edit',
+  CLOUD_ACCESS_EDIT = 'subscriptions_cloud_access_edit'
 }
 
 interface HasRelationResult {
@@ -35,17 +35,17 @@ export const useHasRelation = (relation: Relation): HasRelationResult => {
             resource: {
               id: `redhat/${user.identity.org_id}`,
               type: 'tenant',
-              reporter: { type: 'rbac' },
-            },
+              reporter: { type: 'rbac' }
+            }
           })
         ).allowed === 'ALLOWED_TRUE'
       );
     },
-    staleTime: QUERY_STALE_TIME,
+    staleTime: QUERY_STALE_TIME
   });
 
   return {
     has: !!has,
-    isLoading: accessCheckIsLoading,
+    isLoading: accessCheckIsLoading
   };
 };

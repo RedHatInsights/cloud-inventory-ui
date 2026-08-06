@@ -13,17 +13,14 @@ interface HydrateAtomsInitialValues {
   children: ReactNode;
 }
 
-const AtomsHydrator = ({
-  initialValues,
-  children,
-}: HydrateAtomsInitialValues) => {
+const AtomsHydrator = ({ initialValues, children }: HydrateAtomsInitialValues) => {
   useHydrateAtoms(new Map(initialValues));
   return children;
 };
 
 export const HydrateAtomsTestProvider = ({
   initialValues,
-  children,
+  children
 }: HydrateAtomsInitialValues) => {
   return (
     <Provider>

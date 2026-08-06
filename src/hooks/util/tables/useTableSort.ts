@@ -18,7 +18,7 @@ type SortFunc<T extends { [s: string]: unknown }> = (
   data: Sortable<T>,
   sortDirection: SortByDirection | undefined,
   sortIndex: number | undefined,
-  rowTranslator: SortableRowTranslator<T>,
+  rowTranslator: SortableRowTranslator<T>
 ) => Sortable<T>;
 
 interface InitialSortOptions {
@@ -45,9 +45,7 @@ interface ApiBasedTableSortResult {
   getSortParams: (index: number) => ThSortType;
 }
 
-function defaultSortableRowTranslator<T extends { [s: string]: unknown }>(
-  o: T,
-) {
+function defaultSortableRowTranslator<T extends { [s: string]: unknown }>(o: T) {
   const rows: (string | number)[] = [];
 
   Object.entries(o).forEach(([k, v]) => {
@@ -55,7 +53,7 @@ function defaultSortableRowTranslator<T extends { [s: string]: unknown }>(
       rows.push(v);
     } else {
       throw new InvalidSortTypeError(
-        `Unsupported type for key ${k}. Got type ${typeof v}, expected string or number`,
+        `Unsupported type for key ${k}. Got type ${typeof v}, expected string or number`
       );
     }
   });
@@ -67,7 +65,7 @@ function defaultSort<T extends { [s: string]: unknown }>(
   data: Sortable<T>,
   sortDirection: SortByDirection | undefined,
   sortIndex: number | undefined,
-  rowTranslator: SortableRowTranslator<T>,
+  rowTranslator: SortableRowTranslator<T>
 ) {
   if (sortIndex === undefined || sortDirection === undefined) {
     return data;
@@ -92,7 +90,7 @@ function defaultSort<T extends { [s: string]: unknown }>(
     }
 
     throw new InvalidSortTypeError(
-      `Invalid comparison between ${typeof aValue} and ${typeof bValue}`,
+      `Invalid comparison between ${typeof aValue} and ${typeof bValue}`
     );
   });
 }
@@ -114,34 +112,33 @@ export function useTableSort<T extends { [s: string]: unknown }>(
   {
     rowTranslator = defaultSortableRowTranslator<T>,
     initialSort = undefined,
-    sortFunc = defaultSort,
-  }: TableSortOptions<T> = {},
+    sortFunc = defaultSort
+  }: TableSortOptions<T> = {}
 ): TableSortResult<T> {
-  const [activeSortIndex, setActiveSortIndex] = useQueryParamInformedState<
-    number | undefined
-  >(initialSort?.index, `${key}ActiveSortIndex`);
-  const [activeSortDirection, setActiveSortDirection] =
-    useQueryParamInformedState<SortByDirection | undefined>(
-      initialSort?.dir,
-      `${key}ActiveSortDir`,
-    );
+  const [activeSortIndex, setActiveSortIndex] = useQueryParamInformedState<number | undefined>(
+    initialSort?.index,
+    `${key}ActiveSortIndex`
+  );
+  const [activeSortDirection, setActiveSortDirection] = useQueryParamInformedState<
+    SortByDirection | undefined
+  >(initialSort?.dir, `${key}ActiveSortDir`);
 
   const getSortParams = (index: number) => ({
     sortBy: {
       index: activeSortIndex,
       direction: activeSortDirection,
-      defaultDirection: SortByDirection.asc,
+      defaultDirection: SortByDirection.asc
     },
     onSort: (_event: MouseEvent, index: number, direction: SortByDirection) => {
       setActiveSortIndex(index);
       setActiveSortDirection(direction);
     },
-    columnIndex: index,
+    columnIndex: index
   });
 
   return {
     sorted: sortFunc(data, activeSortDirection, activeSortIndex, rowTranslator),
-    getSortParams,
+    getSortParams
   };
 }
 
@@ -167,22 +164,19 @@ export function useApiBasedTableSort(
     sortDir,
     setSortBy,
     setSortDir,
-    lookup,
-  }: ApiBasedTableSortOptions,
+    lookup
+  }: ApiBasedTableSortOptions
 ): ApiBasedTableSortResult {
-  const [activeSortIndex, setActiveSortIndex] = useQueryParamInformedState<
-    number | undefined
-  >(initialSort?.index, `${key}ActiveSortIndex`);
-  const [activeSortDirection, setActiveSortDirection] =
-    useQueryParamInformedState<SortByDirection | undefined>(
-      initialSort?.dir,
-      `${key}ActiveSortDir`,
-    );
+  const [activeSortIndex, setActiveSortIndex] = useQueryParamInformedState<number | undefined>(
+    initialSort?.index,
+    `${key}ActiveSortIndex`
+  );
+  const [activeSortDirection, setActiveSortDirection] = useQueryParamInformedState<
+    SortByDirection | undefined
+  >(initialSort?.dir, `${key}ActiveSortDir`);
 
   useEffect(() => {
-    const i = Object.keys(lookup).find(
-      (key) => lookup[parseInt(key)] == sortBy,
-    );
+    const i = Object.keys(lookup).find((key) => lookup[parseInt(key)] == sortBy);
     setActiveSortIndex(i ? parseInt(i) : undefined);
     setActiveSortDirection(sortDir);
   }, [sortBy, sortDir]);
@@ -191,16 +185,16 @@ export function useApiBasedTableSort(
     sortBy: {
       index: activeSortIndex,
       direction: activeSortDirection,
-      defaultDirection: SortByDirection.asc,
+      defaultDirection: SortByDirection.asc
     },
     onSort: (_event: MouseEvent, index: number, direction: SortByDirection) => {
       setSortBy(lookup[index]);
       setSortDir(direction);
     },
-    columnIndex: index,
+    columnIndex: index
   });
 
   return {
-    getSortParams,
+    getSortParams
   };
 }

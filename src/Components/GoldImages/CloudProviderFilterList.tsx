@@ -5,11 +5,9 @@ import { useQueryParamInformedAtom } from '../../hooks/util/useQueryParam';
 import { CloudProviderName } from '../../hooks/api/useGoldImages';
 
 export const CloudProviderFilterList = () => {
-  const [cloudProviderFilter, setCloudProviderFilter] =
-    useQueryParamInformedAtom<CloudProviderName[]>(
-      cloudProviderFilterData,
-      'cloudProvider',
-    );
+  const [cloudProviderFilter, setCloudProviderFilter] = useQueryParamInformedAtom<
+    CloudProviderName[]
+  >(cloudProviderFilterData, 'cloudProvider');
 
   return (
     <>
@@ -19,9 +17,7 @@ export const CloudProviderFilterList = () => {
             key={cloudProvider}
             onClose={() => {
               setCloudProviderFilter(
-                cloudProviderFilter.filter(
-                  (existing) => cloudProvider != existing,
-                ),
+                cloudProviderFilter.filter((existing) => cloudProvider != existing)
               );
             }}
           >

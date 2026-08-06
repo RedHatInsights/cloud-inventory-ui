@@ -5,5 +5,5 @@ export enum Paths {
   CloudAccounts = 'cloud-accounts',
   MarketplacePurchases = 'marketplace-purchases',
   Catch = '*',
-  Root = '/',
+  Root = '/'
 }

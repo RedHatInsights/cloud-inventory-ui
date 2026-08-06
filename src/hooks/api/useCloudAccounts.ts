@@ -1,9 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { HttpError } from '../../utils/errors';
-import {
-  CloudAccountsResponse,
-  FetchCloudAccountsArgs,
-} from '../../types/cloudAccountsTypes';
+import { CloudAccountsResponse, FetchCloudAccountsArgs } from '../../types/cloudAccountsTypes';
 
 const fetchCloudAccounts = async ({
   limit,
@@ -12,11 +9,11 @@ const fetchCloudAccounts = async ({
   sortDirection,
   providerAccountID,
   shortName,
-  goldImageAccess,
+  goldImageAccess
 }: FetchCloudAccountsArgs): Promise<CloudAccountsResponse> => {
   const params = new URLSearchParams({
     limit: String(limit),
-    offset: String(offset),
+    offset: String(offset)
   });
 
   if (sortField && sortDirection) {
@@ -36,16 +33,10 @@ const fetchCloudAccounts = async ({
     params.set('goldImageAccess', goldImageAccess.join(','));
   }
 
-  const response = await fetch(
-    `/api/rhsm/v2/cloud_access_providers/accounts?${params.toString()}`,
-  );
+  const response = await fetch(`/api/rhsm/v2/cloud_access_providers/accounts?${params.toString()}`);
 
   if (!response.ok) {
-    throw new HttpError(
-      'Something went wrong',
-      response.status,
-      response.statusText,
-    );
+    throw new HttpError('Something went wrong', response.status, response.statusText);
   }
 
   const json = await response.json();
@@ -55,6 +46,6 @@ const fetchCloudAccounts = async ({
 export const useCloudAccounts = (args: FetchCloudAccountsArgs) => {
   return useQuery({
     queryKey: ['cloudAccounts', args],
-    queryFn: () => fetchCloudAccounts(args),
+    queryFn: () => fetchCloudAccounts(args)
   });
 };

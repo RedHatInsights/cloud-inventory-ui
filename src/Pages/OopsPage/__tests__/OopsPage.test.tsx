@@ -4,7 +4,5 @@ import { render, screen } from '@testing-library/react';
 
 it('Renders no permissions page', () => {
   render(<OopsPage />);
-  expect(
-    screen.getByText('This page is temporarily unavailable'),
-  ).toBeInTheDocument();
+  expect(screen.getByText('This page is temporarily unavailable')).toBeInTheDocument();
 });

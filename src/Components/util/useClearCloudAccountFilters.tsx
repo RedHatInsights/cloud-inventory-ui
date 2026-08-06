@@ -3,26 +3,17 @@ import {
   CloudAccountsPaginationData,
   cloudAccountIDFilterData,
   cloudProviderFilterData,
-  goldImageStatusFilterData,
+  goldImageStatusFilterData
 } from '../../state/cloudAccounts';
 
 export const useClearCloudAccountFilters = () => {
   const [pagination, setPagination] = useQueryParamInformedAtom(
     CloudAccountsPaginationData,
-    'pagination',
+    'pagination'
   );
-  const [, setProviders] = useQueryParamInformedAtom(
-    cloudProviderFilterData,
-    'shortName',
-  );
-  const [, setStatuses] = useQueryParamInformedAtom(
-    goldImageStatusFilterData,
-    'goldImageAccess',
-  );
-  const [, setAccountID] = useQueryParamInformedAtom(
-    cloudAccountIDFilterData,
-    'providerAccountID',
-  );
+  const [, setProviders] = useQueryParamInformedAtom(cloudProviderFilterData, 'shortName');
+  const [, setStatuses] = useQueryParamInformedAtom(goldImageStatusFilterData, 'goldImageAccess');
+  const [, setAccountID] = useQueryParamInformedAtom(cloudAccountIDFilterData, 'providerAccountID');
 
   return () => {
     setProviders([]);

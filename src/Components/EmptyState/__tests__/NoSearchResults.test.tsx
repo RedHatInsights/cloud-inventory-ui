@@ -7,7 +7,7 @@ import {
   CloudAccountsPaginationData,
   cloudAccountIDFilterData,
   cloudProviderFilterData,
-  goldImageStatusFilterData,
+  goldImageStatusFilterData
 } from '../../../state/cloudAccounts';
 import { CloudProviderShortname } from '../../../types/cloudAccountsTypes';
 import { NoSearchResults } from '../NoSearchResults';
@@ -35,7 +35,7 @@ const NoSearchResultsWithState = () => {
         [CloudAccountsPaginationData, { page: 3, perPage: 10, itemCount: 25 }],
         [cloudProviderFilterData, [CloudProviderShortname.AWS]],
         [goldImageStatusFilterData, ['available']],
-        [cloudAccountIDFilterData, 'abc123'],
+        [cloudAccountIDFilterData, 'abc123']
       ]}
     >
       <NoSearchResults />
@@ -49,16 +49,14 @@ describe('NoSearchResults', () => {
     renderWithRouter(<NoSearchResultsWithState />);
 
     expect(
-      screen.getByText(/no results found\. try adjusting your filters\./i),
+      screen.getByText(/no results found\. try adjusting your filters\./i)
     ).toBeInTheDocument();
   });
 
   it('renders the clear all filters button', () => {
     renderWithRouter(<NoSearchResultsWithState />);
 
-    expect(
-      screen.getByRole('button', { name: /clear all filters/i }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /clear all filters/i })).toBeInTheDocument();
   });
 
   it('clears filters and resets pagination when clear all filters is clicked', () => {
@@ -70,7 +68,7 @@ describe('NoSearchResults', () => {
     expect(screen.getByTestId('statuses')).toHaveTextContent('[]');
     expect(screen.getByTestId('account-id')).toHaveTextContent('""');
     expect(screen.getByTestId('pagination')).toHaveTextContent(
-      '{"page":1,"perPage":10,"itemCount":25}',
+      '{"page":1,"perPage":10,"itemCount":25}'
     );
   });
 });

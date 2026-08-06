@@ -17,11 +17,9 @@ export const GoldImagesPage = () => {
   const {
     data: goldImages,
     isError: isGoldImageError,
-    isLoading: areGoldImagesLoading,
+    isLoading: areGoldImagesLoading
   } = useGoldImages();
-  const { has: canReadCloudAccess, isLoading } = useHasRelation(
-    Relation.CLOUD_ACCESS_VIEW,
-  );
+  const { has: canReadCloudAccess, isLoading } = useHasRelation(Relation.CLOUD_ACCESS_VIEW);
 
   // Permission gate
   if (isLoading) return <Loading />;
@@ -38,10 +36,10 @@ export const GoldImagesPage = () => {
       <PageHeader>
         <Content component="h1">Gold Images</Content>
         <Content component="p">
-          This is a listing of the gold images available to your organization,
-          based on your subscriptions. Learn more about gold images. To see
-          which cloud accounts have gold image access enabled, view the list of
-          your <Link to={`../${Paths.CloudAccounts}`}>cloud accounts.</Link>
+          This is a listing of the gold images available to your organization, based on your
+          subscriptions. Learn more about gold images. To see which cloud accounts have gold image
+          access enabled, view the list of your{' '}
+          <Link to={`../${Paths.CloudAccounts}`}>cloud accounts.</Link>
         </Content>
       </PageHeader>
       <Section>

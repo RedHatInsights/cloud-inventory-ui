@@ -5,12 +5,12 @@ import {
   LabelGroup,
   ToolbarContent,
   ToolbarGroup,
-  ToolbarItem,
+  ToolbarItem
 } from '@patternfly/react-core';
 import {
   cloudAccountIDFilterData,
   cloudProviderFilterData,
-  goldImageStatusFilterData,
+  goldImageStatusFilterData
 } from '../../state/cloudAccounts';
 import { ProviderLabelMap } from '../../types/cloudAccountsTypes';
 import { useQueryParamInformedAtom } from '../../hooks/util/useQueryParam';
@@ -21,29 +21,27 @@ type FilterCategory = 'ID' | 'Provider' | 'Status';
 const FILTER_LABELS: Record<FilterCategory, string> = {
   ID: 'Cloud account',
   Provider: 'Cloud provider',
-  Status: 'Gold image access',
+  Status: 'Gold image access'
 };
 
 export const CloudAccountsFilterList = () => {
   const [selectedProviders, setSelectedProviders] = useQueryParamInformedAtom(
     cloudProviderFilterData,
-    'shortName',
+    'shortName'
   );
   const [selectedStatuses, setSelectedStatuses] = useQueryParamInformedAtom(
     goldImageStatusFilterData,
-    'goldImageAccess',
+    'goldImageAccess'
   );
   const [selectedID, setSelectedID] = useQueryParamInformedAtom(
     cloudAccountIDFilterData,
-    'providerAccountID',
+    'providerAccountID'
   );
 
   const clearFilters = useClearCloudAccountFilters();
 
   const hasActiveFilters =
-    selectedID !== '' ||
-    selectedProviders.length > 0 ||
-    selectedStatuses.length > 0;
+    selectedID !== '' || selectedProviders.length > 0 || selectedStatuses.length > 0;
 
   return (
     <ToolbarContent>
@@ -59,9 +57,7 @@ export const CloudAccountsFilterList = () => {
               <Label
                 key={provider}
                 onClose={() =>
-                  setSelectedProviders(
-                    selectedProviders.filter((p) => p !== provider),
-                  )
+                  setSelectedProviders(selectedProviders.filter((p) => p !== provider))
                 }
               >
                 {ProviderLabelMap[provider] ?? provider}
@@ -74,11 +70,7 @@ export const CloudAccountsFilterList = () => {
             {selectedStatuses.map((status) => (
               <Label
                 key={status}
-                onClose={() =>
-                  setSelectedStatuses(
-                    selectedStatuses.filter((s) => s !== status),
-                  )
-                }
+                onClose={() => setSelectedStatuses(selectedStatuses.filter((s) => s !== status))}
               >
                 {status}
               </Label>

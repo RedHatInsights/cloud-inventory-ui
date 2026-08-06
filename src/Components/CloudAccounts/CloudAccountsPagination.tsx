@@ -3,7 +3,5 @@ import { CloudAccountsPaginationData } from '../../state/cloudAccounts';
 import { PaginationBase } from '../shared/PaginationBase';
 
 export const CloudAccountsPagination = ({ isCompact = false }) => {
-  return (
-    <PaginationBase atom={CloudAccountsPaginationData} isCompact={isCompact} />
-  );
+  return <PaginationBase atom={CloudAccountsPaginationData} isCompact={isCompact} />;
 };

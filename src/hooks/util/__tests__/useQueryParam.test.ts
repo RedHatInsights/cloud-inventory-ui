@@ -1,10 +1,7 @@
 import { atom } from 'jotai';
 import { renderHookWithRouter } from '../../../utils/testing/customRender';
 import { generateQueryParamsForData } from '../useQueryParam';
-import {
-  useQueryParamInformedAtom,
-  useQueryParamInformedState,
-} from '../useQueryParam';
+import { useQueryParamInformedAtom, useQueryParamInformedState } from '../useQueryParam';
 import { useEffect } from 'react';
 import { waitFor } from '@testing-library/react';
 import { __resetQueryParamBatchforTests } from '../useQueryParam';
@@ -27,20 +24,17 @@ jest.mock('react-router-dom', () => ({
 
     const snapshot = new URLSearchParams(mockURLSearchParams.toString());
 
-    type SetSearchParamsArg =
-      | URLSearchParams
-      | ((prev: URLSearchParams) => URLSearchParams);
+    type SetSearchParamsArg = URLSearchParams | ((prev: URLSearchParams) => URLSearchParams);
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const setSearchParams = (next: SetSearchParamsArg, ..._args: unknown[]) => {
-      const resolved =
-        typeof next === 'function' ? next(mockURLSearchParams) : next;
+      const resolved = typeof next === 'function' ? next(mockURLSearchParams) : next;
 
       mockURLSearchParams = new URLSearchParams(resolved.toString());
     };
 
     return [snapshot, setSearchParams] as const;
-  },
+  }
 }));
 
 describe('query param informed hook', () => {
@@ -52,9 +46,7 @@ describe('query param informed hook', () => {
     const customAtom = atom<number>(1);
     mockURLSearchParams = new URLSearchParams({ num: '2' });
 
-    const { result } = renderHookWithRouter(() =>
-      useQueryParamInformedAtom(customAtom, 'num'),
-    );
+    const { result } = renderHookWithRouter(() => useQueryParamInformedAtom(customAtom, 'num'));
 
     expect(result.current[0]).toEqual(2);
   });
@@ -62,9 +54,7 @@ describe('query param informed hook', () => {
   it('initializes state if present', () => {
     mockURLSearchParams = new URLSearchParams({ str: '"test"' });
 
-    const { result } = renderHookWithRouter(() =>
-      useQueryParamInformedState('', 'str'),
-    );
+    const { result } = renderHookWithRouter(() => useQueryParamInformedState('', 'str'));
 
     expect(result.current[0]).toEqual('test');
   });
@@ -72,11 +62,11 @@ describe('query param informed hook', () => {
   it('uses default if no search is present', () => {
     const customAtom = atom<string>('defaultAtom');
     const { result: stateResult } = renderHookWithRouter(() =>
-      useQueryParamInformedState('defaultState', 'str'),
+      useQueryParamInformedState('defaultState', 'str')
     );
 
     const { result: atomResult } = renderHookWithRouter(() =>
-      useQueryParamInformedAtom(customAtom, 'num'),
+      useQueryParamInformedAtom(customAtom, 'num')
     );
 
     expect(stateResult.current[0]).toEqual('defaultState');
@@ -133,10 +123,7 @@ describe('query param informed hook', () => {
 
     const { result } = renderHookWithRouter(() => {
       const [state, setState] = useQueryParamInformedState(1, 'customState');
-      const [atomVal, setAtomVal] = useQueryParamInformedAtom(
-        customAtom,
-        'customAtom',
-      );
+      const [atomVal, setAtomVal] = useQueryParamInformedAtom(customAtom, 'customAtom');
 
       useEffect(() => {
         setState(2);

@@ -8,21 +8,15 @@ import { expectToThrow } from '../../../../utils/testing/expectToThrow';
 describe('Table sort hook', () => {
   it("doesn't sort initially", async () => {
     const initialData = [{ test: 2 }, { test: 1 }, { test: 3 }];
-    const { result } = renderHookWithRouter(() =>
-      useTableSort(initialData, 'data'),
-    );
+    const { result } = renderHookWithRouter(() => useTableSort(initialData, 'data'));
 
-    (await waitFor(() => expect(result.current.sorted))).toStrictEqual(
-      initialData,
-    );
+    (await waitFor(() => expect(result.current.sorted))).toStrictEqual(initialData);
   });
 
   it('can sort numbers', async () => {
     const initialData = [{ test: 2 }, { test: 1 }, { test: 3 }];
     const sortedData = initialData.sort((a, b) => (a.test < b.test ? 1 : 0));
-    const { result } = renderHookWithRouter(() =>
-      useTableSort(initialData, 'data'),
-    );
+    const { result } = renderHookWithRouter(() => useTableSort(initialData, 'data'));
 
     if (result.current.getSortParams(0).onSort == undefined) {
       throw new Error('onSort not defined');
@@ -35,13 +29,11 @@ describe('Table sort hook', () => {
           null as unknown as MouseEvent,
           0,
           SortByDirection.asc,
-          null as unknown as IExtraColumnData,
-        ),
+          null as unknown as IExtraColumnData
+        )
     );
 
-    (await waitFor(() => expect(result.current.sorted))).toStrictEqual(
-      sortedData,
-    );
+    (await waitFor(() => expect(result.current.sorted))).toStrictEqual(sortedData);
   });
 
   it('sorts by default when asked', async () => {
@@ -49,13 +41,11 @@ describe('Table sort hook', () => {
     const sortedData = initialData.sort((a, b) => (a.test < b.test ? 1 : 0));
     const { result } = renderHookWithRouter(() =>
       useTableSort(initialData, 'data', {
-        initialSort: { dir: SortByDirection.asc, index: 0 },
-      }),
+        initialSort: { dir: SortByDirection.asc, index: 0 }
+      })
     );
 
-    (await waitFor(() => expect(result.current.sorted))).toStrictEqual(
-      sortedData,
-    );
+    (await waitFor(() => expect(result.current.sorted))).toStrictEqual(sortedData);
   });
 
   it('can sort strings', async () => {
@@ -63,13 +53,11 @@ describe('Table sort hook', () => {
     const sortedData = initialData.sort((a, b) => a.test.localeCompare(b.test));
     const { result } = renderHookWithRouter(() =>
       useTableSort(initialData, 'data', {
-        initialSort: { dir: SortByDirection.asc, index: 0 },
-      }),
+        initialSort: { dir: SortByDirection.asc, index: 0 }
+      })
     );
 
-    (await waitFor(() => expect(result.current.sorted))).toStrictEqual(
-      sortedData,
-    );
+    (await waitFor(() => expect(result.current.sorted))).toStrictEqual(sortedData);
   });
 
   it('throws error on unsupported types', async () => {
@@ -77,9 +65,9 @@ describe('Table sort hook', () => {
     expectToThrow(async () =>
       renderHookWithRouter(() =>
         useTableSort(initialData, 'data', {
-          initialSort: { dir: SortByDirection.asc, index: 0 },
-        }),
-      ),
+          initialSort: { dir: SortByDirection.asc, index: 0 }
+        })
+      )
     ).rejects.toThrow(/Unsupported type/);
   });
 
@@ -88,9 +76,9 @@ describe('Table sort hook', () => {
     expectToThrow(async () =>
       renderHookWithRouter(() =>
         useTableSort(initialData, 'data', {
-          initialSort: { dir: SortByDirection.asc, index: 0 },
-        }),
-      ),
+          initialSort: { dir: SortByDirection.asc, index: 0 }
+        })
+      )
     ).rejects.toThrow(/Invalid comparison/);
   });
 
@@ -109,9 +97,9 @@ describe('Table sort hook', () => {
           0: 'providerAccountID',
           1: 'shortName',
           2: 'goldImageAccess',
-          3: 'dateAdded',
-        },
-      }),
+          3: 'dateAdded'
+        }
+      })
     );
 
     if (result.current.getSortParams(0).onSort == undefined) {
@@ -125,8 +113,8 @@ describe('Table sort hook', () => {
           null as unknown as MouseEvent,
           3,
           SortByDirection.asc,
-          null as unknown as IExtraColumnData,
-        ),
+          null as unknown as IExtraColumnData
+        )
     );
 
     expect(setSortBy).toHaveBeenCalledWith('dateAdded');

@@ -14,28 +14,26 @@ const renderToolbar = () =>
           {
             page: 1,
             perPage: 10,
-            itemCount: 25,
-          },
-        ],
+            itemCount: 25
+          }
+        ]
       ]}
     >
       <MarketplacePurchasesToolbar />
-    </HydrateAtomsTestProvider>,
+    </HydrateAtomsTestProvider>
   );
 
 describe('MarketplacePurchasesToolbar', () => {
   it('renders the toolbar', () => {
     const { container } = renderToolbar();
-    expect(
-      container.querySelector('#marketplace-purchases-toolbar'),
-    ).toBeInTheDocument();
+    expect(container.querySelector('#marketplace-purchases-toolbar')).toBeInTheDocument();
   });
   it('renders the compact pagination component', () => {
     renderToolbar();
     expect(
       screen.getByRole('button', {
-        name: /1\s*[–-]\s*10 of 25/i,
-      }),
+        name: /1\s*[–-]\s*10 of 25/i
+      })
     ).toBeInTheDocument();
   });
 });
