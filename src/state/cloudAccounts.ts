@@ -11,7 +11,7 @@ export const cloudAccountIDFilterData = atom<string>('');
 export const CloudAccountsPaginationData = atom<PaginationData>({
   page: 1,
   perPage: 10,
-  itemCount: 0,
+  itemCount: 0
 });
 
 export type CloudAccountsSortField =
@@ -20,6 +20,4 @@ export type CloudAccountsSortField =
   | 'goldImageAccess'
   | 'dateAdded';
 
-export const cloudAccountsFilterCategoryData = atom<
-  'ID' | 'Provider' | 'Status'
->('ID');
+export const cloudAccountsFilterCategoryData = atom<'ID' | 'Provider' | 'Status'>('ID');

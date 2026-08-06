@@ -6,9 +6,7 @@ import { CloudAccountIDFilter } from '../CloudAccountIDFilter';
 import { cloudAccountIDFilterData } from '../../../state/cloudAccounts';
 
 const CloudAccountIDFilterWithState = ({ initialValue = '' }) => (
-  <HydrateAtomsTestProvider
-    initialValues={[[cloudAccountIDFilterData, initialValue]]}
-  >
+  <HydrateAtomsTestProvider initialValues={[[cloudAccountIDFilterData, initialValue]]}>
     <CloudAccountIDFilter />
   </HydrateAtomsTestProvider>
 );
@@ -17,9 +15,7 @@ describe('CloudAccountIDFilter filter', () => {
   it('displays the correct account id when state is "123"', () => {
     renderWithRouter(<CloudAccountIDFilterWithState initialValue="123" />);
 
-    const input = screen.getByPlaceholderText(
-      'Filter by cloud account ID',
-    ) as HTMLInputElement;
+    const input = screen.getByPlaceholderText('Filter by cloud account ID') as HTMLInputElement;
     expect(input.value).toBe('123');
   });
 
@@ -33,9 +29,7 @@ describe('CloudAccountIDFilter filter', () => {
 
   it('clears the input value when the "x" (reset) button is clicked', async () => {
     renderWithRouter(<CloudAccountIDFilterWithState initialValue="781" />);
-    const input = screen.getByPlaceholderText(
-      'Filter by cloud account ID',
-    ) as HTMLInputElement;
+    const input = screen.getByPlaceholderText('Filter by cloud account ID') as HTMLInputElement;
     expect(input.value).toBe('781');
     const clearButton = screen.getByRole('button', { name: /reset/i });
     fireEvent.click(clearButton);
@@ -49,8 +43,6 @@ describe('CloudAccountIDFilter filter', () => {
 
     const input = screen.getByPlaceholderText('Filter by cloud account ID');
     expect(input).toHaveValue('');
-    expect(
-      screen.queryByRole('button', { name: /reset/i }),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /reset/i })).not.toBeInTheDocument();
   });
 });

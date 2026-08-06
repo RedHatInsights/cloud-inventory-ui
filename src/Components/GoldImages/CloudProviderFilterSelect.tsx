@@ -4,7 +4,7 @@ import {
   MenuToggleElement,
   Select,
   SelectList,
-  SelectOption,
+  SelectOption
 } from '@patternfly/react-core';
 import React, { Ref, useState } from 'react';
 import { cloudProviderFilterData } from '../../state/goldImages';
@@ -15,12 +15,12 @@ interface CloudProviderFilterSelectProps {
   cloudProviders: string[];
 }
 
-export const CloudProviderFilterSelect = ({
-  cloudProviders,
-}: CloudProviderFilterSelectProps) => {
+export const CloudProviderFilterSelect = ({ cloudProviders }: CloudProviderFilterSelectProps) => {
   const [isFilterExpanded, setIsFilterExpanded] = useState(false);
-  const [cloudProviderFilter, setCloudProviderFilter] =
-    useQueryParamInformedAtom(cloudProviderFilterData, 'cloudProvider');
+  const [cloudProviderFilter, setCloudProviderFilter] = useQueryParamInformedAtom(
+    cloudProviderFilterData,
+    'cloudProvider'
+  );
 
   return (
     <Select
@@ -32,12 +32,9 @@ export const CloudProviderFilterSelect = ({
             onClick={() => setIsFilterExpanded(!isFilterExpanded)}
             isExpanded={isFilterExpanded}
             splitButtonItems={[
-              <MenuToggleAction
-                key="label"
-                onClick={() => setIsFilterExpanded(!isFilterExpanded)}
-              >
+              <MenuToggleAction key="label" onClick={() => setIsFilterExpanded(!isFilterExpanded)}>
                 Cloud Provider
-              </MenuToggleAction>,
+              </MenuToggleAction>
             ]}
           >
             {'Filter by cloud provider'}
@@ -47,10 +44,7 @@ export const CloudProviderFilterSelect = ({
       selected={cloudProviderFilter}
       onSelect={(_event, value) => {
         if (!cloudProviderFilter.includes(value as CloudProviderName)) {
-          setCloudProviderFilter([
-            ...cloudProviderFilter,
-            value as CloudProviderName,
-          ]);
+          setCloudProviderFilter([...cloudProviderFilter, value as CloudProviderName]);
         }
         setIsFilterExpanded(false);
       }}

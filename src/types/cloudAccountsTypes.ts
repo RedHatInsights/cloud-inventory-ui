@@ -3,19 +3,19 @@ import { SortByDirection } from '@patternfly/react-table';
 export enum CloudProviderShortname {
   AWS = 'AWS',
   GCP = 'GCE',
-  AZURE = 'MSAZ',
+  AZURE = 'MSAZ'
 }
 
 export enum CloudProviderDisplayNames {
   AWS = 'AWS',
   GCP = 'Google Compute Engine',
-  AZURE = 'Microsoft Azure',
+  AZURE = 'Microsoft Azure'
 }
 
 export const ProviderLabelMap: Record<string, string> = {
   [CloudProviderShortname.AWS]: CloudProviderDisplayNames.AWS,
   [CloudProviderShortname.GCP]: CloudProviderDisplayNames.GCP,
-  [CloudProviderShortname.AZURE]: CloudProviderDisplayNames.AZURE,
+  [CloudProviderShortname.AZURE]: CloudProviderDisplayNames.AZURE
 };
 
 export type CloudAccount = {

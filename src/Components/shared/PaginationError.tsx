@@ -8,18 +8,13 @@ interface PaginationErrorProps {
   setPagination: (v: PaginationData) => void;
 }
 
-export const PaginationError = ({
-  pagination,
-  setPagination,
-}: PaginationErrorProps) => {
+export const PaginationError = ({ pagination, setPagination }: PaginationErrorProps) => {
   return (
     <EmptyState variant="lg" icon={InfoCircleIcon}>
       <EmptyStateBody>
         No results for current page. <br />
         <br />
-        <Button onClick={() => setPagination({ ...pagination, page: 1 })}>
-          Return to page 1
-        </Button>
+        <Button onClick={() => setPagination({ ...pagination, page: 1 })}>Return to page 1</Button>
       </EmptyStateBody>
     </EmptyState>
   );

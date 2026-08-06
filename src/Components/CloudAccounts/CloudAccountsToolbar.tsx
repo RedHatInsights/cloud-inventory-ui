@@ -8,7 +8,7 @@ import {
   Toolbar,
   ToolbarContent,
   ToolbarGroup,
-  ToolbarItem,
+  ToolbarItem
 } from '@patternfly/react-core';
 import FilterIcon from '@patternfly/react-icons/dist/js/icons/filter-icon';
 import { CloudAccountIDFilter } from './CloudAccountIDFilter';
@@ -30,22 +30,22 @@ type FilterCategory = 'ID' | 'Provider' | 'Status';
 const FILTER_LABELS: Record<FilterCategory, string> = {
   ID: 'Cloud account',
   Provider: 'Cloud provider',
-  Status: 'Gold image access',
+  Status: 'Gold image access'
 };
 
 export const CloudAccountsToolbar: React.FC<CloudAccountsToolbarProps> = ({
   availableProviders,
-  availableStatuses,
+  availableStatuses
 }) => {
   const [activeCategory, setActiveCategory] = useQueryParamInformedAtom(
     cloudAccountsFilterCategoryData,
-    'filterCategory',
+    'filterCategory'
   );
   const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
 
   const onCategorySelect = (
     _event: React.MouseEvent | undefined,
-    value: string | number | undefined,
+    value: string | number | undefined
   ) => {
     if (!value) {
       return;
@@ -80,21 +80,17 @@ export const CloudAccountsToolbar: React.FC<CloudAccountsToolbarProps> = ({
               toggle={categoryToggle}
             >
               <SelectList>
-                {(Object.keys(FILTER_LABELS) as FilterCategory[]).map(
-                  (category) => (
-                    <SelectOption key={category} value={category}>
-                      {FILTER_LABELS[category]}
-                    </SelectOption>
-                  ),
-                )}
+                {(Object.keys(FILTER_LABELS) as FilterCategory[]).map((category) => (
+                  <SelectOption key={category} value={category}>
+                    {FILTER_LABELS[category]}
+                  </SelectOption>
+                ))}
               </SelectList>
             </Select>
           </ToolbarItem>
           {activeCategory === 'ID' && <CloudAccountIDFilter />}
           {activeCategory === 'Provider' && (
-            <CloudAccountProviderFilter
-              availableProviders={availableProviders}
-            />
+            <CloudAccountProviderFilter availableProviders={availableProviders} />
           )}
           {activeCategory === 'Status' && (
             <ToolbarItem>

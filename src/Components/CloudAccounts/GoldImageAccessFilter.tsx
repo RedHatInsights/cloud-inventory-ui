@@ -4,7 +4,7 @@ import {
   MenuToggleElement,
   Select,
   SelectList,
-  SelectOption,
+  SelectOption
 } from '@patternfly/react-core';
 import { useQueryParamInformedAtom } from '../../hooks/util/useQueryParam';
 import { goldImageStatusFilterData } from '../../state/cloudAccounts';
@@ -13,19 +13,14 @@ interface GoldImageAccessFilterProps {
   availableStatuses: string[];
 }
 
-export const GoldImageAccessFilter = ({
-  availableStatuses,
-}: GoldImageAccessFilterProps) => {
+export const GoldImageAccessFilter = ({ availableStatuses }: GoldImageAccessFilterProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedStatuses, setSelectedStatuses] = useQueryParamInformedAtom(
     goldImageStatusFilterData,
-    'goldImageAccess',
+    'goldImageAccess'
   );
 
-  const onSelect = (
-    _event: React.MouseEvent | undefined,
-    value: string | number | undefined,
-  ) => {
+  const onSelect = (_event: React.MouseEvent | undefined, value: string | number | undefined) => {
     if (!value || typeof value !== 'string') {
       return;
     }
@@ -48,7 +43,7 @@ export const GoldImageAccessFilter = ({
           onClick={() => setIsOpen((prev) => !prev)}
           isExpanded={isOpen}
           {...(selectedStatuses.length > 0 && {
-            badge: selectedStatuses.length,
+            badge: selectedStatuses.length
           })}
         >
           {selectedStatuses.length === 0 ? 'Filter by status' : 'Status'}

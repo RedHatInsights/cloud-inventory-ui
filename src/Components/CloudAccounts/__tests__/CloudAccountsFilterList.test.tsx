@@ -6,14 +6,14 @@ import { CloudAccountsFilterList } from '../CloudAccountsFilterList';
 import {
   cloudAccountIDFilterData,
   cloudProviderFilterData,
-  goldImageStatusFilterData,
+  goldImageStatusFilterData
 } from '../../../state/cloudAccounts';
 import { CloudProviderShortname } from '../../../types/cloudAccountsTypes';
 
 const renderFilterList = ({
   selectedID = '',
   selectedProviders = [],
-  selectedStatuses = [],
+  selectedStatuses = []
 }: {
   selectedID?: string;
   selectedProviders?: string[];
@@ -24,13 +24,13 @@ const renderFilterList = ({
       initialValues={[
         [cloudAccountIDFilterData, selectedID],
         [cloudProviderFilterData, selectedProviders],
-        [goldImageStatusFilterData, selectedStatuses],
+        [goldImageStatusFilterData, selectedStatuses]
       ]}
     >
             
       <CloudAccountsFilterList />
           
-    </HydrateAtomsTestProvider>,
+    </HydrateAtomsTestProvider>
   );
 
 beforeEach(() => {
@@ -41,9 +41,7 @@ describe('CloudAccountsFilterList', () => {
   it('renders nothing filter-related when no filters are active', () => {
     renderFilterList();
 
-    expect(
-      screen.queryByRole('button', { name: /clear all filters/i }),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /clear all filters/i })).not.toBeInTheDocument();
     expect(screen.queryByText('Cloud account')).not.toBeInTheDocument();
     expect(screen.queryByText('Cloud provider')).not.toBeInTheDocument();
     expect(screen.queryByText('Gold image access')).not.toBeInTheDocument();
@@ -58,10 +56,7 @@ describe('CloudAccountsFilterList', () => {
 
   it('renders selected provider filters using display labels', () => {
     renderFilterList({
-      selectedProviders: [
-        CloudProviderShortname.AWS,
-        CloudProviderShortname.GCP,
-      ],
+      selectedProviders: [CloudProviderShortname.AWS, CloudProviderShortname.GCP]
     });
 
     expect(screen.getByText('Cloud provider')).toBeInTheDocument();
@@ -71,7 +66,7 @@ describe('CloudAccountsFilterList', () => {
 
   it('renders selected status filters', () => {
     renderFilterList({
-      selectedStatuses: ['Granted', 'Failed'],
+      selectedStatuses: ['Granted', 'Failed']
     });
 
     expect(screen.getByText('Gold image access')).toBeInTheDocument();
@@ -84,9 +79,7 @@ describe('CloudAccountsFilterList', () => {
 
     const closeButtons = screen
       .getAllByRole('button')
-      .filter((button) =>
-        button.getAttribute('aria-label')?.toLowerCase().includes('close'),
-      );
+      .filter((button) => button.getAttribute('aria-label')?.toLowerCase().includes('close'));
 
     expect(closeButtons.length).toBeGreaterThan(0);
 
@@ -100,7 +93,7 @@ describe('CloudAccountsFilterList', () => {
     renderFilterList({
       selectedID: 'acct-123',
       selectedProviders: [CloudProviderShortname.AWS],
-      selectedStatuses: ['Granted'],
+      selectedStatuses: ['Granted']
     });
 
     fireEvent.click(screen.getByRole('button', { name: /clear all filters/i }));
@@ -118,14 +111,10 @@ describe('CloudAccountsFilterList', () => {
 
     const closeButtons = screen
       .getAllByRole('button')
-      .filter((button) =>
-        button.getAttribute('aria-label')?.toLowerCase().includes('close'),
-      );
+      .filter((button) => button.getAttribute('aria-label')?.toLowerCase().includes('close'));
 
     fireEvent.click(closeButtons[0]);
 
-    expect(
-      screen.queryByRole('button', { name: /clear all filters/i }),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /clear all filters/i })).not.toBeInTheDocument();
   });
 });

@@ -13,7 +13,7 @@ export function __resetQueryParamBatchforTests() {
 function updateQueryParamsTogether(
   currentSearch: string,
   applyUpdate: (p: URLSearchParams) => void,
-  commitSearchParams: (p: URLSearchParams) => void,
+  commitSearchParams: (p: URLSearchParams) => void
 ) {
   const base = nextParams
     ? new URLSearchParams(nextParams.toString())
@@ -49,31 +49,25 @@ function useInitializeFromQueryParam<T>(key: string, setter: (v: T) => void) {
   }, [init, key, setter]);
 }
 
-export function generateQueryParamsForData<T>(
-  data: T,
-  key: string,
-): URLSearchParams {
+export function generateQueryParamsForData<T>(data: T, key: string): URLSearchParams {
   const params = new URLSearchParams();
   params.set(key, JSON.stringify(data));
   return params;
 }
 
-function useUpdateQueryParams<T>(
-  key: string,
-  setter: (v: T) => void,
-): (v: T) => void {
+function useUpdateQueryParams<T>(key: string, setter: (v: T) => void): (v: T) => void {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const commit = useCallback(
     (p: URLSearchParams) => setSearchParams(p, { replace: true }),
-    [setSearchParams],
+    [setSearchParams]
   );
 
   return (v: T) => {
     updateQueryParamsTogether(
       searchParams.toString(),
       (p) => p.set(key, JSON.stringify(v)),
-      commit,
+      commit
     );
 
     setter(v);
@@ -82,7 +76,7 @@ function useUpdateQueryParams<T>(
 
 export function useQueryParamInformedAtom<T>(
   atom: PrimitiveAtom<T>,
-  key: string,
+  key: string
 ): [Awaited<T>, (v: T) => void] {
   const [atomValue, setAtom] = useAtom(atom);
 
@@ -92,10 +86,7 @@ export function useQueryParamInformedAtom<T>(
   return [atomValue, queryParamWrappedSetter];
 }
 
-export function useQueryParamInformedState<T>(
-  init: T,
-  key: string,
-): [T, (v: T) => void] {
+export function useQueryParamInformedState<T>(init: T, key: string): [T, (v: T) => void] {
   const [state, setState] = useState(init);
 
   useInitializeFromQueryParam(key, setState);

@@ -5,6 +5,4 @@ interface HelloProps {
   name: string;
 }
 
-export const Hello = ({ name }: HelloProps) => (
-  <Content component="p">Hello, {name}</Content>
-);
+export const Hello = ({ name }: HelloProps) => <Content component="p">Hello, {name}</Content>;

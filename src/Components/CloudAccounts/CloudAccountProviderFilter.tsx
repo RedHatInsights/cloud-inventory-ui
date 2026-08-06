@@ -5,25 +5,22 @@ import {
   Select,
   SelectList,
   SelectOption,
-  ToolbarItem,
+  ToolbarItem
 } from '@patternfly/react-core';
 import { cloudProviderFilterData } from '../../state/cloudAccounts';
 import { useQueryParamInformedAtom } from '../../hooks/util/useQueryParam';
-import {
-  CloudProviderShortname,
-  ProviderLabelMap,
-} from '../../types/cloudAccountsTypes';
+import { CloudProviderShortname, ProviderLabelMap } from '../../types/cloudAccountsTypes';
 
 interface CloudAccountProviderFilterProps {
   availableProviders: CloudProviderShortname[];
 }
 
-export const CloudAccountProviderFilter: React.FC<
-  CloudAccountProviderFilterProps
-> = ({ availableProviders }) => {
+export const CloudAccountProviderFilter: React.FC<CloudAccountProviderFilterProps> = ({
+  availableProviders
+}) => {
   const [selectedProviders, setSelectedProviders] = useQueryParamInformedAtom(
     cloudProviderFilterData,
-    'shortName',
+    'shortName'
   );
   const [isOpen, setIsOpen] = useState(false);
 
@@ -31,10 +28,7 @@ export const CloudAccountProviderFilter: React.FC<
     setIsOpen((prev) => !prev);
   };
 
-  const onSelect = (
-    _event: React.MouseEvent | undefined,
-    value: string | number | undefined,
-  ) => {
+  const onSelect = (_event: React.MouseEvent | undefined, value: string | number | undefined) => {
     if (!value || typeof value !== 'string') {
       setIsOpen(false);
       return;
@@ -58,11 +52,7 @@ export const CloudAccountProviderFilter: React.FC<
         onSelect={onSelect}
         selected={selectedProviders}
         toggle={(toggleRef: React.Ref<MenuToggleElement>) => (
-          <MenuToggle
-            ref={toggleRef}
-            onClick={onToggleClick}
-            isExpanded={isOpen}
-          >
+          <MenuToggle ref={toggleRef} onClick={onToggleClick} isExpanded={isOpen}>
                         Filter by cloud provider           
           </MenuToggle>
         )}

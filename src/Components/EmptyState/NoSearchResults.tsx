@@ -7,9 +7,7 @@ export const NoSearchResults = () => {
 
   return (
     <EmptyState>
-      <EmptyStateBody>
-        No results found. Try adjusting your filters.       
-      </EmptyStateBody>
+      <EmptyStateBody>No results found. Try adjusting your filters.       </EmptyStateBody>
       <Button variant="link" onClick={clearFilters} isInline>
         Clear all filters       
       </Button>

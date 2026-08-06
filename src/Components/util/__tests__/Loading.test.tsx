@@ -6,8 +6,6 @@ describe('Loading', () => {
   it('renders', () => {
     const { container } = render(<Loading />);
 
-    expect(
-      container.querySelector('[aria-valuetext="Loading..."]'),
-    ).toBeInTheDocument();
+    expect(container.querySelector('[aria-valuetext="Loading..."]')).toBeInTheDocument();
   });
 });

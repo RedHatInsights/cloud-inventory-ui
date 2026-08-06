@@ -6,7 +6,7 @@ import { cloudAccountIDFilterData } from '../../state/cloudAccounts';
 export const CloudAccountIDFilter = () => {
   const [accountIDFilter, setAccountIDFilter] = useQueryParamInformedAtom(
     cloudAccountIDFilterData,
-    'providerAccountID',
+    'providerAccountID'
   );
 
   const timerRef = useRef<ReturnType<typeof setTimeout>>();

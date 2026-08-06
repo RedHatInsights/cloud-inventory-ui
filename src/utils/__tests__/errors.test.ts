@@ -20,11 +20,7 @@ describe('HttpError', () => {
   it('handles different HTTP status codes', () => {
     const error401 = new HttpError('Unauthorized', 401, 'Unauthorized');
     const error403 = new HttpError('Forbidden', 403, 'Forbidden');
-    const error500 = new HttpError(
-      'Server error',
-      500,
-      'Internal Server Error',
-    );
+    const error500 = new HttpError('Server error', 500, 'Internal Server Error');
 
     expect(error401.status).toBe(401);
     expect(error403.status).toBe(403);
@@ -44,7 +40,7 @@ describe('hasPaginationError', () => {
     const pagination: PaginationData = {
       page: 1,
       perPage: 10,
-      itemCount: 25,
+      itemCount: 25
     };
 
     expect(hasPaginationError(pagination)).toBe(false);
@@ -54,7 +50,7 @@ describe('hasPaginationError', () => {
     const pagination: PaginationData = {
       page: 2,
       perPage: 10,
-      itemCount: 25,
+      itemCount: 25
     };
 
     expect(hasPaginationError(pagination)).toBe(false);
@@ -64,7 +60,7 @@ describe('hasPaginationError', () => {
     const pagination: PaginationData = {
       page: 3,
       perPage: 10,
-      itemCount: 25,
+      itemCount: 25
     };
 
     expect(hasPaginationError(pagination)).toBe(false);
@@ -74,7 +70,7 @@ describe('hasPaginationError', () => {
     const pagination: PaginationData = {
       page: 5,
       perPage: 10,
-      itemCount: 25,
+      itemCount: 25
     };
 
     expect(hasPaginationError(pagination)).toBe(true);
@@ -84,7 +80,7 @@ describe('hasPaginationError', () => {
     const pagination: PaginationData = {
       page: 100,
       perPage: 10,
-      itemCount: 5,
+      itemCount: 5
     };
 
     expect(hasPaginationError(pagination)).toBe(true);
@@ -94,7 +90,7 @@ describe('hasPaginationError', () => {
     const pagination: PaginationData = {
       page: 3,
       perPage: 10,
-      itemCount: 20,
+      itemCount: 20
     };
 
     expect(hasPaginationError(pagination)).toBe(true);
@@ -104,7 +100,7 @@ describe('hasPaginationError', () => {
     const pagination: PaginationData = {
       page: 2,
       perPage: 10,
-      itemCount: 0,
+      itemCount: 0
     };
 
     expect(hasPaginationError(pagination)).toBe(true);
@@ -114,7 +110,7 @@ describe('hasPaginationError', () => {
     const pagination: PaginationData = {
       page: 1,
       perPage: 10,
-      itemCount: 0,
+      itemCount: 0
     };
 
     expect(hasPaginationError(pagination)).toBe(false);
@@ -124,12 +120,12 @@ describe('hasPaginationError', () => {
     const pagination20: PaginationData = {
       page: 2,
       perPage: 20,
-      itemCount: 25,
+      itemCount: 25
     };
     const pagination5: PaginationData = {
       page: 7,
       perPage: 5,
-      itemCount: 25,
+      itemCount: 25
     };
 
     expect(hasPaginationError(pagination20)).toBe(false);
@@ -140,7 +136,7 @@ describe('hasPaginationError', () => {
     const pagination: PaginationData = {
       page: 1,
       perPage: 10,
-      itemCount: 1,
+      itemCount: 1
     };
 
     expect(hasPaginationError(pagination)).toBe(false);

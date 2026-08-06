@@ -7,12 +7,7 @@ type MarketplacePurchasesPaginationProps = {
 };
 
 export const MarketplacePurchasesPagination = ({
-  isCompact = false,
+  isCompact = false
 }: MarketplacePurchasesPaginationProps) => {
-  return (
-    <PaginationBase
-      atom={MarketplacePurchasesPaginationData}
-      isCompact={isCompact}
-    />
-  );
+  return <PaginationBase atom={MarketplacePurchasesPaginationData} isCompact={isCompact} />;
 };

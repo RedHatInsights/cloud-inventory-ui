@@ -10,11 +10,11 @@ const mockNavigate = jest.fn();
 
 jest.mock('@project-kessel/react-kessel-access-check', () => ({
   fetchDefaultWorkspace: jest.fn(() => Promise.resolve({ id: 'org-id' })),
-  useAccessCheckContext: jest.fn(() => ({})),
+  useAccessCheckContext: jest.fn(() => ({}))
 }));
 
 jest.mock('@project-kessel/react-kessel-access-check/core/api-client', () => ({
-  checkSelf: (...args: unknown[]) => mockCheck(...args),
+  checkSelf: (...args: unknown[]) => mockCheck(...args)
 }));
 
 jest.mock('react-router-dom', () => ({
@@ -23,7 +23,7 @@ jest.mock('react-router-dom', () => ({
   Navigate: ({ to }: { to: string }) => {
     mockNavigate(to);
     return <div data-testid="navigate" />;
-  },
+  }
 }));
 
 const defaultQueryParams = {
@@ -33,18 +33,16 @@ const defaultQueryParams = {
   sortDirection: undefined,
   shortName: [],
   goldImageAccess: [],
-  providerAccountID: '',
+  providerAccountID: ''
 };
 
-const { ComponentWithQueryClient, queryClient } = ManipulatableQueryWrapper(
-  <CloudAccountsPage />,
-);
+const { ComponentWithQueryClient, queryClient } = ManipulatableQueryWrapper(<CloudAccountsPage />);
 
 beforeEach(() => {
   queryClient.clear();
 
   mockCheck.mockResolvedValue({
-    allowed: 'ALLOWED_TRUE',
+    allowed: 'ALLOWED_TRUE'
   });
 });
 
@@ -60,15 +58,15 @@ it('renders cloud accounts page', async () => {
         providerAccountID: 'abc',
         shortName: 'AWS',
         goldImageAccess: 'Granted',
-        dateAdded: '2025-01-01',
-      },
+        dateAdded: '2025-01-01'
+      }
     ],
     pagination: {
       total: 1,
       count: 1,
       limit: 10,
-      offset: 0,
-    },
+      offset: 0
+    }
   });
 
   renderWithRouter(<ComponentWithQueryClient />);
@@ -79,13 +77,13 @@ it('renders cloud accounts page', async () => {
 it('shows empty state when no accounts exist', async () => {
   queryClient.setQueryData(['cloudAccounts', defaultQueryParams], {
     body: [],
-    pagination: { total: 0, count: 0, limit: 10, offset: 0 },
+    pagination: { total: 0, count: 0, limit: 10, offset: 0 }
   });
 
   renderWithRouter(<ComponentWithQueryClient />);
 
   const integrationsLink = await screen.findByRole('link', {
-    name: /integrations/i,
+    name: /integrations/i
   });
 
   expect(integrationsLink).toHaveAttribute('href', '/settings/integrations/');
@@ -93,7 +91,7 @@ it('shows empty state when no accounts exist', async () => {
 
 it('shows loading state while cloud accounts are loading', async () => {
   queryClient.setQueryDefaults(['cloudAccounts'], {
-    queryFn: () => new Promise(() => {}),
+    queryFn: () => new Promise(() => {})
   });
 
   renderWithRouter(<ComponentWithQueryClient />);
@@ -103,7 +101,7 @@ it('shows loading state while cloud accounts are loading', async () => {
 
 it('redirects when user lacks permission', async () => {
   mockCheck.mockResolvedValueOnce({
-    allowed: 'ALLOWED_FALSE',
+    allowed: 'ALLOWED_FALSE'
   });
 
   renderWithRouter(<ComponentWithQueryClient />);

@@ -16,20 +16,16 @@ export const enableMocks = () => {
           json: () => {
             return Promise.resolve(mockMap[url].body);
           },
-          ok: mockMap[url].ok,
+          ok: mockMap[url].ok
         });
       } else {
         return Promise.reject('No url mocked');
       }
-    }) as jest.Mock,
+    }) as jest.Mock
   );
 };
 
-export const mockApiResponse = (
-  url: string,
-  payload: unknown,
-  success: boolean,
-) => {
+export const mockApiResponse = (url: string, payload: unknown, success: boolean) => {
   mockMap[url] = { body: payload, ok: success };
 };
 
@@ -49,22 +45,20 @@ export class RequestMocks {
             json: () => {
               return Promise.resolve(this.map[url].body);
             },
-            ok: this.map[url].ok,
+            ok: this.map[url].ok
           });
         } else {
           return Promise.reject('No url mocked');
         }
-      }) as jest.Mock,
+      }) as jest.Mock
     );
 
     this.queryClient = new QueryClient({
-      defaultOptions: { queries: { retry: false } },
+      defaultOptions: { queries: { retry: false } }
     });
 
     this.wrapper = ({ children }: { children: ReactNode }) => (
-      <QueryClientProvider client={this.queryClient}>
-        {children}
-      </QueryClientProvider>
+      <QueryClientProvider client={this.queryClient}>{children}</QueryClientProvider>
     );
   }
 

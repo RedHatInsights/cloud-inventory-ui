@@ -12,12 +12,11 @@ interface PaginationBaseProps {
   isCompact?: boolean;
 }
 
-export const PaginationBase = ({
-  atom,
-  isCompact = false,
-}: PaginationBaseProps) => {
-  const [{ perPage, page, itemCount }, setPagination] =
-    useQueryParamInformedAtom(atom, 'pagination');
+export const PaginationBase = ({ atom, isCompact = false }: PaginationBaseProps) => {
+  const [{ perPage, page, itemCount }, setPagination] = useQueryParamInformedAtom(
+    atom,
+    'pagination'
+  );
 
   return (
     <Pagination
@@ -29,14 +28,14 @@ export const PaginationBase = ({
         setPagination({
           page: newPage,
           perPage,
-          itemCount,
+          itemCount
         });
       }}
       onPerPageSelect={(_evt, newPerPage, newPage) => {
         setPagination({
           page: newPage,
           perPage: newPerPage,
-          itemCount,
+          itemCount
         });
       }}
     />

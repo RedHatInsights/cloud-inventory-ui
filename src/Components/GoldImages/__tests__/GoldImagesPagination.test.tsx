@@ -6,7 +6,7 @@ import { fireEvent, waitFor } from '@testing-library/react';
 import { renderWithRouter } from '../../../utils/testing/customRender';
 
 const GoldImagesPaginationWithState = ({
-  init,
+  init
 }: {
   init: { page: number; perPage: number; itemCount: number };
 }) => (
@@ -20,21 +20,16 @@ describe('Gold Images Pagination', () => {
     const { container } = renderWithRouter(<GoldImagesPagination />);
 
     expect(
-      container.querySelector('.pf-v6-c-pagination__total-items')?.firstChild
-        ?.textContent,
+      container.querySelector('.pf-v6-c-pagination__total-items')?.firstChild?.textContent
     ).toBe('0 - 0');
   });
 
   it('can go to the next page', async () => {
     const { container } = renderWithRouter(
-      <GoldImagesPaginationWithState
-        init={{ page: 1, perPage: 10, itemCount: 123 }}
-      />,
+      <GoldImagesPaginationWithState init={{ page: 1, perPage: 10, itemCount: 123 }} />
     );
 
-    const nextButton = container.querySelector(
-      '[aria-label="Go to next page"]',
-    );
+    const nextButton = container.querySelector('[aria-label="Go to next page"]');
 
     if (!nextButton) {
       throw new Error('Next page button not found');
@@ -42,31 +37,25 @@ describe('Gold Images Pagination', () => {
 
     await waitFor(() =>
       expect(
-        container.querySelector('.pf-v6-c-pagination__total-items')?.firstChild
-          ?.textContent,
-      ).toBe('1 - 10'),
+        container.querySelector('.pf-v6-c-pagination__total-items')?.firstChild?.textContent
+      ).toBe('1 - 10')
     );
 
     fireEvent.click(nextButton);
 
     await waitFor(() =>
       expect(
-        container.querySelector('.pf-v6-c-pagination__total-items')?.firstChild
-          ?.textContent,
-      ).toBe('11 - 20'),
+        container.querySelector('.pf-v6-c-pagination__total-items')?.firstChild?.textContent
+      ).toBe('11 - 20')
     );
   });
 
   it('can go back a page', async () => {
     const { container } = renderWithRouter(
-      <GoldImagesPaginationWithState
-        init={{ page: 2, perPage: 10, itemCount: 123 }}
-      />,
+      <GoldImagesPaginationWithState init={{ page: 2, perPage: 10, itemCount: 123 }} />
     );
 
-    const previousButton = container.querySelector(
-      '[aria-label="Go to previous page"]',
-    );
+    const previousButton = container.querySelector('[aria-label="Go to previous page"]');
 
     if (!previousButton) {
       throw new Error('Next page button not found');
@@ -74,30 +63,26 @@ describe('Gold Images Pagination', () => {
 
     await waitFor(() =>
       expect(
-        container.querySelector('.pf-v6-c-pagination__total-items')?.firstChild
-          ?.textContent,
-      ).toBe('11 - 20'),
+        container.querySelector('.pf-v6-c-pagination__total-items')?.firstChild?.textContent
+      ).toBe('11 - 20')
     );
 
     fireEvent.click(previousButton);
 
     await waitFor(() =>
       expect(
-        container.querySelector('.pf-v6-c-pagination__total-items')?.firstChild
-          ?.textContent,
-      ).toBe('1 - 10'),
+        container.querySelector('.pf-v6-c-pagination__total-items')?.firstChild?.textContent
+      ).toBe('1 - 10')
     );
   });
 
   it('can change page size', async () => {
     const { container, queryByText } = renderWithRouter(
-      <GoldImagesPaginationWithState
-        init={{ page: 1, perPage: 10, itemCount: 123 }}
-      />,
+      <GoldImagesPaginationWithState init={{ page: 1, perPage: 10, itemCount: 123 }} />
     );
 
     const expandPageSelectionButton = container.querySelector(
-      '[data-ouia-component-type="PF6/MenuToggle"]',
+      '[data-ouia-component-type="PF6/MenuToggle"]'
     );
 
     if (!expandPageSelectionButton) {
@@ -106,15 +91,14 @@ describe('Gold Images Pagination', () => {
 
     await waitFor(() =>
       expect(
-        container.querySelector('.pf-v6-c-pagination__total-items')?.firstChild
-          ?.textContent,
-      ).toBe('1 - 10'),
+        container.querySelector('.pf-v6-c-pagination__total-items')?.firstChild?.textContent
+      ).toBe('1 - 10')
     );
 
     fireEvent.click(expandPageSelectionButton);
 
     const twentyPerPageSelectionButton = await waitFor(
-      () => queryByText('20 per page')?.parentElement?.parentElement,
+      () => queryByText('20 per page')?.parentElement?.parentElement
     );
 
     if (!twentyPerPageSelectionButton) {
@@ -125,9 +109,8 @@ describe('Gold Images Pagination', () => {
 
     await waitFor(() =>
       expect(
-        container.querySelector('.pf-v6-c-pagination__total-items')?.firstChild
-          ?.textContent,
-      ).toBe('1 - 20'),
+        container.querySelector('.pf-v6-c-pagination__total-items')?.firstChild?.textContent
+      ).toBe('1 - 20')
     );
   });
 });

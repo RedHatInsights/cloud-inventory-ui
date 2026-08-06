@@ -9,7 +9,7 @@ type GoldImage = {
 export enum CloudProviderName {
   AWS = 'AWS',
   GCP = 'Google Compute Engine',
-  AZURE = 'Microsoft Azure',
+  AZURE = 'Microsoft Azure'
 }
 
 type CloudProviderDetail = {
@@ -20,16 +20,10 @@ type CloudProviderDetail = {
 export type GoldImagesResponse = Record<string, CloudProviderDetail>;
 
 const fetchGoldImages: () => Promise<GoldImagesResponse> = async () => {
-  const response = await fetch(
-    '/api/rhsm/v2/cloud_access_providers/gold_images',
-  );
+  const response = await fetch('/api/rhsm/v2/cloud_access_providers/gold_images');
 
   if (!response.ok) {
-    throw new HttpError(
-      `Something went wrong`,
-      response.status,
-      response.statusText,
-    );
+    throw new HttpError(`Something went wrong`, response.status, response.statusText);
   }
 
   return (await response.json()).body as GoldImagesResponse;

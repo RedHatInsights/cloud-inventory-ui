@@ -13,27 +13,22 @@ const makeMarketplacePurchases = (count: number): MarketplacePurchase[] =>
     marketplaceAccount: `account-${index}`,
     marketplace: index % 2 === 0 ? 'aws_marketplace' : 'azure_marketplace',
     startDate: `2026-01-${String(index + 1).padStart(2, '0')}`,
-    skus: [`SKU-${index}`],
+    skus: [`SKU-${index}`]
   }));
 
 const defaultPagination = {
   page: 1,
   perPage: 10,
-  itemCount: 10,
+  itemCount: 10
 };
 
-const renderTable = (
-  purchases: MarketplacePurchase[],
-  pagination = defaultPagination,
-) =>
+const renderTable = (purchases: MarketplacePurchase[], pagination = defaultPagination) =>
   renderWithRouter(
-    <HydrateAtomsTestProvider
-      initialValues={[[MarketplacePurchasesPaginationData, pagination]]}
-    >
+    <HydrateAtomsTestProvider initialValues={[[MarketplacePurchasesPaginationData, pagination]]}>
             
       <MarketplacePurchasesTable marketplacePurchases={purchases} />
           
-    </HydrateAtomsTestProvider>,
+    </HydrateAtomsTestProvider>
   );
 
 describe('MarketplacePurchasesTable', () => {
@@ -42,8 +37,8 @@ describe('MarketplacePurchasesTable', () => {
 
     expect(
       screen.getByRole('grid', {
-        name: /marketplace purchases table/i,
-      }),
+        name: /marketplace purchases table/i
+      })
     ).toBeInTheDocument();
   });
 
@@ -76,12 +71,10 @@ describe('MarketplacePurchasesTable', () => {
     renderTable(makeMarketplacePurchases(25), {
       page: 1,
       perPage: 10,
-      itemCount: 25,
+      itemCount: 25
     });
 
-    expect(
-      screen.queryByText(/No results for current page/i),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByText(/No results for current page/i)).not.toBeInTheDocument();
   });
 
   it('renders pagination error when page exceeds item count', () => {
@@ -90,17 +83,15 @@ describe('MarketplacePurchasesTable', () => {
     renderTable(purchases, {
       page: 10,
       perPage: 10,
-      itemCount: 5,
+      itemCount: 5
     });
 
-    expect(
-      screen.getByText(/No results for current page/i),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/No results for current page/i)).toBeInTheDocument();
 
     expect(
       screen.getByRole('button', {
-        name: /return to page 1/i,
-      }),
+        name: /return to page 1/i
+      })
     ).toBeInTheDocument();
   });
 
@@ -110,7 +101,7 @@ describe('MarketplacePurchasesTable', () => {
     renderTable(purchases, {
       page: 10,
       perPage: 10,
-      itemCount: 5,
+      itemCount: 5
     });
 
     expect(screen.queryByText('Offering name')).not.toBeInTheDocument();
@@ -119,8 +110,8 @@ describe('MarketplacePurchasesTable', () => {
 
     expect(
       screen.queryByRole('grid', {
-        name: /marketplace purchases table/i,
-      }),
+        name: /marketplace purchases table/i
+      })
     ).not.toBeInTheDocument();
   });
 
@@ -130,26 +121,20 @@ describe('MarketplacePurchasesTable', () => {
     renderTable(purchases, {
       page: 10,
       perPage: 10,
-      itemCount: 5,
+      itemCount: 5
     });
 
-    expect(
-      screen.getByText(/No results for current page/i),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/No results for current page/i)).toBeInTheDocument();
 
     fireEvent.click(
       screen.getByRole('button', {
-        name: /return to page 1/i,
-      }),
+        name: /return to page 1/i
+      })
     );
 
-    expect(
-      screen.queryByText(/No results for current page/i),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByText(/No results for current page/i)).not.toBeInTheDocument();
 
-    await waitFor(() =>
-      expect(screen.getByText(purchases[0].offeringName)).toBeInTheDocument(),
-    );
+    await waitFor(() => expect(screen.getByText(purchases[0].offeringName)).toBeInTheDocument());
   });
 
   describe('cloud account link', () => {
@@ -158,9 +143,7 @@ describe('MarketplacePurchasesTable', () => {
       renderTable(marketplacePurchases);
 
       expect(
-        screen
-          .getByText(marketplacePurchases[0].marketplaceAccount)
-          .getAttribute('href'),
+        screen.getByText(marketplacePurchases[0].marketplaceAccount).getAttribute('href')
       ).not.toBeNull();
     });
 
@@ -169,11 +152,9 @@ describe('MarketplacePurchasesTable', () => {
       renderTable(marketplacePurchases);
 
       expect(
-        screen
-          .getByText(marketplacePurchases[0].marketplaceAccount)
-          .getAttribute('href'),
+        screen.getByText(marketplacePurchases[0].marketplaceAccount).getAttribute('href')
       ).toBe(
-        `/${Paths.CloudAccounts}?providerAccountID=${encodeURI(`["${marketplacePurchases[0].marketplaceAccount}"]`)}`,
+        `/${Paths.CloudAccounts}?providerAccountID=${encodeURI(`["${marketplacePurchases[0].marketplaceAccount}"]`)}`
       );
     });
   });

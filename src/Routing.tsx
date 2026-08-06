@@ -1,9 +1,5 @@
 import React, { Suspense, lazy, useMemo } from 'react';
-import {
-  Navigate,
-  Route as RouterRoute,
-  Routes as RouterRoutes,
-} from 'react-router-dom';
+import { Navigate, Route as RouterRoute, Routes as RouterRoutes } from 'react-router-dom';
 import { InvalidObject } from '@redhat-cloud-services/frontend-components/InvalidObject';
 import { Bullseye, Spinner } from '@patternfly/react-core';
 import { GoldImagesPage } from './Pages/GoldImagesPage/GoldImagesPage';
@@ -14,56 +10,52 @@ const MarketPlacePurchasesPage = lazy(
   () =>
     import(
       /* webpackChunkName: "MarketPlacePurchasesPage" */ './Pages/MarketplacePurchasesPage/MarketplacePurchasesPage'
-    ),
+    )
 );
-const OopsPage = lazy(
-  () => import(/* webpackChunkName: "OopsPage" */ './Pages/OopsPage/OopsPage'),
-);
+const OopsPage = lazy(() => import(/* webpackChunkName: "OopsPage" */ './Pages/OopsPage/OopsPage'));
 const NoPermissionsPage = lazy(
   () =>
     import(
       /* webpackChunkName: "NoPermissionsPage" */ './Pages/NoPermissionsPage/NoPermissionsPage'
-    ),
+    )
 );
 
 interface RouteDefinition {
   path: Paths;
-  element:
-    | React.LazyExoticComponent<() => React.JSX.Element>
-    | (() => React.JSX.Element);
+  element: React.LazyExoticComponent<() => React.JSX.Element> | (() => React.JSX.Element);
 }
 
 const routes: RouteDefinition[] = [
   {
     path: Paths.NoPermissions,
-    element: NoPermissionsPage,
+    element: NoPermissionsPage
   },
   {
     path: Paths.Oops,
-    element: OopsPage,
+    element: OopsPage
   },
   {
     path: Paths.Root,
-    element: () => <Navigate to={`./${Paths.GoldImages}`} />,
+    element: () => <Navigate to={`./${Paths.GoldImages}`} />
   },
   {
     path: Paths.GoldImages,
-    element: GoldImagesPage,
+    element: GoldImagesPage
   },
   {
     path: Paths.CloudAccounts,
-    element: CloudAccountsPage,
+    element: CloudAccountsPage
   },
   /* Catch all unmatched routes */
   {
     path: Paths.MarketplacePurchases,
-    element: MarketPlacePurchasesPage,
+    element: MarketPlacePurchasesPage
   },
   /* Catch all unmatched routes */
   {
     path: Paths.Catch,
-    element: () => <InvalidObject />,
-  },
+    element: () => <InvalidObject />
+  }
 ];
 
 const renderRoutes = (routes: RouteDefinition[] = []) =>

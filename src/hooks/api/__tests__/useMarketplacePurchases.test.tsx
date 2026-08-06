@@ -4,12 +4,11 @@ import { useMarketplacePurchases } from '../useMarketplacePurchases';
 
 const mocks = new RequestMocks();
 
-const marketplacePurchasesUrl =
-  '/api/rhsm/v2/cloud_access_providers/marketplace_purchases';
+const marketplacePurchasesUrl = '/api/rhsm/v2/cloud_access_providers/marketplace_purchases';
 
 const defaultArgs = {
   limit: 10,
-  offset: 0,
+  offset: 0
 };
 
 const defaultMarketplacePurchasesUrl = `${marketplacePurchasesUrl}?limit=10&offset=0&sort_by=startDate&sort_direction=desc`;
@@ -33,21 +32,21 @@ describe('useMarketplacePurchases', () => {
             marketplaceAccount: '123456789',
             marketplace: 'aws_marketplace',
             startDate: '2026-07-13T00:00:00Z',
-            skus: ['RH02612'],
-          },
+            skus: ['RH02612']
+          }
         ],
         pagination: {
           count: 1,
           limit: 10,
           offset: 0,
-          total: 1,
-        },
+          total: 1
+        }
       },
-      true,
+      true
     );
 
     const { result } = renderHook(() => useMarketplacePurchases(defaultArgs), {
-      wrapper: mocks.wrapper,
+      wrapper: mocks.wrapper
     });
 
     await waitFor(() => {
@@ -55,9 +54,7 @@ describe('useMarketplacePurchases', () => {
     });
 
     expect(result.current.data?.body).toHaveLength(1);
-    expect(result.current.data?.body[0].offeringName).toBe(
-      'Red Hat Enterprise Linux',
-    );
+    expect(result.current.data?.body[0].offeringName).toBe('Red Hat Enterprise Linux');
     expect(result.current.data?.pagination.total).toBe(1);
   });
 
@@ -70,14 +67,14 @@ describe('useMarketplacePurchases', () => {
           count: 0,
           limit: 10,
           offset: 0,
-          total: 0,
-        },
+          total: 0
+        }
       },
-      true,
+      true
     );
 
     const { result } = renderHook(() => useMarketplacePurchases(defaultArgs), {
-      wrapper: mocks.wrapper,
+      wrapper: mocks.wrapper
     });
 
     await waitFor(() => {
@@ -91,7 +88,7 @@ describe('useMarketplacePurchases', () => {
   it('exposes pagination metadata returned by the API', async () => {
     const args = {
       limit: 5,
-      offset: 10,
+      offset: 10
     };
 
     mocks.addMock(
@@ -102,14 +99,14 @@ describe('useMarketplacePurchases', () => {
           count: 5,
           limit: 5,
           offset: 10,
-          total: 42,
-        },
+          total: 42
+        }
       },
-      true,
+      true
     );
 
     const { result } = renderHook(() => useMarketplacePurchases(args), {
-      wrapper: mocks.wrapper,
+      wrapper: mocks.wrapper
     });
 
     await waitFor(() => {
@@ -120,7 +117,7 @@ describe('useMarketplacePurchases', () => {
       count: 5,
       limit: 5,
       offset: 10,
-      total: 42,
+      total: 42
     });
   });
 
@@ -130,26 +127,25 @@ describe('useMarketplacePurchases', () => {
       {
         body: [
           {
-            offeringName:
-              'Red Hat OpenShift Streams for Apache Kafka - Testing Purposes Only',
+            offeringName: 'Red Hat OpenShift Streams for Apache Kafka - Testing Purposes Only',
             marketplaceAccount: '665427542893',
             marketplace: 'aws_marketplace',
             startDate: '2025-05-22T18:39:23.826220243Z',
-            skus: ['MW01882'],
-          },
+            skus: ['MW01882']
+          }
         ],
         pagination: {
           count: 1,
           limit: 10,
           offset: 0,
-          total: 1,
-        },
+          total: 1
+        }
       },
-      true,
+      true
     );
 
     const { result } = renderHook(() => useMarketplacePurchases(defaultArgs), {
-      wrapper: mocks.wrapper,
+      wrapper: mocks.wrapper
     });
 
     await waitFor(() => {
@@ -157,12 +153,11 @@ describe('useMarketplacePurchases', () => {
     });
 
     expect(result.current.data?.body[0]).toStrictEqual({
-      offeringName:
-        'Red Hat OpenShift Streams for Apache Kafka - Testing Purposes Only',
+      offeringName: 'Red Hat OpenShift Streams for Apache Kafka - Testing Purposes Only',
       marketplaceAccount: '665427542893',
       marketplace: 'aws_marketplace',
       startDate: '2025-05-22T18:39:23.826220243Z',
-      skus: ['MW01882'],
+      skus: ['MW01882']
     });
   });
 
@@ -170,7 +165,7 @@ describe('useMarketplacePurchases', () => {
     mocks.addMock(defaultMarketplacePurchasesUrl, {}, false);
 
     const { result } = renderHook(() => useMarketplacePurchases(defaultArgs), {
-      wrapper: mocks.wrapper,
+      wrapper: mocks.wrapper
     });
 
     await waitFor(() => {
@@ -179,12 +174,10 @@ describe('useMarketplacePurchases', () => {
   });
 
   it('enters error state on network failure', async () => {
-    jest
-      .spyOn(global, 'fetch')
-      .mockRejectedValueOnce(new Error('Network error'));
+    jest.spyOn(global, 'fetch').mockRejectedValueOnce(new Error('Network error'));
 
     const { result } = renderHook(() => useMarketplacePurchases(defaultArgs), {
-      wrapper: mocks.wrapper,
+      wrapper: mocks.wrapper
     });
 
     await waitFor(() => {
@@ -196,7 +189,7 @@ describe('useMarketplacePurchases', () => {
     mocks.addMock(defaultMarketplacePurchasesUrl, {}, true);
 
     const { result } = renderHook(() => useMarketplacePurchases(defaultArgs), {
-      wrapper: mocks.wrapper,
+      wrapper: mocks.wrapper
     });
 
     expect(result.current.isLoading).toBe(true);

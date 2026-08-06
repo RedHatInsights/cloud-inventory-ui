@@ -13,13 +13,13 @@ import { Paths } from '../../utils/routing';
 import { NoCloudAccounts } from '../../Components/CloudAccounts/NoCloudAccounts';
 import {
   useQueryParamInformedAtom,
-  useQueryParamInformedState,
+  useQueryParamInformedState
 } from '../../hooks/util/useQueryParam';
 import {
   CloudAccountsPaginationData,
   cloudAccountIDFilterData,
   cloudProviderFilterData,
-  goldImageStatusFilterData,
+  goldImageStatusFilterData
 } from '../../state/cloudAccounts';
 import { SortByDirection } from '@patternfly/react-table';
 import { hasPaginationError } from '../../utils/errors';
@@ -30,38 +30,36 @@ import { Relation, useHasRelation } from '../../hooks/util/useHasRelation';
 export const CloudAccountsPage = () => {
   const [pagination, setPagination] = useQueryParamInformedAtom(
     CloudAccountsPaginationData,
-    'pagination',
+    'pagination'
   );
 
   const [sortBy, setSortBy] = useQueryParamInformedState<string | undefined>(
     undefined,
-    'cloudAccountsActiveSortBy',
+    'cloudAccountsActiveSortBy'
   );
-  const [sortDir, setSortDir] = useQueryParamInformedState<
-    SortByDirection | undefined
-  >(undefined, 'cloudAccountsActiveSortDir');
+  const [sortDir, setSortDir] = useQueryParamInformedState<SortByDirection | undefined>(
+    undefined,
+    'cloudAccountsActiveSortDir'
+  );
 
   const { page, perPage } = pagination;
 
-  const [selectedProviders] = useQueryParamInformedAtom(
-    cloudProviderFilterData,
-    'shortName',
-  );
+  const [selectedProviders] = useQueryParamInformedAtom(cloudProviderFilterData, 'shortName');
 
   const [selectedStatuses] = useQueryParamInformedAtom(
     goldImageStatusFilterData,
-    'goldImageAccess',
+    'goldImageAccess'
   );
 
   const [accountIDSearch] = useQueryParamInformedAtom(
     cloudAccountIDFilterData,
-    'providerAccountID',
+    'providerAccountID'
   );
 
   const {
     data: cloudAccountsResponse,
     isError: isCloudAccountsError,
-    isLoading: areCloudAccountsLoading,
+    isLoading: areCloudAccountsLoading
   } = useCloudAccounts({
     limit: perPage,
     offset: (page - 1) * perPage,
@@ -69,7 +67,7 @@ export const CloudAccountsPage = () => {
     sortDirection: sortDir,
     shortName: selectedProviders,
     goldImageAccess: selectedStatuses,
-    providerAccountID: accountIDSearch,
+    providerAccountID: accountIDSearch
   });
 
   const accounts = cloudAccountsResponse?.body ?? [];
@@ -77,7 +75,7 @@ export const CloudAccountsPage = () => {
   const availableProviders: CloudProviderShortname[] = [
     CloudProviderShortname.AWS,
     CloudProviderShortname.GCP,
-    CloudProviderShortname.AZURE,
+    CloudProviderShortname.AZURE
   ];
 
   const availableStatuses = ['Granted', 'Requested', 'Failed'];
@@ -88,23 +86,18 @@ export const CloudAccountsPage = () => {
     if (cloudAccountsResponse?.pagination) {
       setPagination({
         ...pagination,
-        itemCount: cloudAccountsResponse.pagination.total,
+        itemCount: cloudAccountsResponse.pagination.total
       });
     }
   }, [cloudAccountsResponse?.pagination?.total]);
 
-  const { has: canReadCloudAccess, isLoading } = useHasRelation(
-    Relation.CLOUD_ACCESS_VIEW,
-  );
+  const { has: canReadCloudAccess, isLoading } = useHasRelation(Relation.CLOUD_ACCESS_VIEW);
 
   const hasActiveFilters =
-    selectedProviders.length > 0 ||
-    selectedStatuses.length > 0 ||
-    accountIDSearch !== '';
+    selectedProviders.length > 0 || selectedStatuses.length > 0 || accountIDSearch !== '';
 
   const shouldShowNoResults = !hasAccounts && hasActiveFilters;
-  const shouldShowEmptyState =
-    !hasAccounts && !hasActiveFilters && !hasPaginationError(pagination);
+  const shouldShowEmptyState = !hasAccounts && !hasActiveFilters && !hasPaginationError(pagination);
 
   if (isLoading) return <Loading />;
   if (!canReadCloudAccess) return <Navigate to={`../${Paths.NoPermissions}`} />;

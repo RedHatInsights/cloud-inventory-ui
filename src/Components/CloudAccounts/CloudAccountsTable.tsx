@@ -1,13 +1,5 @@
 import React from 'react';
-import {
-  SortByDirection,
-  Table,
-  Tbody,
-  Td,
-  Th,
-  Thead,
-  Tr,
-} from '@patternfly/react-table';
+import { SortByDirection, Table, Tbody, Td, Th, Thead, Tr } from '@patternfly/react-table';
 import { Button, Content } from '@patternfly/react-core';
 import { Link } from 'react-router-dom';
 import { CloudAccountRow } from './types';
@@ -15,13 +7,10 @@ import { CloudAccountStatus, getStatusIcon } from './GetStatusIcon';
 import { formatDate } from '../../hooks/util/dates';
 import {
   generateQueryParamsForData,
-  useQueryParamInformedAtom,
+  useQueryParamInformedAtom
 } from '../../hooks/util/useQueryParam';
 import { shortToFriendly } from '../../hooks/util/cloudProviderMaps';
-import {
-  CloudAccountsPaginationData,
-  CloudAccountsSortField,
-} from '../../state/cloudAccounts';
+import { CloudAccountsPaginationData, CloudAccountsSortField } from '../../state/cloudAccounts';
 import { useApiBasedTableSort } from '../../hooks/util/tables/useTableSort';
 import { hasPaginationError } from '../../utils/errors';
 import { PaginationError } from '../shared/PaginationError';
@@ -53,19 +42,19 @@ export const CloudAccountsTable = ({
   sortBy,
   setSortBy,
   sortDir,
-  setSortDir,
+  setSortDir
 }: CloudAccountProps) => {
   const rows: CloudAccountRow[] = cloudAccounts.map((acct) => ({
     id: acct.providerAccountID,
     provider: shortToFriendly[acct.shortName],
     goldImage: acct.goldImageAccess as CloudAccountStatus,
     date: acct.dateAdded,
-    sourceID: acct.sourceID,
+    sourceID: acct.sourceID
   }));
 
   const [pagination, setPagination] = useQueryParamInformedAtom(
     CloudAccountsPaginationData,
-    'pagination',
+    'pagination'
   );
 
   const displayRows = rows;
@@ -80,14 +69,12 @@ export const CloudAccountsTable = ({
       0: 'providerAccountID',
       1: 'shortName',
       2: 'goldImageAccess',
-      3: 'dateAdded',
-    },
+      3: 'dateAdded'
+    }
   });
 
   if (onInvalidPage) {
-    return (
-      <PaginationError pagination={pagination} setPagination={setPagination} />
-    );
+    return <PaginationError pagination={pagination} setPagination={setPagination} />;
   }
 
   return (
@@ -106,9 +93,7 @@ export const CloudAccountsTable = ({
           <Tr key={row.id}>
             <Td>
               {row.sourceID && (
-                <Link to={`/settings/integrations/detail/${row.sourceID}`}>
-                  {row.id}
-                </Link>
+                <Link to={`/settings/integrations/detail/${row.sourceID}`}>{row.id}</Link>
               )}
               {!row.sourceID && row.id}
             </Td>
@@ -116,10 +101,7 @@ export const CloudAccountsTable = ({
               <Link
                 to={{
                   pathname: '/subscriptions/cloud-inventory/gold-images',
-                  search: generateQueryParamsForData(
-                    [row.provider],
-                    'cloudProvider',
-                  ).toString(),
+                  search: generateQueryParamsForData([row.provider], 'cloudProvider').toString()
                 }}
               >
                 {row.provider}

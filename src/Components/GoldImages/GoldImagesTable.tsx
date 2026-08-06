@@ -1,27 +1,13 @@
 import React, { useEffect } from 'react';
-import {
-  CloudProviderName,
-  GoldImagesResponse,
-} from '../../hooks/api/useGoldImages';
-import {
-  SortByDirection,
-  Table,
-  Tbody,
-  Td,
-  Th,
-  Thead,
-  Tr,
-} from '@patternfly/react-table';
+import { CloudProviderName, GoldImagesResponse } from '../../hooks/api/useGoldImages';
+import { SortByDirection, Table, Tbody, Td, Th, Thead, Tr } from '@patternfly/react-table';
 import { Content } from '@patternfly/react-core';
 import { useTableSort } from '../../hooks/util/tables/useTableSort';
 import { useAtomValue } from 'jotai';
-import {
-  cloudProviderFilterData,
-  goldImagePaginationData,
-} from '../../state/goldImages';
+import { cloudProviderFilterData, goldImagePaginationData } from '../../state/goldImages';
 import {
   generateQueryParamsForData,
-  useQueryParamInformedAtom,
+  useQueryParamInformedAtom
 } from '../../hooks/util/useQueryParam';
 import { hasPaginationError } from '../../utils/errors';
 import { PaginationError } from '../shared/PaginationError';
@@ -36,7 +22,7 @@ interface GoldImagesProps {
 export const GoldImagesTable = ({ goldImages }: GoldImagesProps) => {
   const [pageOptions, setGoldImagePagination] = useQueryParamInformedAtom(
     goldImagePaginationData,
-    'pagination',
+    'pagination'
   );
   const cloudProviderFilter = useAtomValue(cloudProviderFilterData);
 
@@ -46,46 +32,37 @@ export const GoldImagesTable = ({ goldImages }: GoldImagesProps) => {
     cloudProviderFilter.length == 0
       ? Object.values(goldImages)
       : Object.values(goldImages).filter((cloudProvider) =>
-          cloudProviderFilter.includes(cloudProvider.provider),
+          cloudProviderFilter.includes(cloudProvider.provider)
         );
 
-  const { sorted, getSortParams } = useTableSort(
-    filteredGoldImages,
-    'goldImages',
-    {
-      rowTranslator: (hyperscaler) => [hyperscaler.provider],
-      initialSort: {
-        dir: SortByDirection.asc,
-        index: 0,
-      },
-    },
-  );
+  const { sorted, getSortParams } = useTableSort(filteredGoldImages, 'goldImages', {
+    rowTranslator: (hyperscaler) => [hyperscaler.provider],
+    initialSort: {
+      dir: SortByDirection.asc,
+      index: 0
+    }
+  });
 
   const paginatedGoldImage = sorted.slice(
     (pageOptions.page - 1) * pageOptions.perPage,
-    pageOptions.page * pageOptions.perPage,
+    pageOptions.page * pageOptions.perPage
   );
 
   const goldImagesProviderToCloudAccountShortName = {
     [CloudProviderName.AWS]: CloudProviderShortname.AWS,
     [CloudProviderName.GCP]: CloudProviderShortname.GCP,
-    [CloudProviderName.AZURE]: CloudProviderShortname.AZURE,
+    [CloudProviderName.AZURE]: CloudProviderShortname.AZURE
   };
 
   useEffect(() => {
     setGoldImagePagination({
       ...pageOptions,
-      itemCount: filteredGoldImages.length,
+      itemCount: filteredGoldImages.length
     });
   }, [cloudProviderFilter, filteredGoldImages.length]);
 
   if (onInvalidPage) {
-    return (
-      <PaginationError
-        pagination={pageOptions}
-        setPagination={setGoldImagePagination}
-      />
-    );
+    return <PaginationError pagination={pageOptions} setPagination={setGoldImagePagination} />;
   }
 
   return (
@@ -112,12 +89,8 @@ export const GoldImagesTable = ({ goldImages }: GoldImagesProps) => {
               <Td modifier="fitContent">
                 <Link
                   to={`../${Paths.CloudAccounts}?${generateQueryParamsForData(
-                    [
-                      goldImagesProviderToCloudAccountShortName[
-                        hyperscaler.provider
-                      ],
-                    ],
-                    'shortName',
+                    [goldImagesProviderToCloudAccountShortName[hyperscaler.provider]],
+                    'shortName'
                   ).toString()}`}
                 >
                     View cloud accounts

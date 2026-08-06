@@ -19,10 +19,7 @@ const App = () => {
 
   return (
     <Fragment>
-      <AccessCheck.Provider
-        baseUrl={window.location.origin}
-        apiPath="/api/kessel/v1beta2"
-      >
+      <AccessCheck.Provider baseUrl={window.location.origin} apiPath="/api/kessel/v1beta2">
         <QueryClientProvider client={queryClient}>
           <NotificationsProvider />
           <Routing />

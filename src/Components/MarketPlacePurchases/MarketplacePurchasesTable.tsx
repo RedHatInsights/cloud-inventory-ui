@@ -5,7 +5,7 @@ import { MarketplacePurchase } from '../../hooks/api/useMarketplacePurchases';
 import { marketplaceToFriendly } from '../../hooks/util/cloudProviderMaps';
 import {
   generateQueryParamsForData,
-  useQueryParamInformedAtom,
+  useQueryParamInformedAtom
 } from '../../hooks/util/useQueryParam';
 import { MarketplacePurchasesPaginationData } from '../../state/marketplacePurchases';
 import { hasPaginationError } from '../../utils/errors';
@@ -18,19 +18,17 @@ type MarketplacePurchasesTableProps = {
 };
 
 export const MarketplacePurchasesTable = ({
-  marketplacePurchases,
+  marketplacePurchases
 }: MarketplacePurchasesTableProps) => {
   const [pagination, setPagination] = useQueryParamInformedAtom(
     MarketplacePurchasesPaginationData,
-    'pagination',
+    'pagination'
   );
 
   const onInvalidPage = hasPaginationError(pagination);
 
   if (onInvalidPage) {
-    return (
-      <PaginationError pagination={pagination} setPagination={setPagination} />
-    );
+    return <PaginationError pagination={pagination} setPagination={setPagination} />;
   }
 
   return (
@@ -44,11 +42,11 @@ export const MarketplacePurchasesTable = ({
                 'Some providers allow purchases to be shared across multiple provider accounts. The account shown here is the one that paid for the purchase.',
               className: 'repositories-info-tip',
               popoverProps: {
-                headerContent: 'Provider account',
+                headerContent: 'Provider account'
               },
               tooltipProps: {
-                isContentLeftAligned: true,
-              },
+                isContentLeftAligned: true
+              }
             }}
           >
             Marketplace account
@@ -60,11 +58,11 @@ export const MarketplacePurchasesTable = ({
                 'The date shown here reflects the time that Red Hat was informed of the purchase. This date may differ from the date shown by the cloud provider.',
               className: 'date-added-tooltip',
               popoverProps: {
-                headerContent: 'Date Added',
+                headerContent: 'Date Added'
               },
               tooltipProps: {
-                isContentLeftAligned: true,
-              },
+                isContentLeftAligned: true
+              }
             }}
           >
             Date added
@@ -81,15 +79,14 @@ export const MarketplacePurchasesTable = ({
                 <Link
                   to={`../${Paths.CloudAccounts}?${generateQueryParamsForData(
                     [purchase.marketplaceAccount],
-                    'providerAccountID',
+                    'providerAccountID'
                   )}`}
                 >
                    {purchase.marketplaceAccount}
                 </Link>
               </Td>
               <Td dataLabel="Marketplace">
-                {marketplaceToFriendly[purchase.marketplace] ??
-                  purchase.marketplace}
+                {marketplaceToFriendly[purchase.marketplace] ?? purchase.marketplace}
               </Td>
               <Td dataLabel="Date added">{formatDate(purchase.startDate)}</Td>
             </Tr>

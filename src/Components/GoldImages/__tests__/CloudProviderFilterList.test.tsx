@@ -6,11 +6,7 @@ import { CloudProviderFilterList } from '../CloudProviderFilterList';
 import { cloudProviderFilterData } from '../../../state/goldImages';
 import { CloudProviderName } from '../../../hooks/api/useGoldImages';
 
-const CloudProviderFilterListWithState = ({
-  init,
-}: {
-  init: CloudProviderName[];
-}) => (
+const CloudProviderFilterListWithState = ({ init }: { init: CloudProviderName[] }) => (
   <HydrateAtomsTestProvider initialValues={[[cloudProviderFilterData, init]]}>
     <CloudProviderFilterList />
   </HydrateAtomsTestProvider>
@@ -22,9 +18,7 @@ describe('Cloud provider filter list', () => {
   });
 
   it('renderWithRouters when filters are set', () => {
-    renderWithRouter(
-      <CloudProviderFilterListWithState init={[CloudProviderName.AWS]} />,
-    );
+    renderWithRouter(<CloudProviderFilterListWithState init={[CloudProviderName.AWS]} />);
 
     expect(screen.queryByText('Cloud provider')).toBeInTheDocument();
     expect(screen.queryByText('AWS')).toBeInTheDocument();
@@ -32,9 +26,7 @@ describe('Cloud provider filter list', () => {
 
   it('only renderWithRouters selected filters', () => {
     renderWithRouter(
-      <CloudProviderFilterListWithState
-        init={[CloudProviderName.AWS, CloudProviderName.GCP]}
-      />,
+      <CloudProviderFilterListWithState init={[CloudProviderName.AWS, CloudProviderName.GCP]} />
     );
 
     expect(screen.queryByText('AWS')).toBeInTheDocument();
@@ -50,17 +42,13 @@ describe('Cloud provider filter list', () => {
 
   it('removes filter when "x" is clicked', () => {
     const { container } = renderWithRouter(
-      <CloudProviderFilterListWithState
-        init={[CloudProviderName.AWS, CloudProviderName.GCP]}
-      />,
+      <CloudProviderFilterListWithState init={[CloudProviderName.AWS, CloudProviderName.GCP]} />
     );
 
     expect(screen.queryByText('AWS')).toBeInTheDocument();
     expect(screen.queryByText('Google Compute Engine')).toBeInTheDocument();
 
-    const closeButton = container.querySelector(
-      '[aria-label="Close Google Compute Engine"]',
-    );
+    const closeButton = container.querySelector('[aria-label="Close Google Compute Engine"]');
 
     if (!closeButton) {
       throw new Error('Close button not found');
@@ -74,16 +62,14 @@ describe('Cloud provider filter list', () => {
 
   it('clears all filters when "Clear filters" is clicked', () => {
     renderWithRouter(
-      <CloudProviderFilterListWithState
-        init={[CloudProviderName.AWS, CloudProviderName.GCP]}
-      />,
+      <CloudProviderFilterListWithState init={[CloudProviderName.AWS, CloudProviderName.GCP]} />
     );
 
     expect(screen.getByText('AWS')).toBeInTheDocument();
     expect(screen.getByText('Google Compute Engine')).toBeInTheDocument();
 
     const clearAllButton = screen.getByRole('button', {
-      name: /clear filters/i,
+      name: /clear filters/i
     });
 
     fireEvent.click(clearAllButton);
@@ -91,8 +77,6 @@ describe('Cloud provider filter list', () => {
     expect(screen.queryByText('AWS')).not.toBeInTheDocument();
     expect(screen.queryByText('Google Compute Engine')).not.toBeInTheDocument();
 
-    expect(
-      screen.queryByRole('button', { name: /clear filters/i }),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /clear filters/i })).not.toBeInTheDocument();
   });
 });

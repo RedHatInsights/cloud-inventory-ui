@@ -5,14 +5,14 @@ import { MemoryRouter } from 'react-router-dom';
 
 jest.mock('@patternfly/react-icons/dist/esm/icons/cubes-icon', () => ({
   __esModule: true,
-  default: () => <div data-testid="mock-cubes-icon" />,
+  default: () => <div data-testid="mock-cubes-icon" />
 }));
 describe('NoCloudAccounts', () => {
   const renderWithRouter = () =>
     render(
       <MemoryRouter>
         <NoCloudAccounts />
-      </MemoryRouter>,
+      </MemoryRouter>
     );
 
   it('renders the empty state title', () => {
@@ -25,7 +25,7 @@ describe('NoCloudAccounts', () => {
     renderWithRouter();
 
     const button = screen.getByRole('button', {
-      name: /view documentation/i,
+      name: /view documentation/i
     });
 
     expect(button).toBeInTheDocument();
@@ -36,7 +36,7 @@ describe('NoCloudAccounts', () => {
     renderWithRouter();
 
     const link = screen.getByRole('link', {
-      name: /integrations/i,
+      name: /integrations/i
     });
 
     expect(link).toBeInTheDocument();

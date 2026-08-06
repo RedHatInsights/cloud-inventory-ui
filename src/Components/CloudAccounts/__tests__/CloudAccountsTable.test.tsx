@@ -5,31 +5,24 @@ import { CloudAccountsPaginationData } from '../../../state/cloudAccounts';
 import { HydrateAtomsTestProvider } from '../../util/testing/HydrateAtomsTestProvider';
 import { renderWithRouter } from '../../../utils/testing/customRender';
 import { SortByDirection } from '@patternfly/react-table';
-import {
-  CloudAccount,
-  CloudProviderShortname,
-} from '../../../types/cloudAccountsTypes';
+import { CloudAccount, CloudProviderShortname } from '../../../types/cloudAccountsTypes';
 
 jest.mock('../../../Components/CloudAccounts/GetStatusIcon', () => ({
-  getStatusIcon: () => <span data-testid="status-icon" />,
+  getStatusIcon: () => <span data-testid="status-icon" />
 }));
 
 jest.mock('../../../hooks/util/dates', () => ({
-  formatDate: (d: string) => `Formatted:${d}`,
+  formatDate: (d: string) => `Formatted:${d}`
 }));
 
-const makeAccounts = (
-  count: number,
-  hasSourceId: boolean = true,
-): CloudAccount[] =>
+const makeAccounts = (count: number, hasSourceId: boolean = true): CloudAccount[] =>
   Array.from({ length: count }).map((_, i) => ({
     providerAccountID: `acct-${i}`,
-    shortName:
-      i % 2 === 0 ? CloudProviderShortname.AWS : CloudProviderShortname.GCP,
+    shortName: i % 2 === 0 ? CloudProviderShortname.AWS : CloudProviderShortname.GCP,
     providerLabel: i % 2 === 0 ? 'AWS' : 'Google Cloud',
     goldImageAccess: i % 2 === 0 ? 'Granted' : 'Failed',
     dateAdded: `2024-01-${String(i + 1).padStart(2, '0')}`,
-    sourceID: hasSourceId ? 'source-id' : undefined,
+    sourceID: hasSourceId ? 'source-id' : undefined
   }));
 
 const TestTableComponent = ({ accounts }: { accounts: CloudAccount[] }) => {
@@ -55,17 +48,14 @@ const TestTableComponent = ({ accounts }: { accounts: CloudAccount[] }) => {
           }
 
           return sortDir == SortByDirection.asc ? result : result * -1;
-        }),
+        })
       );
   }, [sortBy, sortDir]);
 
   return (
     <HydrateAtomsTestProvider
       initialValues={[
-        [
-          CloudAccountsPaginationData,
-          { page: 1, perPage: 10, itemCount: accounts.length },
-        ],
+        [CloudAccountsPaginationData, { page: 1, perPage: 10, itemCount: accounts.length }]
       ]}
     >
       <CloudAccountsTable
@@ -85,9 +75,7 @@ const renderTable = (accounts: CloudAccount[]) =>
 describe('CloudAccountsTable', () => {
   it('renders the table', () => {
     renderTable(makeAccounts(3));
-    expect(
-      screen.getByRole('grid', { name: /cloud accounts table/i }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('grid', { name: /cloud accounts table/i })).toBeInTheDocument();
   });
 
   it('renders provider link with cloudProvider query param', () => {
@@ -113,7 +101,7 @@ describe('CloudAccountsTable', () => {
     renderTable(makeAccounts(1));
     expect(screen.getByText('acct-0')).toBeInTheDocument();
     expect(screen.getByText('acct-0').closest('a')?.href).toContain(
-      '/settings/integrations/detail/source-id',
+      '/settings/integrations/detail/source-id'
     );
   });
 
@@ -130,21 +118,14 @@ describe('CloudAccountsTable', () => {
 
   it('does not render pagination error when on valid page', () => {
     renderTable(makeAccounts(25));
-    expect(
-      screen.queryByText(/No results for current page/i),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByText(/No results for current page/i)).not.toBeInTheDocument();
   });
 
   it('renders pagination error when page exceeds item count', () => {
     const accounts = makeAccounts(5);
     renderWithRouter(
       <HydrateAtomsTestProvider
-        initialValues={[
-          [
-            CloudAccountsPaginationData,
-            { page: 10, perPage: 10, itemCount: 5 },
-          ],
-        ]}
+        initialValues={[[CloudAccountsPaginationData, { page: 10, perPage: 10, itemCount: 5 }]]}
       >
         <CloudAccountsTable
           cloudAccounts={accounts}
@@ -153,27 +134,18 @@ describe('CloudAccountsTable', () => {
           sortDir={SortByDirection.asc}
           setSortDir={() => {}}
         />
-      </HydrateAtomsTestProvider>,
+      </HydrateAtomsTestProvider>
     );
 
-    expect(
-      screen.getByText(/No results for current page/i),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole('button', { name: /return to page 1/i }),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/No results for current page/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /return to page 1/i })).toBeInTheDocument();
   });
 
   it('does not render table content when pagination error is shown', () => {
     const accounts = makeAccounts(5);
     renderWithRouter(
       <HydrateAtomsTestProvider
-        initialValues={[
-          [
-            CloudAccountsPaginationData,
-            { page: 10, perPage: 10, itemCount: 5 },
-          ],
-        ]}
+        initialValues={[[CloudAccountsPaginationData, { page: 10, perPage: 10, itemCount: 5 }]]}
       >
         <CloudAccountsTable
           cloudAccounts={accounts}
@@ -182,7 +154,7 @@ describe('CloudAccountsTable', () => {
           sortDir={SortByDirection.asc}
           setSortDir={() => {}}
         />
-      </HydrateAtomsTestProvider>,
+      </HydrateAtomsTestProvider>
     );
 
     expect(screen.queryByText('Cloud account')).not.toBeInTheDocument();
@@ -194,12 +166,7 @@ describe('CloudAccountsTable', () => {
 
     renderWithRouter(
       <HydrateAtomsTestProvider
-        initialValues={[
-          [
-            CloudAccountsPaginationData,
-            { page: 10, perPage: 10, itemCount: 5 },
-          ],
-        ]}
+        initialValues={[[CloudAccountsPaginationData, { page: 10, perPage: 10, itemCount: 5 }]]}
       >
         <CloudAccountsTable
           cloudAccounts={accounts}
@@ -208,22 +175,16 @@ describe('CloudAccountsTable', () => {
           sortDir={SortByDirection.asc}
           setSortDir={() => {}}
         />
-      </HydrateAtomsTestProvider>,
+      </HydrateAtomsTestProvider>
     );
 
-    expect(
-      screen.getByText(/No results for current page/i),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/No results for current page/i)).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: /return to page 1/i }));
 
-    expect(
-      screen.queryByText(/No results for current page/i),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByText(/No results for current page/i)).not.toBeInTheDocument();
 
-    await waitFor(() =>
-      expect(screen.getAllByText(accounts[0].shortName)[0]).toBeInTheDocument(),
-    );
+    await waitFor(() => expect(screen.getAllByText(accounts[0].shortName)[0]).toBeInTheDocument());
   });
 
   describe('mapField', () => {
@@ -248,81 +209,53 @@ describe('CloudAccountsTable', () => {
     it('by cloud account id', () => {
       const { container } = renderTable(makeAccounts(3));
       fireEvent.click(screen.getByRole('button', { name: /cloud account/i }));
-      expect(
-        String(
-          container.querySelector('tbody')?.firstChild?.childNodes[0]
-            .textContent,
-        ),
-      ).toBe('acct-0');
+      expect(String(container.querySelector('tbody')?.firstChild?.childNodes[0].textContent)).toBe(
+        'acct-0'
+      );
 
       fireEvent.click(screen.getByRole('button', { name: /cloud account/i }));
-      expect(
-        String(
-          container.querySelector('tbody')?.firstChild?.childNodes[0]
-            .textContent,
-        ),
-      ).toBe('acct-2');
+      expect(String(container.querySelector('tbody')?.firstChild?.childNodes[0].textContent)).toBe(
+        'acct-2'
+      );
     });
 
     it('by cloud provider', () => {
       const { container } = renderTable(makeAccounts(3));
       fireEvent.click(screen.getByRole('button', { name: /cloud provider/i }));
-      expect(
-        String(
-          container.querySelector('tbody')?.firstChild?.childNodes[1]
-            .textContent,
-        ),
-      ).toBe('AWS');
+      expect(String(container.querySelector('tbody')?.firstChild?.childNodes[1].textContent)).toBe(
+        'AWS'
+      );
 
       fireEvent.click(screen.getByRole('button', { name: /cloud provider/i }));
-      expect(
-        String(
-          container.querySelector('tbody')?.firstChild?.childNodes[1]
-            .textContent,
-        ),
-      ).toBe('Google Compute Engine');
+      expect(String(container.querySelector('tbody')?.firstChild?.childNodes[1].textContent)).toBe(
+        'Google Compute Engine'
+      );
     });
 
     it('by gold image', () => {
       const { container } = renderTable(makeAccounts(3));
-      fireEvent.click(
-        screen.getByRole('button', { name: /gold image access/i }),
+      fireEvent.click(screen.getByRole('button', { name: /gold image access/i }));
+      expect(String(container.querySelector('tbody')?.firstChild?.childNodes[2].textContent)).toBe(
+        'Failed'
       );
-      expect(
-        String(
-          container.querySelector('tbody')?.firstChild?.childNodes[2]
-            .textContent,
-        ),
-      ).toBe('Failed');
 
-      fireEvent.click(
-        screen.getByRole('button', { name: /gold image access/i }),
+      fireEvent.click(screen.getByRole('button', { name: /gold image access/i }));
+      expect(String(container.querySelector('tbody')?.firstChild?.childNodes[2].textContent)).toBe(
+        'Granted'
       );
-      expect(
-        String(
-          container.querySelector('tbody')?.firstChild?.childNodes[2]
-            .textContent,
-        ),
-      ).toBe('Granted');
     });
 
     it('by date added', () => {
       const { container } = renderTable(makeAccounts(3));
       fireEvent.click(screen.getByRole('button', { name: /date added/i }));
-      expect(
-        String(
-          container.querySelector('tbody')?.firstChild?.childNodes[3]
-            .textContent,
-        ),
-      ).toBe('Formatted:2024-01-01');
+      expect(String(container.querySelector('tbody')?.firstChild?.childNodes[3].textContent)).toBe(
+        'Formatted:2024-01-01'
+      );
 
       fireEvent.click(screen.getByRole('button', { name: /date added/i }));
-      expect(
-        String(
-          container.querySelector('tbody')?.firstChild?.childNodes[3]
-            .textContent,
-        ),
-      ).toBe('Formatted:2024-01-03');
+      expect(String(container.querySelector('tbody')?.firstChild?.childNodes[3].textContent)).toBe(
+        'Formatted:2024-01-03'
+      );
     });
   });
 });
