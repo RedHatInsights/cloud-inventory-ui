@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Button, Content, PageSection, Popover } from '@patternfly/react-core';
 import { HelpIcon } from '@patternfly/react-icons';
 import { PageHeader } from '@redhat-cloud-services/frontend-components/PageHeader';
@@ -6,24 +6,54 @@ import { Section } from '@redhat-cloud-services/frontend-components/Section';
 import { Unavailable } from '@redhat-cloud-services/frontend-components/Unavailable';
 import { Navigate } from 'react-router-dom';
 import { Loading } from '../../Components/util/Loading';
-import { useMarketplacePurchases } from '../../hooks/api/useMarketplacePurchases';
-import { Relation, useHasRelation } from '../../hooks/util/useHasRelation';
-import { Paths } from '../../utils/routing';
 import { MarketplacePurchasesTable } from '../../Components/MarketPlacePurchases/MarketplacePurchasesTable';
 import { NoMarketplacePurchases } from '../../Components/MarketPlacePurchases/NoMarketplacePurchases';
+import { useMarketplacePurchases } from '../../hooks/api/useMarketplacePurchases';
+import { Relation, useHasRelation } from '../../hooks/util/useHasRelation';
+import { useQueryParamInformedAtom } from '../../hooks/util/useQueryParam';
+import { hasPaginationError } from '../../utils/errors';
+import { Paths } from '../../utils/routing';
+import { MarketplacePurchasesPaginationData } from '../../state/marketplacePurchases';
+import { MarketplacePurchasesPagination } from '../../Components/MarketPlacePurchases/MarketplacePurchasesPagination';
+import { MarketplacePurchasesToolbar } from '../../Components/MarketPlacePurchases/MarketplacePurchasesToolbar';
 
 const MarketplacePurchasesPage = () => {
-  const {
-    data,
-    isError: isMarketplacePurchasesError,
-    isLoading: isMarketplacePurchasesLoading,
-  } = useMarketplacePurchases();
+  const [pagination, setPagination] = useQueryParamInformedAtom(
+    MarketplacePurchasesPaginationData,
+    'pagination',
+  );
 
+  const { page, perPage } = pagination;
   const { has: canReadCloudAccess, isLoading: isPermissionsLoading } =
     useHasRelation(Relation.CLOUD_ACCESS_VIEW);
+  const canFetchMarketplacePurchases =
+    !isPermissionsLoading && canReadCloudAccess;
 
-  const marketplacePurchases = data?.body ?? [];
+  const {
+    data: marketplacePurchasesResponse,
+    isError: isMarketplacePurchasesError,
+    isLoading: isMarketplacePurchasesLoading,
+  } = useMarketplacePurchases(
+    {
+      limit: perPage,
+      offset: (page - 1) * perPage,
+    },
+    canFetchMarketplacePurchases,
+  );
+  const marketplacePurchases = marketplacePurchasesResponse?.body ?? [];
   const hasMarketplacePurchases = marketplacePurchases.length > 0;
+
+  useEffect(() => {
+    if (marketplacePurchasesResponse?.pagination) {
+      setPagination({
+        ...pagination,
+        itemCount: marketplacePurchasesResponse.pagination.total,
+      });
+    }
+  }, [marketplacePurchasesResponse?.pagination?.total]);
+
+  const shouldShowEmptyState =
+    !hasMarketplacePurchases && !hasPaginationError(pagination);
 
   if (isPermissionsLoading) {
     return <Loading />;
@@ -43,6 +73,7 @@ const MarketplacePurchasesPage = () => {
 
   return (
     <>
+            
       <PageHeader>
         <Content component="h1">
           Marketplace Purchases           
@@ -61,12 +92,17 @@ const MarketplacePurchasesPage = () => {
       </PageHeader>
       <Section>
         <PageSection>
-          {hasMarketplacePurchases ? (
-            <MarketplacePurchasesTable
-              marketplacePurchases={marketplacePurchases}
-            />
-          ) : (
+          {shouldShowEmptyState ? (
             <NoMarketplacePurchases />
+          ) : (
+            <>
+              <MarketplacePurchasesToolbar />
+              <MarketplacePurchasesTable
+                marketplacePurchases={marketplacePurchases}
+              />
+              <br />
+              <MarketplacePurchasesPagination />
+            </>
           )}
         </PageSection>
       </Section>

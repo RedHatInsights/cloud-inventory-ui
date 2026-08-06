@@ -1,8 +1,10 @@
 import React from 'react';
-import { screen } from '@testing-library/react';
+import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { renderWithRouter } from '../../../utils/testing/customRender';
 import { MarketplacePurchasesTable } from '../MarketplacePurchasesTable';
 import { MarketplacePurchase } from '../../../hooks/api/useMarketplacePurchases';
+import { HydrateAtomsTestProvider } from '../../../Components/util/testing/HydrateAtomsTestProvider';
+import { MarketplacePurchasesPaginationData } from '../../../state/marketplacePurchases';
 import { Paths } from '../../../utils/routing';
 
 const makeMarketplacePurchases = (count: number): MarketplacePurchase[] =>
@@ -14,9 +16,24 @@ const makeMarketplacePurchases = (count: number): MarketplacePurchase[] =>
     skus: [`SKU-${index}`],
   }));
 
-const renderTable = (purchases: MarketplacePurchase[]) =>
+const defaultPagination = {
+  page: 1,
+  perPage: 10,
+  itemCount: 10,
+};
+
+const renderTable = (
+  purchases: MarketplacePurchase[],
+  pagination = defaultPagination,
+) =>
   renderWithRouter(
-    <MarketplacePurchasesTable marketplacePurchases={purchases} />,
+    <HydrateAtomsTestProvider
+      initialValues={[[MarketplacePurchasesPaginationData, pagination]]}
+    >
+            
+      <MarketplacePurchasesTable marketplacePurchases={purchases} />
+          
+    </HydrateAtomsTestProvider>,
   );
 
 describe('MarketplacePurchasesTable', () => {
@@ -55,6 +72,86 @@ describe('MarketplacePurchasesTable', () => {
     expect(screen.getByText('2026-01-02')).toBeInTheDocument();
   });
 
+  it('does not render pagination error when on valid page', () => {
+    renderTable(makeMarketplacePurchases(25), {
+      page: 1,
+      perPage: 10,
+      itemCount: 25,
+    });
+
+    expect(
+      screen.queryByText(/No results for current page/i),
+    ).not.toBeInTheDocument();
+  });
+
+  it('renders pagination error when page exceeds item count', () => {
+    const purchases = makeMarketplacePurchases(5);
+
+    renderTable(purchases, {
+      page: 10,
+      perPage: 10,
+      itemCount: 5,
+    });
+
+    expect(
+      screen.getByText(/No results for current page/i),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('button', {
+        name: /return to page 1/i,
+      }),
+    ).toBeInTheDocument();
+  });
+
+  it('does not render table content when pagination error is shown', () => {
+    const purchases = makeMarketplacePurchases(5);
+
+    renderTable(purchases, {
+      page: 10,
+      perPage: 10,
+      itemCount: 5,
+    });
+
+    expect(screen.queryByText('Offering name')).not.toBeInTheDocument();
+
+    expect(screen.queryByText('Marketplace account')).not.toBeInTheDocument();
+
+    expect(
+      screen.queryByRole('grid', {
+        name: /marketplace purchases table/i,
+      }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('clears pagination error and returns to first page when clicking "Return to page 1"', async () => {
+    const purchases = makeMarketplacePurchases(5);
+
+    renderTable(purchases, {
+      page: 10,
+      perPage: 10,
+      itemCount: 5,
+    });
+
+    expect(
+      screen.getByText(/No results for current page/i),
+    ).toBeInTheDocument();
+
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: /return to page 1/i,
+      }),
+    );
+
+    expect(
+      screen.queryByText(/No results for current page/i),
+    ).not.toBeInTheDocument();
+
+    await waitFor(() =>
+      expect(screen.getByText(purchases[0].offeringName)).toBeInTheDocument(),
+    );
+  });
+
   describe('cloud account link', () => {
     it('renders the link', () => {
       const marketplacePurchases = makeMarketplacePurchases(2);
@@ -66,6 +163,7 @@ describe('MarketplacePurchasesTable', () => {
           .getAttribute('href'),
       ).not.toBeNull();
     });
+
     it('renders the link with expected query params', () => {
       const marketplacePurchases = makeMarketplacePurchases(2);
       renderTable(marketplacePurchases);
