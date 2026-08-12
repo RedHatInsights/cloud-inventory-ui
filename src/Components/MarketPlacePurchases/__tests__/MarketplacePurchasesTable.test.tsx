@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { renderWithRouter } from '../../../utils/testing/customRender';
 import { MarketplacePurchasesTable } from '../MarketplacePurchasesTable';
@@ -6,6 +6,7 @@ import { MarketplacePurchase } from '../../../hooks/api/useMarketplacePurchases'
 import { HydrateAtomsTestProvider } from '../../../Components/util/testing/HydrateAtomsTestProvider';
 import { MarketplacePurchasesPaginationData } from '../../../state/marketplacePurchases';
 import { Paths } from '../../../utils/routing';
+import { SortByDirection } from '@patternfly/react-table';
 
 const makeMarketplacePurchases = (count: number): MarketplacePurchase[] =>
   Array.from({ length: count }).map((_, index) => ({
@@ -22,14 +23,30 @@ const defaultPagination = {
   itemCount: 10
 };
 
-const renderTable = (purchases: MarketplacePurchase[], pagination = defaultPagination) =>
-  renderWithRouter(
-    <HydrateAtomsTestProvider initialValues={[[MarketplacePurchasesPaginationData, pagination]]}>
-            
-      <MarketplacePurchasesTable marketplacePurchases={purchases} />
-          
-    </HydrateAtomsTestProvider>
-  );
+const renderTable = (
+  purchases: MarketplacePurchase[],
+  pagination = defaultPagination,
+  withSortState = false
+) => {
+  const TableWithState = () => {
+    const [sortBy, setSortBy] = useState<string | undefined>(undefined);
+    const [sortDir, setSortDir] = useState<SortByDirection | undefined>(undefined);
+
+    return (
+      <HydrateAtomsTestProvider initialValues={[[MarketplacePurchasesPaginationData, pagination]]}>
+        <MarketplacePurchasesTable
+          marketplacePurchases={purchases}
+          sortBy={withSortState ? sortBy : undefined}
+          sortDir={withSortState ? sortDir : undefined}
+          setSortBy={withSortState ? setSortBy : jest.fn()}
+          setSortDir={withSortState ? setSortDir : jest.fn()}
+        />
+      </HydrateAtomsTestProvider>
+    );
+  };
+
+  return renderWithRouter(<TableWithState />);
+};
 
 describe('MarketplacePurchasesTable', () => {
   it('renders the marketplace purchases table', () => {
@@ -157,5 +174,79 @@ describe('MarketplacePurchasesTable', () => {
         `/${Paths.CloudAccounts}?providerAccountID=${encodeURI(`["${marketplacePurchases[0].marketplaceAccount}"]`)}`
       );
     });
+  });
+
+  it('allows a user to sort marketplace purchases by offering name', () => {
+    renderTable(makeMarketplacePurchases(3), defaultPagination, true);
+
+    const offeringNameHeader = screen.getByRole('columnheader', {
+      name: /offering name/i
+    });
+
+    expect(offeringNameHeader).not.toHaveAttribute('aria-sort', 'ascending');
+
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: /offering name/i
+      })
+    );
+
+    expect(offeringNameHeader).toHaveAttribute('aria-sort', 'ascending');
+  });
+
+  it('allows a user to sort by each marketplace purchase column', () => {
+    renderTable(makeMarketplacePurchases(3), defaultPagination, true);
+
+    expect(
+      screen.getByRole('button', {
+        name: /offering name/i
+      })
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('button', {
+        name: /marketplace account/i
+      })
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('button', {
+        name: /^marketplace$/i
+      })
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('button', {
+        name: /date added/i
+      })
+    ).toBeInTheDocument();
+  });
+
+  it('allows a user to sort by each marketplace purchase column', () => {
+    renderTable(makeMarketplacePurchases(3));
+
+    expect(
+      screen.getByRole('button', {
+        name: /offering name/i
+      })
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('button', {
+        name: /marketplace account/i
+      })
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('button', {
+        name: /^marketplace$/i
+      })
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('button', {
+        name: /date added/i
+      })
+    ).toBeInTheDocument();
   });
 });

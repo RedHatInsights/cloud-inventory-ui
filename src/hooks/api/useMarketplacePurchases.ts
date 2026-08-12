@@ -22,19 +22,50 @@ export type MarketplacePurchasesResponse = {
 export type FetchMarketplacePurchasesArgs = {
   limit: number;
   offset: number;
+  sortField?: string;
+  sortDirection?: string;
+  offeringName?: string;
+  marketplaceAccount?: string;
+  marketplace?: string;
 };
+
+export type MarketplacePurchaseSortField =
+  | 'offeringName'
+  | 'marketplaceAccount'
+  | 'marketplace'
+  | 'startDate';
+
+export type SortDirection = 'asc' | 'desc';
 
 const fetchMarketplacePurchases = async ({
   limit,
-  offset
+  offset,
+  sortField,
+  sortDirection,
+  offeringName,
+  marketplaceAccount,
+  marketplace
 }: FetchMarketplacePurchasesArgs): Promise<MarketplacePurchasesResponse> => {
   const params = new URLSearchParams({
     limit: String(limit),
     offset: String(offset)
   });
 
-  params.set('sort_by', 'startDate');
-  params.set('sort_direction', 'desc');
+  if (sortField && sortDirection) {
+    params.set('sort_by', sortField);
+    params.set('sort_direction', sortDirection);
+  }
+  if (offeringName) {
+    params.set('offeringName', offeringName);
+  }
+
+  if (marketplaceAccount) {
+    params.set('marketplaceAccount', marketplaceAccount);
+  }
+
+  if (marketplace) {
+    params.set('marketplace', marketplace);
+  }
 
   const response = await fetch(
     `/api/rhsm/v2/cloud_access_providers/marketplace_purchases?${params.toString()}`

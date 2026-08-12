@@ -6,3 +6,13 @@ export const MarketplacePurchasesPaginationData = atom<PaginationData>({
   perPage: 10,
   itemCount: 0
 });
+
+export const MarketplacePurchasesFilterCategoryData = atom<
+  'OfferingName' | 'MarketplaceAccount' | 'Marketplace'
+>('OfferingName');
+
+export const MarketplaceOfferingNameFilterData = atom<string>('');
+
+export const MarketplaceAccountFilterData = atom<string>('');
+
+export const MarketplaceFilterData = atom<string>('');

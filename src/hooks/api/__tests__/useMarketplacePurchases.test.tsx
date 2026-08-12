@@ -11,7 +11,7 @@ const defaultArgs = {
   offset: 0
 };
 
-const defaultMarketplacePurchasesUrl = `${marketplacePurchasesUrl}?limit=10&offset=0&sort_by=startDate&sort_direction=desc`;
+const defaultMarketplacePurchasesUrl = `${marketplacePurchasesUrl}?limit=10&offset=0`;
 
 describe('useMarketplacePurchases', () => {
   beforeEach(() => {
@@ -92,7 +92,7 @@ describe('useMarketplacePurchases', () => {
     };
 
     mocks.addMock(
-      `${marketplacePurchasesUrl}?limit=5&offset=10&sort_by=startDate&sort_direction=desc`,
+      `${marketplacePurchasesUrl}?limit=5&offset=10`,
       {
         body: [],
         pagination: {
@@ -193,5 +193,134 @@ describe('useMarketplacePurchases', () => {
     });
 
     expect(result.current.isLoading).toBe(true);
+  });
+
+  it('fetches marketplace purchases with sorting', async () => {
+    const args = {
+      limit: 10,
+      offset: 0,
+      sortField: 'offeringName' as const,
+      sortDirection: 'asc' as const
+    };
+
+    mocks.addMock(
+      `${marketplacePurchasesUrl}?limit=10&offset=0&sort_by=offeringName&sort_direction=asc`,
+      {
+        body: [
+          {
+            offeringName: 'Red Hat Enterprise Linux',
+            marketplaceAccount: '123456789',
+            marketplace: 'aws_marketplace',
+            startDate: '2026-07-13T00:00:00Z',
+            skus: ['RH02612']
+          }
+        ],
+        pagination: {
+          count: 1,
+          limit: 10,
+          offset: 0,
+          total: 1
+        }
+      },
+      true
+    );
+
+    const { result } = renderHook(() => useMarketplacePurchases(args), {
+      wrapper: mocks.wrapper
+    });
+
+    await waitFor(() => {
+      expect(result.current.isSuccess).toBe(true);
+    });
+
+    expect(result.current.data?.body[0].offeringName).toBe('Red Hat Enterprise Linux');
+  });
+
+  it('fetches marketplace purchases filtered by offering name', async () => {
+    const args = {
+      limit: 10,
+      offset: 0,
+      offeringName: 'OpenShift'
+    };
+
+    mocks.addMock(
+      `${marketplacePurchasesUrl}?limit=10&offset=0&offeringName=OpenShift`,
+      {
+        body: [
+          {
+            offeringName: 'Red Hat OpenShift',
+            marketplaceAccount: '123456789',
+            marketplace: 'aws_marketplace',
+            startDate: '2026-07-13T00:00:00Z',
+            skus: ['RH02612']
+          }
+        ],
+        pagination: {
+          count: 1,
+          limit: 10,
+          offset: 0,
+          total: 1
+        }
+      },
+      true
+    );
+
+    const { result } = renderHook(() => useMarketplacePurchases(args), {
+      wrapper: mocks.wrapper
+    });
+
+    await waitFor(() => {
+      expect(result.current.isSuccess).toBe(true);
+    });
+
+    expect(result.current.data?.body).toHaveLength(1);
+    expect(result.current.data?.body[0].offeringName).toContain('OpenShift');
+  });
+
+  it('fetches marketplace purchases using multiple filters', async () => {
+    const args = {
+      limit: 10,
+      offset: 0,
+      offeringName: 'OpenShift',
+      marketplaceAccount: '123456789',
+      marketplace: 'aws_marketplace'
+    };
+
+    mocks.addMock(
+      `${marketplacePurchasesUrl}?limit=10&offset=0&offeringName=OpenShift&marketplaceAccount=123456789&marketplace=aws_marketplace`,
+      {
+        body: [
+          {
+            offeringName: 'Red Hat OpenShift',
+            marketplaceAccount: '123456789',
+            marketplace: 'aws_marketplace',
+            startDate: '2026-07-13T00:00:00Z',
+            skus: ['RH02612']
+          }
+        ],
+        pagination: {
+          count: 1,
+          limit: 10,
+          offset: 0,
+          total: 1
+        }
+      },
+      true
+    );
+
+    const { result } = renderHook(() => useMarketplacePurchases(args), {
+      wrapper: mocks.wrapper
+    });
+
+    await waitFor(() => {
+      expect(result.current.isSuccess).toBe(true);
+    });
+
+    expect(result.current.data?.body).toHaveLength(1);
+    expect(result.current.data?.body[0]).toMatchObject({
+      offeringName: 'Red Hat OpenShift',
+      marketplaceAccount: '123456789',
+      marketplace: 'aws_marketplace'
+    });
   });
 });

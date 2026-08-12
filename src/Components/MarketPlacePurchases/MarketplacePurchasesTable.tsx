@@ -1,5 +1,5 @@
 import React from 'react';
-import { Table, Tbody, Td, Th, Thead, Tr } from '@patternfly/react-table';
+import { SortByDirection, Table, Tbody, Td, Th, Thead, Tr } from '@patternfly/react-table';
 import { formatDate } from '../../hooks/util/dates';
 import { MarketplacePurchase } from '../../hooks/api/useMarketplacePurchases';
 import { marketplaceToFriendly } from '../../hooks/util/cloudProviderMaps';
@@ -12,18 +12,40 @@ import { hasPaginationError } from '../../utils/errors';
 import { PaginationError } from '../shared/PaginationError';
 import { Link } from 'react-router-dom';
 import { Paths } from '../../utils/routing';
+import { useApiBasedTableSort } from '../../hooks/util/tables/useTableSort';
 
 type MarketplacePurchasesTableProps = {
   marketplacePurchases: MarketplacePurchase[];
+  sortBy?: string;
+  sortDir?: SortByDirection;
+  setSortBy: (value: string | undefined) => void;
+  setSortDir: (value: SortByDirection | undefined) => void;
 };
 
 export const MarketplacePurchasesTable = ({
-  marketplacePurchases
+  marketplacePurchases,
+  sortBy,
+  sortDir,
+  setSortBy,
+  setSortDir
 }: MarketplacePurchasesTableProps) => {
   const [pagination, setPagination] = useQueryParamInformedAtom(
     MarketplacePurchasesPaginationData,
     'pagination'
   );
+
+  const { getSortParams } = useApiBasedTableSort('marketplacePurchasesSort', {
+    sortBy,
+    setSortBy,
+    sortDir,
+    setSortDir,
+    lookup: {
+      0: 'offeringName',
+      1: 'marketplaceAccount',
+      2: 'marketplace',
+      3: 'startDate'
+    }
+  });
 
   const onInvalidPage = hasPaginationError(pagination);
 
@@ -35,8 +57,9 @@ export const MarketplacePurchasesTable = ({
     <Table aria-label="Marketplace purchases table" variant="compact">
       <Thead>
         <Tr>
-          <Th>Offering name</Th>
+          <Th sort={getSortParams(0)}>Offering name</Th>
           <Th
+            sort={getSortParams(1)}
             info={{
               tooltip:
                 'Some providers allow purchases to be shared across multiple provider accounts. The account shown here is the one that paid for the purchase.',
@@ -51,8 +74,9 @@ export const MarketplacePurchasesTable = ({
           >
             Marketplace account
           </Th>
-          <Th>Marketplace</Th>
+          <Th sort={getSortParams(2)}>Marketplace</Th>
           <Th
+            sort={getSortParams(3)}
             info={{
               tooltip:
                 'The date shown here reflects the time that Red Hat was informed of the purchase. This date may differ from the date shown by the cloud provider.',

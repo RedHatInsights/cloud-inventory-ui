@@ -5,7 +5,13 @@ import { renderWithRouter } from '../../../utils/testing/customRender';
 import { ManipulatableQueryWrapper } from '../../../Components/util/testing/ManipulatableQueryWrapper';
 import { HydrateAtomsTestProvider } from '../../../Components/util/testing/HydrateAtomsTestProvider';
 import { useHasRelation } from '../../../hooks/util/useHasRelation';
-import { MarketplacePurchasesPaginationData } from '../../../state/marketplacePurchases';
+import {
+  MarketplaceAccountFilterData,
+  MarketplaceFilterData,
+  MarketplaceOfferingNameFilterData,
+  MarketplacePurchasesPaginationData
+} from '../../../state/marketplacePurchases';
+
 jest.mock('../../../hooks/util/useHasRelation', () => ({
   Relation: {
     CLOUD_ACCESS_VIEW: 'cloud_access_view'
@@ -20,7 +26,18 @@ const defaultPagination = {
   itemCount: 0
 };
 
-const marketplacePurchasesQueryKey = ['marketplacePurchases', { limit: 10, offset: 0 }];
+const marketplacePurchasesQueryKey = [
+  'marketplacePurchases',
+  {
+    limit: 10,
+    offset: 0,
+    sortField: undefined,
+    SortByDirection: undefined,
+    offeringName: '',
+    marketplaceAccount: '',
+    marketplace: ''
+  }
+];
 const mockMarketplacePurchasesResponse = {
   pagination: {
     offset: 0,
@@ -48,7 +65,32 @@ const mockMarketplacePurchasesResponse = {
 
 const TestPage = () => (
   <HydrateAtomsTestProvider
-    initialValues={[[MarketplacePurchasesPaginationData, defaultPagination]]}
+    initialValues={[
+      [MarketplacePurchasesPaginationData, defaultPagination],
+      [MarketplaceOfferingNameFilterData, ''],
+      [MarketplaceOfferingNameFilterData, ''],
+      [MarketplaceFilterData, '']
+    ]}
+  >
+    <MarketplacePurchasesPage />
+  </HydrateAtomsTestProvider>
+);
+const FilteredTestPage = ({
+  offeringName = '',
+  marketplaceAccount = '',
+  marketplace = ''
+}: {
+  offeringName?: string;
+  marketplaceAccount?: string;
+  marketplace?: string;
+}) => (
+  <HydrateAtomsTestProvider
+    initialValues={[
+      [MarketplacePurchasesPaginationData, defaultPagination],
+      [MarketplaceOfferingNameFilterData, offeringName],
+      [MarketplaceAccountFilterData, marketplaceAccount],
+      [MarketplaceFilterData, marketplace]
+    ]}
   >
     <MarketplacePurchasesPage />
   </HydrateAtomsTestProvider>
@@ -172,5 +214,44 @@ describe('Marketplace purchases page', () => {
     renderWithRouter(<ComponentWithQueryClient />);
     expect(await screen.findByLabelText(/contents/i)).toBeInTheDocument();
     expect(screen.queryByText(/you have no marketplace purchases/i)).not.toBeInTheDocument();
+  });
+
+  it('shows no search results when an active filter returns no purchases', async () => {
+    const filteredQueryKey = [
+      'marketplacePurchases',
+      {
+        limit: 10,
+        offset: 0,
+        sortField: undefined,
+        sortDirection: undefined,
+        offeringName: 'does-not-exist',
+        marketplaceAccount: '',
+        marketplace: ''
+      }
+    ];
+
+    queryClient.setQueryData(filteredQueryKey, {
+      pagination: {
+        offset: 0,
+        limit: 10,
+        count: 0,
+        total: 0
+      },
+      body: []
+    });
+
+    const { ComponentWithQueryClient: FilteredComponent } = ManipulatableQueryWrapper(
+      <FilteredTestPage offeringName="does-not-exist" />
+    );
+
+    renderWithRouter(<FilteredComponent />);
+
+    expect(await screen.findByText(/no results found/i)).toBeInTheDocument();
+
+    expect(
+      screen.queryByRole('heading', {
+        name: /no marketplace purchases/i
+      })
+    ).not.toBeInTheDocument();
   });
 });

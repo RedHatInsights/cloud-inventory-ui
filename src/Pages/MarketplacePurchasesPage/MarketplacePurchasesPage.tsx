@@ -10,18 +10,50 @@ import { MarketplacePurchasesTable } from '../../Components/MarketPlacePurchases
 import { NoMarketplacePurchases } from '../../Components/MarketPlacePurchases/NoMarketplacePurchases';
 import { useMarketplacePurchases } from '../../hooks/api/useMarketplacePurchases';
 import { Relation, useHasRelation } from '../../hooks/util/useHasRelation';
-import { useQueryParamInformedAtom } from '../../hooks/util/useQueryParam';
+import {
+  useQueryParamInformedAtom,
+  useQueryParamInformedState
+} from '../../hooks/util/useQueryParam';
 import { hasPaginationError } from '../../utils/errors';
 import { Paths } from '../../utils/routing';
-import { MarketplacePurchasesPaginationData } from '../../state/marketplacePurchases';
+import {
+  MarketplaceAccountFilterData,
+  MarketplaceFilterData,
+  MarketplaceOfferingNameFilterData,
+  MarketplacePurchasesPaginationData
+} from '../../state/marketplacePurchases';
+import { NoSearchResults } from '../../Components/EmptyState/NoSearchResults';
 import { MarketplacePurchasesPagination } from '../../Components/MarketPlacePurchases/MarketplacePurchasesPagination';
 import { MarketplacePurchasesToolbar } from '../../Components/MarketPlacePurchases/MarketplacePurchasesToolbar';
+import { SortByDirection } from '@patternfly/react-table';
 
 const MarketplacePurchasesPage = () => {
   const [pagination, setPagination] = useQueryParamInformedAtom(
     MarketplacePurchasesPaginationData,
     'pagination'
   );
+
+  const [sortBy, setSortBy] = useQueryParamInformedState<string | undefined>(
+    undefined,
+    'marketplacePurchasesActiveSortBy'
+  );
+
+  const [sortDir, setSortDir] = useQueryParamInformedState<SortByDirection | undefined>(
+    undefined,
+    'marketplacePurchasesActiveSortDir'
+  );
+
+  const [offeringName] = useQueryParamInformedAtom(
+    MarketplaceOfferingNameFilterData,
+    'offeringName'
+  );
+
+  const [marketplaceAccount] = useQueryParamInformedAtom(
+    MarketplaceAccountFilterData,
+    'marketplaceAccount'
+  );
+
+  const [marketplace] = useQueryParamInformedAtom(MarketplaceFilterData, 'marketplace');
 
   const { page, perPage } = pagination;
   const { has: canReadCloudAccess, isLoading: isPermissionsLoading } = useHasRelation(
@@ -36,7 +68,12 @@ const MarketplacePurchasesPage = () => {
   } = useMarketplacePurchases(
     {
       limit: perPage,
-      offset: (page - 1) * perPage
+      offset: (page - 1) * perPage,
+      sortField: sortBy,
+      sortDirection: sortDir,
+      offeringName,
+      marketplaceAccount,
+      marketplace
     },
     canFetchMarketplacePurchases
   );
@@ -52,7 +89,12 @@ const MarketplacePurchasesPage = () => {
     }
   }, [marketplacePurchasesResponse?.pagination?.total]);
 
-  const shouldShowEmptyState = !hasMarketplacePurchases && !hasPaginationError(pagination);
+  const hasActiveFilters = offeringName !== '' || marketplaceAccount !== '' || marketplace !== '';
+
+  const shouldShowNoResults = !hasMarketplacePurchases && hasActiveFilters;
+
+  const shouldShowEmptyState =
+    !hasMarketplacePurchases && !hasActiveFilters && !hasPaginationError(pagination);
 
   if (isPermissionsLoading) {
     return <Loading />;
@@ -96,9 +138,21 @@ const MarketplacePurchasesPage = () => {
           ) : (
             <>
               <MarketplacePurchasesToolbar />
-              <MarketplacePurchasesTable marketplacePurchases={marketplacePurchases} />
-              <br />
-              <MarketplacePurchasesPagination />
+              {shouldShowNoResults ? (
+                <NoSearchResults />
+              ) : (
+                <>
+                  <MarketplacePurchasesTable
+                    marketplacePurchases={marketplacePurchases}
+                    sortBy={sortBy}
+                    sortDir={sortDir}
+                    setSortBy={setSortBy}
+                    setSortDir={setSortDir}
+                  />
+                  <br />
+                  <MarketplacePurchasesPagination />
+                </>
+              )}
             </>
           )}
         </PageSection>
