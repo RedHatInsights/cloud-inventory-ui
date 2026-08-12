@@ -2,7 +2,10 @@ import React, { useState } from 'react';
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { renderWithRouter } from '../../../utils/testing/customRender';
 import { MarketplacePurchasesTable } from '../MarketplacePurchasesTable';
-import { MarketplacePurchase } from '../../../hooks/api/useMarketplacePurchases';
+import {
+  MarketplacePurchase,
+  MarketplacePurchaseSortField
+} from '../../../hooks/api/useMarketplacePurchases';
 import { HydrateAtomsTestProvider } from '../../../Components/util/testing/HydrateAtomsTestProvider';
 import { MarketplacePurchasesPaginationData } from '../../../state/marketplacePurchases';
 import { Paths } from '../../../utils/routing';
@@ -29,7 +32,7 @@ const renderTable = (
   withSortState = false
 ) => {
   const TableWithState = () => {
-    const [sortBy, setSortBy] = useState<string | undefined>(undefined);
+    const [sortBy, setSortBy] = useState<MarketplacePurchaseSortField | undefined>(undefined);
     const [sortDir, setSortDir] = useState<SortByDirection | undefined>(undefined);
 
     return (
@@ -193,60 +196,26 @@ describe('MarketplacePurchasesTable', () => {
 
     expect(offeringNameHeader).toHaveAttribute('aria-sort', 'ascending');
   });
-
   it('allows a user to sort by each marketplace purchase column', () => {
     renderTable(makeMarketplacePurchases(3), defaultPagination, true);
 
-    expect(
-      screen.getByRole('button', {
-        name: /offering name/i
-      })
-    ).toBeInTheDocument();
+    const sortableColumns = [
+      /offering name/i,
+      /marketplace account/i,
+      /^marketplace$/i,
+      /date added/i
+    ];
 
-    expect(
-      screen.getByRole('button', {
-        name: /marketplace account/i
-      })
-    ).toBeInTheDocument();
+    sortableColumns.forEach((name) => {
+      const button = screen.getByRole('button', { name });
 
-    expect(
-      screen.getByRole('button', {
-        name: /^marketplace$/i
-      })
-    ).toBeInTheDocument();
+      expect(button).toBeInTheDocument();
 
-    expect(
-      screen.getByRole('button', {
-        name: /date added/i
-      })
-    ).toBeInTheDocument();
-  });
+      fireEvent.click(button);
 
-  it('allows a user to sort by each marketplace purchase column', () => {
-    renderTable(makeMarketplacePurchases(3));
+      const columnHeader = button.closest('th');
 
-    expect(
-      screen.getByRole('button', {
-        name: /offering name/i
-      })
-    ).toBeInTheDocument();
-
-    expect(
-      screen.getByRole('button', {
-        name: /marketplace account/i
-      })
-    ).toBeInTheDocument();
-
-    expect(
-      screen.getByRole('button', {
-        name: /^marketplace$/i
-      })
-    ).toBeInTheDocument();
-
-    expect(
-      screen.getByRole('button', {
-        name: /date added/i
-      })
-    ).toBeInTheDocument();
+      expect(columnHeader).toHaveAttribute('aria-sort', 'ascending');
+    });
   });
 });

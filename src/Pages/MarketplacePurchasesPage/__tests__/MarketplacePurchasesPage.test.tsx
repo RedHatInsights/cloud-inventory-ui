@@ -32,7 +32,7 @@ const marketplacePurchasesQueryKey = [
     limit: 10,
     offset: 0,
     sortField: undefined,
-    SortByDirection: undefined,
+    sortDirection: undefined,
     offeringName: '',
     marketplaceAccount: '',
     marketplace: ''
@@ -67,7 +67,7 @@ const TestPage = () => (
   <HydrateAtomsTestProvider
     initialValues={[
       [MarketplacePurchasesPaginationData, defaultPagination],
-      [MarketplaceOfferingNameFilterData, ''],
+      [MarketplaceAccountFilterData, ''],
       [MarketplaceOfferingNameFilterData, ''],
       [MarketplaceFilterData, '']
     ]}

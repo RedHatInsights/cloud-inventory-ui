@@ -1,7 +1,10 @@
 import React from 'react';
 import { SortByDirection, Table, Tbody, Td, Th, Thead, Tr } from '@patternfly/react-table';
 import { formatDate } from '../../hooks/util/dates';
-import { MarketplacePurchase } from '../../hooks/api/useMarketplacePurchases';
+import {
+  MarketplacePurchase,
+  MarketplacePurchaseSortField
+} from '../../hooks/api/useMarketplacePurchases';
 import { marketplaceToFriendly } from '../../hooks/util/cloudProviderMaps';
 import {
   generateQueryParamsForData,
@@ -16,9 +19,9 @@ import { useApiBasedTableSort } from '../../hooks/util/tables/useTableSort';
 
 type MarketplacePurchasesTableProps = {
   marketplacePurchases: MarketplacePurchase[];
-  sortBy?: string;
+  sortBy?: MarketplacePurchaseSortField;
   sortDir?: SortByDirection;
-  setSortBy: (value: string | undefined) => void;
+  setSortBy: (value: MarketplacePurchaseSortField | undefined) => void;
   setSortDir: (value: SortByDirection | undefined) => void;
 };
 
@@ -34,17 +37,19 @@ export const MarketplacePurchasesTable = ({
     'pagination'
   );
 
+  const sortFieldLookup: Record<number, MarketplacePurchaseSortField> = {
+    0: 'offeringName',
+    1: 'marketplaceAccount',
+    2: 'marketplace',
+    3: 'startDate'
+  };
+
   const { getSortParams } = useApiBasedTableSort('marketplacePurchasesSort', {
     sortBy,
-    setSortBy,
+    setSortBy: (by: string) => setSortBy(by as MarketplacePurchaseSortField),
     sortDir,
     setSortDir,
-    lookup: {
-      0: 'offeringName',
-      1: 'marketplaceAccount',
-      2: 'marketplace',
-      3: 'startDate'
-    }
+    lookup: sortFieldLookup
   });
 
   const onInvalidPage = hasPaginationError(pagination);

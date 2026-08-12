@@ -8,7 +8,10 @@ import { Navigate } from 'react-router-dom';
 import { Loading } from '../../Components/util/Loading';
 import { MarketplacePurchasesTable } from '../../Components/MarketPlacePurchases/MarketplacePurchasesTable';
 import { NoMarketplacePurchases } from '../../Components/MarketPlacePurchases/NoMarketplacePurchases';
-import { useMarketplacePurchases } from '../../hooks/api/useMarketplacePurchases';
+import {
+  MarketplacePurchaseSortField,
+  useMarketplacePurchases
+} from '../../hooks/api/useMarketplacePurchases';
 import { Relation, useHasRelation } from '../../hooks/util/useHasRelation';
 import {
   useQueryParamInformedAtom,
@@ -33,7 +36,7 @@ const MarketplacePurchasesPage = () => {
     'pagination'
   );
 
-  const [sortBy, setSortBy] = useQueryParamInformedState<string | undefined>(
+  const [sortBy, setSortBy] = useQueryParamInformedState<MarketplacePurchaseSortField | undefined>(
     undefined,
     'marketplacePurchasesActiveSortBy'
   );

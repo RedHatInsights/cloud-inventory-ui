@@ -52,7 +52,7 @@ export const MarketplacePurchasesToolbar = () => {
       isExpanded={isCategoryDropdownOpen}
       icon={<FilterIcon />}
     >
-            {FILTER_LABELS[activeCategory]}
+      {FILTER_LABELS[activeCategory]}
           
     </MenuToggle>
   );

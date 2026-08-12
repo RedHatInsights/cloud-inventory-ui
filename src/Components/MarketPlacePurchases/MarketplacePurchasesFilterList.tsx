@@ -61,7 +61,7 @@ export const MarketplacePurchasesFilterList = () => {
         <ToolbarGroup>
           <ToolbarItem>
             <Button variant="link" onClick={clearFilters} isInline>
-              Clear all filters             
+              Clear all filters
             </Button>
           </ToolbarItem>
         </ToolbarGroup>
