@@ -1,6 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { HttpError } from '../../utils/errors';
 
+const QUERY_STALE_TIME = 5 * 60 * 1000;
+
 export type MarketplacePurchase = {
   offeringName: string;
   marketplaceAccount: string;
@@ -83,6 +85,7 @@ export const useMarketplacePurchases = (args: FetchMarketplacePurchasesArgs, ena
   return useQuery({
     queryKey: ['marketplacePurchases', args],
     queryFn: () => fetchMarketplacePurchases(args),
-    enabled
+    enabled,
+    staleTime: QUERY_STALE_TIME
   });
 };
