@@ -45,18 +45,30 @@ const MarketplacePurchasesPage = () => {
     undefined,
     'marketplacePurchasesActiveSortDir'
   );
-
-  const [offeringName] = useQueryParamInformedAtom(
+  const [offeringName, setOfferingName] = useQueryParamInformedAtom(
     MarketplaceOfferingNameFilterData,
     'offeringName'
   );
 
-  const [marketplaceAccount] = useQueryParamInformedAtom(
+  const [marketplaceAccount, setMarketplaceAccount] = useQueryParamInformedAtom(
     MarketplaceAccountFilterData,
     'marketplaceAccount'
   );
 
-  const [selectedMarketplaces] = useQueryParamInformedAtom(MarketplaceFilterData, 'marketplace');
+  const [selectedMarketplaces, setSelectedMarketplaces] = useQueryParamInformedAtom(
+    MarketplaceFilterData,
+    'marketplace'
+  );
+
+  const clearMarketplaceFilters = () => {
+    setOfferingName('');
+    setMarketplaceAccount('');
+    setSelectedMarketplaces([]);
+    setPagination({
+      ...pagination,
+      page: 1
+    });
+  };
 
   const { page, perPage } = pagination;
   const { has: canReadCloudAccess, isLoading: isPermissionsLoading } = useHasRelation(
@@ -143,7 +155,7 @@ const MarketplacePurchasesPage = () => {
             <>
               <MarketplacePurchasesToolbar />
               {shouldShowNoResults ? (
-                <NoSearchResults />
+                <NoSearchResults onClearFilters={clearMarketplaceFilters} />
               ) : (
                 <>
                   <MarketplacePurchasesTable

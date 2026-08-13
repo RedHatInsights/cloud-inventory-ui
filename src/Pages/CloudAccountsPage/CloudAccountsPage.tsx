@@ -26,6 +26,7 @@ import { hasPaginationError } from '../../utils/errors';
 import { CloudProviderShortname } from '../../types/cloudAccountsTypes';
 import { NoSearchResults } from '../../Components/EmptyState/NoSearchResults';
 import { Relation, useHasRelation } from '../../hooks/util/useHasRelation';
+import { useClearCloudAccountFilters } from '../../Components/util/useClearCloudAccountFilters';
 
 export const CloudAccountsPage = () => {
   const [pagination, setPagination] = useQueryParamInformedAtom(
@@ -82,6 +83,8 @@ export const CloudAccountsPage = () => {
 
   const hasAccounts = accounts.length > 0;
 
+  const clearCloudAccountFilters = useClearCloudAccountFilters();
+
   useEffect(() => {
     if (cloudAccountsResponse?.pagination) {
       setPagination({
@@ -121,7 +124,7 @@ export const CloudAccountsPage = () => {
                 availableStatuses={availableStatuses}
               />
               {shouldShowNoResults ? (
-                <NoSearchResults />
+                <NoSearchResults onClearFilters={clearCloudAccountFilters} />
               ) : (
                 <>
                   <CloudAccountsTable
