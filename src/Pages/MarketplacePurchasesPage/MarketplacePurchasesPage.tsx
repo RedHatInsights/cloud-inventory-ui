@@ -56,7 +56,7 @@ const MarketplacePurchasesPage = () => {
     'marketplaceAccount'
   );
 
-  const [marketplace] = useQueryParamInformedAtom(MarketplaceFilterData, 'marketplace');
+  const [selectedMarketplaces] = useQueryParamInformedAtom(MarketplaceFilterData, 'marketplace');
 
   const { page, perPage } = pagination;
   const { has: canReadCloudAccess, isLoading: isPermissionsLoading } = useHasRelation(
@@ -76,7 +76,7 @@ const MarketplacePurchasesPage = () => {
       sortDirection: sortDir,
       offeringName,
       marketplaceAccount,
-      marketplace
+      marketplace: selectedMarketplaces
     },
     canFetchMarketplacePurchases
   );
@@ -92,7 +92,8 @@ const MarketplacePurchasesPage = () => {
     }
   }, [marketplacePurchasesResponse?.pagination?.total]);
 
-  const hasActiveFilters = offeringName !== '' || marketplaceAccount !== '' || marketplace !== '';
+  const hasActiveFilters =
+    offeringName !== '' || marketplaceAccount !== '' || selectedMarketplaces.length > 0;
 
   const shouldShowNoResults = !hasMarketplacePurchases && hasActiveFilters;
 

@@ -15,4 +15,4 @@ export const MarketplaceOfferingNameFilterData = atom<string>('');
 
 export const MarketplaceAccountFilterData = atom<string>('');
 
-export const MarketplaceFilterData = atom<string>('');
+export const MarketplaceFilterData = atom<string[]>([]);

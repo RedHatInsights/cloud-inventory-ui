@@ -16,6 +16,7 @@ import { MarketplacePurchasesTextFilter } from './MarketplacePurchasesTextFilter
 import { MarketplacePurchasesFilterList } from './MarketplacePurchasesFilterList';
 import { useQueryParamInformedAtom } from '../../hooks/util/useQueryParam';
 import { MarketplacePurchasesFilterCategoryData } from '../../state/marketplacePurchases';
+import { MarketplacePurchasesMarketplaceFilter } from './MarketplacePurchasesMarketplaceFilter';
 
 type FilterCategory = 'OfferingName' | 'MarketplaceAccount' | 'Marketplace';
 
@@ -78,7 +79,11 @@ export const MarketplacePurchasesToolbar = () => {
               </SelectList>
             </Select>
           </ToolbarItem>
-          <MarketplacePurchasesTextFilter activeCategory={activeCategory} />
+          {activeCategory === 'Marketplace' ? (
+            <MarketplacePurchasesMarketplaceFilter />
+          ) : (
+            <MarketplacePurchasesTextFilter activeCategory={activeCategory} />
+          )}
         </ToolbarGroup>
         <ToolbarGroup align={{ default: 'alignEnd' }}>
           <MarketplacePurchasesPagination isCompact />

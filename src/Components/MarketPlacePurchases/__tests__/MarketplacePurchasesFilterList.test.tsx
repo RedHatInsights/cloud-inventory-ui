@@ -12,18 +12,18 @@ import {
 const renderFilterList = ({
   offeringName = '',
   marketplaceAccount = '',
-  marketplace = ''
+  marketplaces = []
 }: {
   offeringName?: string;
   marketplaceAccount?: string;
-  marketplace?: string;
+  marketplaces?: string[];
 } = {}) =>
   renderWithRouter(
     <HydrateAtomsTestProvider
       initialValues={[
         [MarketplaceOfferingNameFilterData, offeringName],
         [MarketplaceAccountFilterData, marketplaceAccount],
-        [MarketplaceFilterData, marketplace]
+        [MarketplaceFilterData, marketplaces]
       ]}
     >
             
@@ -69,13 +69,14 @@ describe('MarketplacePurchasesFilterList', () => {
     expect(screen.getByText('123456789')).toBeInTheDocument();
   });
 
-  it('renders the selected marketplace filter', () => {
+  it('renders selected marketplaces using friendly labels', () => {
     renderFilterList({
-      marketplace: 'AWS'
+      marketplaces: ['aws_marketplace', 'azure_marketplace']
     });
 
     expect(screen.getByText('Marketplace')).toBeInTheDocument();
     expect(screen.getByText('AWS')).toBeInTheDocument();
+    expect(screen.getByText('Microsoft Azure')).toBeInTheDocument();
   });
 
   it('removes the offering name filter when its label is closed', () => {
@@ -95,11 +96,31 @@ describe('MarketplacePurchasesFilterList', () => {
     expect(screen.queryByText('Offering name')).not.toBeInTheDocument();
   });
 
+  it('removes only the selected marketplace when its label is closed', () => {
+    renderFilterList({
+      marketplaces: ['aws_marketplace', 'azure_marketplace']
+    });
+
+    const awsLabel = screen.getByText('AWS').closest('.pf-v6-c-label');
+
+    expect(awsLabel).not.toBeNull();
+
+    const closeButton = awsLabel?.querySelector('button');
+
+    expect(closeButton).not.toBeNull();
+
+    fireEvent.click(closeButton!);
+
+    expect(screen.queryByText('AWS')).not.toBeInTheDocument();
+    expect(screen.getByText('Microsoft Azure')).toBeInTheDocument();
+    expect(screen.getByText('Marketplace')).toBeInTheDocument();
+  });
+
   it('clears all active filters when clear all filters is clicked', () => {
     renderFilterList({
       offeringName: 'OpenShift',
       marketplaceAccount: '123456789',
-      marketplace: 'AWS'
+      marketplaces: ['aws_marketplace', 'azure_marketplace']
     });
 
     fireEvent.click(
@@ -111,15 +132,16 @@ describe('MarketplacePurchasesFilterList', () => {
     expect(screen.queryByText('OpenShift')).not.toBeInTheDocument();
     expect(screen.queryByText('123456789')).not.toBeInTheDocument();
     expect(screen.queryByText('AWS')).not.toBeInTheDocument();
+    expect(screen.queryByText('Microsoft Azure')).not.toBeInTheDocument();
 
     expect(screen.queryByText('Offering name')).not.toBeInTheDocument();
     expect(screen.queryByText('Marketplace account')).not.toBeInTheDocument();
     expect(screen.queryByText('Marketplace')).not.toBeInTheDocument();
   });
 
-  it('hides clear all filters after the last active filter is removed', () => {
+  it('hides clear all filters after the last active marketplace is removed', () => {
     renderFilterList({
-      marketplace: 'AWS'
+      marketplaces: ['aws_marketplace']
     });
 
     const closeButtons = screen

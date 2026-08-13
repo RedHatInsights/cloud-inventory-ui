@@ -5,17 +5,15 @@ import { renderWithRouter } from '../../../utils/testing/customRender';
 import { MarketplacePurchasesTextFilter } from '../MarketplacePurchasesTextFilter';
 import {
   MarketplaceAccountFilterData,
-  MarketplaceFilterData,
   MarketplaceOfferingNameFilterData
 } from '../../../state/marketplacePurchases';
 
 const MarketplacePurchasesTextFilterWithState = ({
   activeCategory = 'OfferingName',
   offeringName = '',
-  marketplaceAccount = '',
-  marketplace = ''
+  marketplaceAccount = ''
 }: {
-  activeCategory?: 'OfferingName' | 'MarketplaceAccount' | 'Marketplace';
+  activeCategory?: 'OfferingName' | 'MarketplaceAccount';
   offeringName?: string;
   marketplaceAccount?: string;
   marketplace?: string;
@@ -23,8 +21,7 @@ const MarketplacePurchasesTextFilterWithState = ({
   <HydrateAtomsTestProvider
     initialValues={[
       [MarketplaceOfferingNameFilterData, offeringName],
-      [MarketplaceAccountFilterData, marketplaceAccount],
-      [MarketplaceFilterData, marketplace]
+      [MarketplaceAccountFilterData, marketplaceAccount]
     ]}
   >
         
@@ -94,13 +91,5 @@ describe('MarketplacePurchasesTextFilter', () => {
     );
 
     expect(screen.getByPlaceholderText('Filter by marketplace account')).toHaveValue('123456789');
-  });
-
-  it('displays the marketplace value when that filter is selected', () => {
-    renderWithRouter(
-      <MarketplacePurchasesTextFilterWithState activeCategory="Marketplace" marketplace="AWS" />
-    );
-
-    expect(screen.getByPlaceholderText('Filter by marketplace')).toHaveValue('AWS');
   });
 });

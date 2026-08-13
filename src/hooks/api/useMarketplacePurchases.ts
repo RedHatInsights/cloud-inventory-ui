@@ -28,7 +28,7 @@ export type FetchMarketplacePurchasesArgs = {
   sortDirection?: SortDirection;
   offeringName?: string;
   marketplaceAccount?: string;
-  marketplace?: string;
+  marketplace?: string[];
 };
 
 export type MarketplacePurchaseSortField =
@@ -58,17 +58,17 @@ const fetchMarketplacePurchases = async ({
     params.set('sort_direction', sortDirection);
   }
 
-  const filters = {
-    offeringName,
-    marketplaceAccount,
-    marketplace
-  };
+  if (offeringName) {
+    params.set('offeringName', offeringName);
+  }
 
-  Object.entries(filters).forEach(([key, value]) => {
-    if (value) {
-      params.set(key, value);
-    }
-  });
+  if (marketplaceAccount) {
+    params.set('marketplaceAccount', marketplaceAccount);
+  }
+
+  if (marketplace?.length) {
+    params.set('marketplace', marketplace.join(','));
+  }
 
   const response = await fetch(
     `/api/rhsm/v2/cloud_access_providers/marketplace_purchases?${params.toString()}`
@@ -77,7 +77,9 @@ const fetchMarketplacePurchases = async ({
   if (!response.ok) {
     throw new HttpError('Something went wrong', response.status, response.statusText);
   }
+
   const json = await response.json();
+
   return json as MarketplacePurchasesResponse;
 };
 

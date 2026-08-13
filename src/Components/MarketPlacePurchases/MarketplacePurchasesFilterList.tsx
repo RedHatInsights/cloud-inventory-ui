@@ -13,6 +13,7 @@ import {
   MarketplaceFilterData,
   MarketplaceOfferingNameFilterData
 } from '../../state/marketplacePurchases';
+import { marketplaceToFriendly } from '../../hooks/util/cloudProviderMaps';
 
 export const MarketplacePurchasesFilterList = () => {
   const [offeringName, setOfferingName] = useQueryParamInformedAtom(
@@ -25,17 +26,18 @@ export const MarketplacePurchasesFilterList = () => {
     'marketplaceAccount'
   );
 
-  const [marketplace, setMarketplace] = useQueryParamInformedAtom(
+  const [selectedMarketplaces, setSelectedMarketplaces] = useQueryParamInformedAtom(
     MarketplaceFilterData,
     'marketplace'
   );
 
-  const hasActiveFilters = offeringName !== '' || marketplaceAccount !== '' || marketplace !== '';
+  const hasActiveFilters =
+    offeringName !== '' || marketplaceAccount !== '' || selectedMarketplaces.length > 0;
 
   const clearFilters = () => {
     setOfferingName('');
     setMarketplaceAccount('');
-    setMarketplace('');
+    setSelectedMarketplaces([]);
   };
 
   return (
@@ -51,9 +53,20 @@ export const MarketplacePurchasesFilterList = () => {
             <Label onClose={() => setMarketplaceAccount('')}>{marketplaceAccount}</Label>
           </LabelGroup>
         )}
-        {marketplace && (
+        {selectedMarketplaces.length > 0 && (
           <LabelGroup categoryName="Marketplace">
-            <Label onClose={() => setMarketplace('')}>{marketplace}</Label>
+            {selectedMarketplaces.map((marketplace) => (
+              <Label
+                key={marketplace}
+                onClose={() =>
+                  setSelectedMarketplaces(
+                    selectedMarketplaces.filter((selected) => selected !== marketplace)
+                  )
+                }
+              >
+                {marketplaceToFriendly[marketplace] ?? marketplace}
+              </Label>
+            ))}
           </LabelGroup>
         )}
       </ToolbarGroup>

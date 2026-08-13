@@ -283,7 +283,7 @@ describe('useMarketplacePurchases', () => {
       offset: 0,
       offeringName: 'OpenShift',
       marketplaceAccount: '123456789',
-      marketplace: 'aws_marketplace'
+      marketplace: ['aws_marketplace']
     };
 
     mocks.addMock(
@@ -322,5 +322,51 @@ describe('useMarketplacePurchases', () => {
       marketplaceAccount: '123456789',
       marketplace: 'aws_marketplace'
     });
+  });
+  it('fetches marketplace purchases filtered by multiple marketplaces', async () => {
+    const args = {
+      limit: 10,
+      offset: 0,
+      marketplace: ['aws_marketplace', 'azure_marketplace']
+    };
+
+    mocks.addMock(
+      `${marketplacePurchasesUrl}?limit=10&offset=0&marketplace=aws_marketplace%2Cazure_marketplace`,
+      {
+        body: [
+          {
+            offeringName: 'Red Hat OpenShift',
+            marketplaceAccount: '123456789',
+            marketplace: 'aws_marketplace',
+            startDate: '2026-07-13T00:00:00Z',
+            skus: ['RH02612']
+          },
+          {
+            offeringName: 'Red Hat Enterprise Linux',
+            marketplaceAccount: 'azure-account',
+            marketplace: 'azure_marketplace',
+            startDate: '2026-07-14T00:00:00Z',
+            skus: ['RH02613']
+          }
+        ],
+        pagination: {
+          count: 2,
+          limit: 10,
+          offset: 0,
+          total: 2
+        }
+      },
+      true
+    );
+
+    const { result } = renderHook(() => useMarketplacePurchases(args), {
+      wrapper: mocks.wrapper
+    });
+
+    await waitFor(() => {
+      expect(result.current.isSuccess).toBe(true);
+    });
+
+    expect(result.current.data?.body).toHaveLength(2);
   });
 });

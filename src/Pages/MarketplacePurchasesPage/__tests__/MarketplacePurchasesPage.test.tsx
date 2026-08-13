@@ -11,21 +11,18 @@ import {
   MarketplaceOfferingNameFilterData,
   MarketplacePurchasesPaginationData
 } from '../../../state/marketplacePurchases';
-
 jest.mock('../../../hooks/util/useHasRelation', () => ({
   Relation: {
     CLOUD_ACCESS_VIEW: 'cloud_access_view'
   },
   useHasRelation: jest.fn()
 }));
-
 const mockedUseHasRelation = useHasRelation as jest.MockedFunction<typeof useHasRelation>;
 const defaultPagination = {
   page: 1,
   perPage: 10,
   itemCount: 0
 };
-
 const marketplacePurchasesQueryKey = [
   'marketplacePurchases',
   {
@@ -35,7 +32,7 @@ const marketplacePurchasesQueryKey = [
     sortDirection: undefined,
     offeringName: '',
     marketplaceAccount: '',
-    marketplace: ''
+    marketplace: []
   }
 ];
 const mockMarketplacePurchasesResponse = {
@@ -62,14 +59,13 @@ const mockMarketplacePurchasesResponse = {
     }
   ]
 };
-
 const TestPage = () => (
   <HydrateAtomsTestProvider
     initialValues={[
       [MarketplacePurchasesPaginationData, defaultPagination],
       [MarketplaceAccountFilterData, ''],
       [MarketplaceOfferingNameFilterData, ''],
-      [MarketplaceFilterData, '']
+      [MarketplaceFilterData, []]
     ]}
   >
     <MarketplacePurchasesPage />
@@ -78,26 +74,24 @@ const TestPage = () => (
 const FilteredTestPage = ({
   offeringName = '',
   marketplaceAccount = '',
-  marketplace = ''
+  marketplaces = []
 }: {
   offeringName?: string;
   marketplaceAccount?: string;
-  marketplace?: string;
+  marketplaces?: string[];
 }) => (
   <HydrateAtomsTestProvider
     initialValues={[
       [MarketplacePurchasesPaginationData, defaultPagination],
       [MarketplaceOfferingNameFilterData, offeringName],
       [MarketplaceAccountFilterData, marketplaceAccount],
-      [MarketplaceFilterData, marketplace]
+      [MarketplaceFilterData, marketplaces]
     ]}
   >
     <MarketplacePurchasesPage />
   </HydrateAtomsTestProvider>
 );
-
 const { ComponentWithQueryClient, queryClient } = ManipulatableQueryWrapper(<TestPage />);
-
 describe('Marketplace purchases page', () => {
   beforeEach(() => {
     queryClient.clear();
@@ -124,7 +118,6 @@ describe('Marketplace purchases page', () => {
       })
     ).toBeInTheDocument();
   });
-
   it('renders marketplace purchase data', async () => {
     queryClient.setQueryData(marketplacePurchasesQueryKey, mockMarketplacePurchasesResponse);
     renderWithRouter(<ComponentWithQueryClient />);
@@ -137,14 +130,12 @@ describe('Marketplace purchases page', () => {
     expect(screen.getByText('AWS')).toBeInTheDocument();
     expect(screen.getByText('Microsoft Azure')).toBeInTheDocument();
   });
-
   it('renders one row for each marketplace purchase', async () => {
     queryClient.setQueryData(marketplacePurchasesQueryKey, mockMarketplacePurchasesResponse);
     renderWithRouter(<ComponentWithQueryClient />);
     await screen.findByText('Red Hat Enterprise Linux');
     expect(screen.getAllByRole('row')).toHaveLength(3);
   });
-
   it('renders pagination using the API total', async () => {
     queryClient.setQueryData(marketplacePurchasesQueryKey, mockMarketplacePurchasesResponse);
     const { container } = renderWithRouter(<ComponentWithQueryClient />);
@@ -153,7 +144,6 @@ describe('Marketplace purchases page', () => {
       '1 - 2 of 2'
     );
   });
-
   it('shows the empty state when no marketplace purchases exist', async () => {
     queryClient.setQueryData(marketplacePurchasesQueryKey, {
       pagination: {
@@ -164,7 +154,6 @@ describe('Marketplace purchases page', () => {
       },
       body: []
     });
-
     renderWithRouter(<ComponentWithQueryClient />);
     expect(
       await screen.findByRole('heading', {
@@ -178,7 +167,6 @@ describe('Marketplace purchases page', () => {
       })
     ).not.toBeInTheDocument();
   });
-
   it('opens the Marketplace Purchases information popover', async () => {
     queryClient.setQueryData(marketplacePurchasesQueryKey, mockMarketplacePurchasesResponse);
     renderWithRouter(<ComponentWithQueryClient />);
@@ -193,7 +181,6 @@ describe('Marketplace purchases page', () => {
       )
     ).toBeInTheDocument();
   });
-
   it('shows a loading state while permissions are loading', async () => {
     mockedUseHasRelation.mockReturnValue({
       has: false,
@@ -206,7 +193,6 @@ describe('Marketplace purchases page', () => {
     expect(await screen.findByLabelText(/contents/i)).toBeInTheDocument();
     expect(screen.queryByText(/you have no marketplace purchases/i)).not.toBeInTheDocument();
   });
-
   it('shows a loading state while marketplace purchases are loading', async () => {
     queryClient.setQueryDefaults(marketplacePurchasesQueryKey, {
       queryFn: () => new Promise(() => undefined)
@@ -215,7 +201,6 @@ describe('Marketplace purchases page', () => {
     expect(await screen.findByLabelText(/contents/i)).toBeInTheDocument();
     expect(screen.queryByText(/you have no marketplace purchases/i)).not.toBeInTheDocument();
   });
-
   it('shows no search results when an active filter returns no purchases', async () => {
     const filteredQueryKey = [
       'marketplacePurchases',
@@ -226,10 +211,9 @@ describe('Marketplace purchases page', () => {
         sortDirection: undefined,
         offeringName: 'does-not-exist',
         marketplaceAccount: '',
-        marketplace: ''
+        marketplace: []
       }
     ];
-
     queryClient.setQueryData(filteredQueryKey, {
       pagination: {
         offset: 0,
@@ -239,15 +223,11 @@ describe('Marketplace purchases page', () => {
       },
       body: []
     });
-
     const { ComponentWithQueryClient: FilteredComponent } = ManipulatableQueryWrapper(
       <FilteredTestPage offeringName="does-not-exist" />
     );
-
     renderWithRouter(<FilteredComponent />);
-
     expect(await screen.findByText(/no results found/i)).toBeInTheDocument();
-
     expect(
       screen.queryByRole('heading', {
         name: /no marketplace purchases/i

@@ -3,11 +3,12 @@ import { SearchInput, ToolbarItem } from '@patternfly/react-core';
 import { useQueryParamInformedAtom } from '../../hooks/util/useQueryParam';
 import {
   MarketplaceAccountFilterData,
-  MarketplaceFilterData,
   MarketplaceOfferingNameFilterData
 } from '../../state/marketplacePurchases';
 
 export type MarketplaceFilterCategory = 'OfferingName' | 'MarketplaceAccount' | 'Marketplace';
+
+export type MarketplaceTextFilterCategory = 'OfferingName' | 'MarketplaceAccount';
 
 export const FILTER_LABELS: Record<MarketplaceFilterCategory, string> = {
   OfferingName: 'Offering name',
@@ -16,7 +17,7 @@ export const FILTER_LABELS: Record<MarketplaceFilterCategory, string> = {
 };
 
 type MarketplacePurchasesTextFilterProps = {
-  activeCategory: MarketplaceFilterCategory;
+  activeCategory: MarketplaceTextFilterCategory;
 };
 
 export const MarketplacePurchasesTextFilter = ({
@@ -32,20 +33,10 @@ export const MarketplacePurchasesTextFilter = ({
     'marketplaceAccount'
   );
 
-  const [marketplace, setMarketplace] = useQueryParamInformedAtom(
-    MarketplaceFilterData,
-    'marketplace'
-  );
-
   const timerRef = useRef<ReturnType<typeof setTimeout>>();
   const [inputValue, setInputValue] = useState('');
 
-  const activeValue =
-    activeCategory === 'OfferingName'
-      ? offeringName
-      : activeCategory === 'MarketplaceAccount'
-        ? marketplaceAccount
-        : marketplace;
+  const activeValue = activeCategory === 'OfferingName' ? offeringName : marketplaceAccount;
 
   useEffect(() => {
     setInputValue(activeValue || '');
@@ -65,10 +56,6 @@ export const MarketplacePurchasesTextFilter = ({
 
       case 'MarketplaceAccount':
         setMarketplaceAccount(value);
-        break;
-
-      case 'Marketplace':
-        setMarketplace(value);
         break;
     }
   };
