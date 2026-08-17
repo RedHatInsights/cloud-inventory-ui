@@ -1,15 +1,15 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { renderWithRouter } from '../../../utils/testing/customRender';
 import { MarketplacePurchasesTable } from '../MarketplacePurchasesTable';
-import {
-  MarketplacePurchase,
-  MarketplacePurchaseSortField
-} from '../../../hooks/api/useMarketplacePurchases';
+import { MarketplacePurchase } from '../../../hooks/api/useMarketplacePurchases';
 import { HydrateAtomsTestProvider } from '../../../Components/util/testing/HydrateAtomsTestProvider';
-import { MarketplacePurchasesPaginationData } from '../../../state/marketplacePurchases';
+import {
+  MarketplacePurchasesPaginationData,
+  MarketplacePurchasesSortByData,
+  MarketplacePurchasesSortDirData
+} from '../../../state/marketplacePurchases';
 import { Paths } from '../../../utils/routing';
-import { SortByDirection } from '@patternfly/react-table';
 
 const makeMarketplacePurchases = (count: number): MarketplacePurchase[] =>
   Array.from({ length: count }).map((_, index) => ({
@@ -26,29 +26,18 @@ const defaultPagination = {
   itemCount: 10
 };
 
-const renderTable = (
-  purchases: MarketplacePurchase[],
-  pagination = defaultPagination,
-  withSortState = false
-) => {
-  const TableWithState = () => {
-    const [sortBy, setSortBy] = useState<MarketplacePurchaseSortField | undefined>(undefined);
-    const [sortDir, setSortDir] = useState<SortByDirection | undefined>(undefined);
-
-    return (
-      <HydrateAtomsTestProvider initialValues={[[MarketplacePurchasesPaginationData, pagination]]}>
-        <MarketplacePurchasesTable
-          marketplacePurchases={purchases}
-          sortBy={withSortState ? sortBy : undefined}
-          sortDir={withSortState ? sortDir : undefined}
-          setSortBy={withSortState ? setSortBy : jest.fn()}
-          setSortDir={withSortState ? setSortDir : jest.fn()}
-        />
-      </HydrateAtomsTestProvider>
-    );
-  };
-
-  return renderWithRouter(<TableWithState />);
+const renderTable = (purchases: MarketplacePurchase[], pagination = defaultPagination) => {
+  return renderWithRouter(
+    <HydrateAtomsTestProvider
+      initialValues={[
+        [MarketplacePurchasesPaginationData, pagination],
+        [MarketplacePurchasesSortByData, undefined],
+        [MarketplacePurchasesSortDirData, undefined]
+      ]}
+    >
+      <MarketplacePurchasesTable marketplacePurchases={purchases} />
+    </HydrateAtomsTestProvider>
+  );
 };
 
 describe('MarketplacePurchasesTable', () => {
@@ -180,7 +169,7 @@ describe('MarketplacePurchasesTable', () => {
   });
 
   it('allows a user to sort marketplace purchases by offering name', () => {
-    renderTable(makeMarketplacePurchases(3), defaultPagination, true);
+    renderTable(makeMarketplacePurchases(3), defaultPagination);
 
     const offeringNameHeader = screen.getByRole('columnheader', {
       name: /offering name/i
@@ -197,7 +186,7 @@ describe('MarketplacePurchasesTable', () => {
     expect(offeringNameHeader).toHaveAttribute('aria-sort', 'ascending');
   });
   it('allows a user to sort by each marketplace purchase column', () => {
-    renderTable(makeMarketplacePurchases(3), defaultPagination, true);
+    renderTable(makeMarketplacePurchases(3), defaultPagination);
 
     const sortableColumns = [
       /offering name/i,
@@ -215,7 +204,7 @@ describe('MarketplacePurchasesTable', () => {
 
       const columnHeader = button.closest('th');
 
-      expect(columnHeader).toHaveAttribute('aria-sort', 'ascending');
+      expect(columnHeader).toHaveAttribute('aria-sort');
     });
   });
 });

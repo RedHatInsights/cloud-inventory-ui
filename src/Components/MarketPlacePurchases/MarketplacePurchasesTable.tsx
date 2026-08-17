@@ -1,5 +1,5 @@
 import React from 'react';
-import { SortByDirection, Table, Tbody, Td, Th, Thead, Tr } from '@patternfly/react-table';
+import { Table, Tbody, Td, Th, Thead, Tr } from '@patternfly/react-table';
 import { formatDate } from '../../hooks/util/dates';
 import {
   MarketplacePurchase,
@@ -10,7 +10,11 @@ import {
   generateQueryParamsForData,
   useQueryParamInformedAtom
 } from '../../hooks/util/useQueryParam';
-import { MarketplacePurchasesPaginationData } from '../../state/marketplacePurchases';
+import {
+  MarketplacePurchasesPaginationData,
+  MarketplacePurchasesSortByData,
+  MarketplacePurchasesSortDirData
+} from '../../state/marketplacePurchases';
 import { hasPaginationError } from '../../utils/errors';
 import { PaginationError } from '../shared/PaginationError';
 import { Link } from 'react-router-dom';
@@ -19,24 +23,25 @@ import { useApiBasedTableSort } from '../../hooks/util/tables/useTableSort';
 
 type MarketplacePurchasesTableProps = {
   marketplacePurchases: MarketplacePurchase[];
-  sortBy?: MarketplacePurchaseSortField;
-  sortDir?: SortByDirection;
-  setSortBy: (value: MarketplacePurchaseSortField | undefined) => void;
-  setSortDir: (value: SortByDirection | undefined) => void;
 };
 
 export const MarketplacePurchasesTable = ({
-  marketplacePurchases,
-  sortBy,
-  sortDir,
-  setSortBy,
-  setSortDir
+  marketplacePurchases
 }: MarketplacePurchasesTableProps) => {
   const [pagination, setPagination] = useQueryParamInformedAtom(
     MarketplacePurchasesPaginationData,
     'pagination'
   );
 
+  const [sortBy, setSortBy] = useQueryParamInformedAtom(
+    MarketplacePurchasesSortByData,
+    'marketplacePurchasesActiveSortBy'
+  );
+
+  const [sortDir, setSortDir] = useQueryParamInformedAtom(
+    MarketplacePurchasesSortDirData,
+    'marketplacePurchasesActiveSortDir'
+  );
   const sortFieldLookup: Record<number, MarketplacePurchaseSortField> = {
     0: 'offeringName',
     1: 'marketplaceAccount',

@@ -8,27 +8,22 @@ import { Navigate } from 'react-router-dom';
 import { Loading } from '../../Components/util/Loading';
 import { MarketplacePurchasesTable } from '../../Components/MarketPlacePurchases/MarketplacePurchasesTable';
 import { NoMarketplacePurchases } from '../../Components/MarketPlacePurchases/NoMarketplacePurchases';
-import {
-  MarketplacePurchaseSortField,
-  useMarketplacePurchases
-} from '../../hooks/api/useMarketplacePurchases';
+import { useMarketplacePurchases } from '../../hooks/api/useMarketplacePurchases';
 import { Relation, useHasRelation } from '../../hooks/util/useHasRelation';
-import {
-  useQueryParamInformedAtom,
-  useQueryParamInformedState
-} from '../../hooks/util/useQueryParam';
+import { useQueryParamInformedAtom } from '../../hooks/util/useQueryParam';
 import { hasPaginationError } from '../../utils/errors';
 import { Paths } from '../../utils/routing';
 import {
   MarketplaceAccountFilterData,
   MarketplaceFilterData,
   MarketplaceOfferingNameFilterData,
-  MarketplacePurchasesPaginationData
+  MarketplacePurchasesPaginationData,
+  MarketplacePurchasesSortByData,
+  MarketplacePurchasesSortDirData
 } from '../../state/marketplacePurchases';
 import { NoSearchResults } from '../../Components/EmptyState/NoSearchResults';
 import { MarketplacePurchasesPagination } from '../../Components/MarketPlacePurchases/MarketplacePurchasesPagination';
 import { MarketplacePurchasesToolbar } from '../../Components/MarketPlacePurchases/MarketplacePurchasesToolbar';
-import { SortByDirection } from '@patternfly/react-table';
 
 const MarketplacePurchasesPage = () => {
   const [pagination, setPagination] = useQueryParamInformedAtom(
@@ -36,13 +31,13 @@ const MarketplacePurchasesPage = () => {
     'pagination'
   );
 
-  const [sortBy, setSortBy] = useQueryParamInformedState<MarketplacePurchaseSortField | undefined>(
-    undefined,
+  const [sortBy] = useQueryParamInformedAtom(
+    MarketplacePurchasesSortByData,
     'marketplacePurchasesActiveSortBy'
   );
 
-  const [sortDir, setSortDir] = useQueryParamInformedState<SortByDirection | undefined>(
-    undefined,
+  const [sortDir] = useQueryParamInformedAtom(
+    MarketplacePurchasesSortDirData,
     'marketplacePurchasesActiveSortDir'
   );
   const [offeringName, setOfferingName] = useQueryParamInformedAtom(
@@ -158,13 +153,7 @@ const MarketplacePurchasesPage = () => {
                 <NoSearchResults onClearFilters={clearMarketplaceFilters} />
               ) : (
                 <>
-                  <MarketplacePurchasesTable
-                    marketplacePurchases={marketplacePurchases}
-                    sortBy={sortBy}
-                    sortDir={sortDir}
-                    setSortBy={setSortBy}
-                    setSortDir={setSortDir}
-                  />
+                  <MarketplacePurchasesTable marketplacePurchases={marketplacePurchases} />
                   <br />
                   <MarketplacePurchasesPagination />
                 </>
