@@ -13,7 +13,15 @@ import { Relation, useHasRelation } from '../../hooks/util/useHasRelation';
 import { useQueryParamInformedAtom } from '../../hooks/util/useQueryParam';
 import { hasPaginationError } from '../../utils/errors';
 import { Paths } from '../../utils/routing';
-import { MarketplacePurchasesPaginationData } from '../../state/marketplacePurchases';
+import {
+  MarketplaceAccountFilterData,
+  MarketplaceFilterData,
+  MarketplaceOfferingNameFilterData,
+  MarketplacePurchasesPaginationData,
+  MarketplacePurchasesSortByData,
+  MarketplacePurchasesSortDirData
+} from '../../state/marketplacePurchases';
+import { NoSearchResults } from '../../Components/EmptyState/NoSearchResults';
 import { MarketplacePurchasesPagination } from '../../Components/MarketPlacePurchases/MarketplacePurchasesPagination';
 import { MarketplacePurchasesToolbar } from '../../Components/MarketPlacePurchases/MarketplacePurchasesToolbar';
 
@@ -22,6 +30,40 @@ const MarketplacePurchasesPage = () => {
     MarketplacePurchasesPaginationData,
     'pagination'
   );
+
+  const [sortBy] = useQueryParamInformedAtom(
+    MarketplacePurchasesSortByData,
+    'marketplacePurchasesActiveSortBy'
+  );
+
+  const [sortDir] = useQueryParamInformedAtom(
+    MarketplacePurchasesSortDirData,
+    'marketplacePurchasesActiveSortDir'
+  );
+  const [offeringName, setOfferingName] = useQueryParamInformedAtom(
+    MarketplaceOfferingNameFilterData,
+    'offeringName'
+  );
+
+  const [marketplaceAccount, setMarketplaceAccount] = useQueryParamInformedAtom(
+    MarketplaceAccountFilterData,
+    'marketplaceAccount'
+  );
+
+  const [selectedMarketplaces, setSelectedMarketplaces] = useQueryParamInformedAtom(
+    MarketplaceFilterData,
+    'marketplace'
+  );
+
+  const clearMarketplaceFilters = () => {
+    setOfferingName('');
+    setMarketplaceAccount('');
+    setSelectedMarketplaces([]);
+    setPagination({
+      ...pagination,
+      page: 1
+    });
+  };
 
   const { page, perPage } = pagination;
   const { has: canReadCloudAccess, isLoading: isPermissionsLoading } = useHasRelation(
@@ -36,7 +78,12 @@ const MarketplacePurchasesPage = () => {
   } = useMarketplacePurchases(
     {
       limit: perPage,
-      offset: (page - 1) * perPage
+      offset: (page - 1) * perPage,
+      sortField: sortBy,
+      sortDirection: sortDir,
+      offeringName,
+      marketplaceAccount,
+      marketplace: selectedMarketplaces
     },
     canFetchMarketplacePurchases
   );
@@ -52,7 +99,13 @@ const MarketplacePurchasesPage = () => {
     }
   }, [marketplacePurchasesResponse?.pagination?.total]);
 
-  const shouldShowEmptyState = !hasMarketplacePurchases && !hasPaginationError(pagination);
+  const hasActiveFilters =
+    offeringName !== '' || marketplaceAccount !== '' || selectedMarketplaces.length > 0;
+
+  const shouldShowNoResults = !hasMarketplacePurchases && hasActiveFilters;
+
+  const shouldShowEmptyState =
+    !hasMarketplacePurchases && !hasActiveFilters && !hasPaginationError(pagination);
 
   if (isPermissionsLoading) {
     return <Loading />;
@@ -96,9 +149,15 @@ const MarketplacePurchasesPage = () => {
           ) : (
             <>
               <MarketplacePurchasesToolbar />
-              <MarketplacePurchasesTable marketplacePurchases={marketplacePurchases} />
-              <br />
-              <MarketplacePurchasesPagination />
+              {shouldShowNoResults ? (
+                <NoSearchResults onClearFilters={clearMarketplaceFilters} />
+              ) : (
+                <>
+                  <MarketplacePurchasesTable marketplacePurchases={marketplacePurchases} />
+                  <br />
+                  <MarketplacePurchasesPagination />
+                </>
+              )}
             </>
           )}
         </PageSection>

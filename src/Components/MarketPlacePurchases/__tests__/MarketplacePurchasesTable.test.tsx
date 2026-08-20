@@ -4,7 +4,11 @@ import { renderWithRouter } from '../../../utils/testing/customRender';
 import { MarketplacePurchasesTable } from '../MarketplacePurchasesTable';
 import { MarketplacePurchase } from '../../../hooks/api/useMarketplacePurchases';
 import { HydrateAtomsTestProvider } from '../../../Components/util/testing/HydrateAtomsTestProvider';
-import { MarketplacePurchasesPaginationData } from '../../../state/marketplacePurchases';
+import {
+  MarketplacePurchasesPaginationData,
+  MarketplacePurchasesSortByData,
+  MarketplacePurchasesSortDirData
+} from '../../../state/marketplacePurchases';
 import { Paths } from '../../../utils/routing';
 
 const makeMarketplacePurchases = (count: number): MarketplacePurchase[] =>
@@ -22,14 +26,19 @@ const defaultPagination = {
   itemCount: 10
 };
 
-const renderTable = (purchases: MarketplacePurchase[], pagination = defaultPagination) =>
-  renderWithRouter(
-    <HydrateAtomsTestProvider initialValues={[[MarketplacePurchasesPaginationData, pagination]]}>
-            
+const renderTable = (purchases: MarketplacePurchase[], pagination = defaultPagination) => {
+  return renderWithRouter(
+    <HydrateAtomsTestProvider
+      initialValues={[
+        [MarketplacePurchasesPaginationData, pagination],
+        [MarketplacePurchasesSortByData, undefined],
+        [MarketplacePurchasesSortDirData, undefined]
+      ]}
+    >
       <MarketplacePurchasesTable marketplacePurchases={purchases} />
-          
     </HydrateAtomsTestProvider>
   );
+};
 
 describe('MarketplacePurchasesTable', () => {
   it('renders the marketplace purchases table', () => {
@@ -156,6 +165,46 @@ describe('MarketplacePurchasesTable', () => {
       ).toBe(
         `/${Paths.CloudAccounts}?providerAccountID=${encodeURI(`["${marketplacePurchases[0].marketplaceAccount}"]`)}`
       );
+    });
+  });
+
+  it('allows a user to sort marketplace purchases by offering name', () => {
+    renderTable(makeMarketplacePurchases(3), defaultPagination);
+
+    const offeringNameHeader = screen.getByRole('columnheader', {
+      name: /offering name/i
+    });
+
+    expect(offeringNameHeader).not.toHaveAttribute('aria-sort', 'ascending');
+
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: /offering name/i
+      })
+    );
+
+    expect(offeringNameHeader).toHaveAttribute('aria-sort', 'ascending');
+  });
+  it('allows a user to sort by each marketplace purchase column', () => {
+    renderTable(makeMarketplacePurchases(3), defaultPagination);
+
+    const sortableColumns = [
+      /offering name/i,
+      /marketplace account/i,
+      /^marketplace$/i,
+      /date added/i
+    ];
+
+    sortableColumns.forEach((name) => {
+      const button = screen.getByRole('button', { name });
+
+      expect(button).toBeInTheDocument();
+
+      fireEvent.click(button);
+
+      const columnHeader = button.closest('th');
+
+      expect(columnHeader).toHaveAttribute('aria-sort');
     });
   });
 });
