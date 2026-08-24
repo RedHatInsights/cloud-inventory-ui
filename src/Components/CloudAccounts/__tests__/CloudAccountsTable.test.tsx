@@ -258,4 +258,14 @@ describe('CloudAccountsTable', () => {
       );
     });
   });
+  it('links View Purchases to marketplace purchases filtered by account', () => {
+    renderTable(makeAccounts(1));
+
+    const link = screen.getByRole('link', { name: 'View Purchases' });
+
+    const url = new URL(link.getAttribute('href')!, 'http://localhost');
+
+    expect(url.pathname).toBe('/subscriptions/cloud-inventory/marketplace-purchases');
+    expect(url.searchParams.get('marketplaceAccount')).toBe('acct-0');
+  });
 });

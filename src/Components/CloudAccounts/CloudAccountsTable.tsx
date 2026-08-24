@@ -115,8 +115,17 @@ export const CloudAccountsTable = ({
             </Td>
             <Td>{formatDate(row.date)}</Td>
             <Td>
-              <Button variant="link" isInline component="a">
-                View Purchases
+              <Button
+                variant="link"
+                isInline
+                component={(props) => (
+                  <Link
+                    {...props}
+                    to={`/subscriptions/cloud-inventory/marketplace-purchases?marketplaceAccount=${row.id}`}
+                  />
+                )}
+              >
+                  View Purchases
               </Button>
             </Td>
           </Tr>
