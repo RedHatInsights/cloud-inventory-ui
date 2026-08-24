@@ -121,7 +121,9 @@ export const CloudAccountsTable = ({
                 component={(props) => (
                   <Link
                     {...props}
-                    to={`/subscriptions/cloud-inventory/marketplace-purchases?marketplaceAccount=${row.id}`}
+                    to={`/subscriptions/cloud-inventory/marketplace-purchases?marketplaceAccount=${encodeURIComponent(
+                      row.id
+                    )}`}
                   />
                 )}
               >

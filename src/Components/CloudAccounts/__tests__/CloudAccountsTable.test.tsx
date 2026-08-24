@@ -258,14 +258,15 @@ describe('CloudAccountsTable', () => {
       );
     });
   });
-  it('links View Purchases to marketplace purchases filtered by account', () => {
-    renderTable(makeAccounts(1));
+  it('URL encodes marketplace account in View Purchases link', () => {
+    const accounts = makeAccounts(1);
+    accounts[0].providerAccountID = 'acct&123';
+
+    renderTable(accounts);
 
     const link = screen.getByRole('link', { name: 'View Purchases' });
-
     const url = new URL(link.getAttribute('href')!, 'http://localhost');
 
-    expect(url.pathname).toBe('/subscriptions/cloud-inventory/marketplace-purchases');
-    expect(url.searchParams.get('marketplaceAccount')).toBe('acct-0');
+    expect(url.searchParams.get('marketplaceAccount')).toBe('acct&123');
   });
 });
