@@ -1,6 +1,6 @@
 import React from 'react';
 import { SortByDirection, Table, Tbody, Td, Th, Thead, Tr } from '@patternfly/react-table';
-import { Button, Content } from '@patternfly/react-core';
+import { Content } from '@patternfly/react-core';
 import { Link } from 'react-router-dom';
 import { CloudAccountRow } from './types';
 import { CloudAccountStatus, getStatusIcon } from './GetStatusIcon';
@@ -15,6 +15,7 @@ import { useApiBasedTableSort } from '../../hooks/util/tables/useTableSort';
 import { hasPaginationError } from '../../utils/errors';
 import { PaginationError } from '../shared/PaginationError';
 import { CloudAccount } from '../../types/cloudAccountsTypes';
+import { Paths } from '../../utils/routing';
 
 type CloudAccountProps = {
   cloudAccounts: CloudAccount[];
@@ -115,20 +116,14 @@ export const CloudAccountsTable = ({
             </Td>
             <Td>{formatDate(row.date)}</Td>
             <Td>
-              <Button
-                variant="link"
-                isInline
-                component={(props) => (
-                  <Link
-                    {...props}
-                    to={`/subscriptions/cloud-inventory/marketplace-purchases?marketplaceAccount=${encodeURIComponent(
-                      row.id
-                    )}`}
-                  />
-                )}
+              <Link
+                to={`/subscriptions/cloud-inventory/${Paths.MarketplacePurchases}?${generateQueryParamsForData(
+                  [row.id],
+                  'marketplaceAccount'
+                ).toString()}`}
               >
                   View Purchases
-              </Button>
+              </Link>
             </Td>
           </Tr>
         ))}

@@ -266,7 +266,8 @@ describe('CloudAccountsTable', () => {
 
     const link = screen.getByRole('link', { name: 'View Purchases' });
     const url = new URL(link.getAttribute('href')!, 'http://localhost');
+    const param = url.searchParams.get('marketplaceAccount');
 
-    expect(url.searchParams.get('marketplaceAccount')).toBe('acct&123');
+    expect(JSON.parse(decodeURIComponent(param!))).toEqual(['acct&123']);
   });
 });
