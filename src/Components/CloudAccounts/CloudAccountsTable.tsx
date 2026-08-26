@@ -117,10 +117,10 @@ export const CloudAccountsTable = ({
             <Td>{formatDate(row.date)}</Td>
             <Td>
               <Link
-                to={`/subscriptions/cloud-inventory/${Paths.MarketplacePurchases}?${generateQueryParamsForData(
-                  [row.id],
-                  'marketplaceAccount'
-                ).toString()}`}
+                to={{
+                  pathname: `/subscriptions/cloud-inventory/${Paths.MarketplacePurchases}`,
+                  search: generateQueryParamsForData([row.id], 'marketplaceAccount').toString()
+                }}
               >
                   View Purchases
               </Link>
