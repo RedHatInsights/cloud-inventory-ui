@@ -258,4 +258,16 @@ describe('CloudAccountsTable', () => {
       );
     });
   });
+  it('URL encodes marketplace account in View Purchases link', () => {
+    const accounts = makeAccounts(1);
+    accounts[0].providerAccountID = 'acct&123';
+
+    renderTable(accounts);
+
+    const link = screen.getByRole('link', { name: 'View Purchases' });
+    const url = new URL(link.getAttribute('href')!, 'http://localhost');
+    const param = url.searchParams.get('marketplaceAccount');
+
+    expect(JSON.parse(decodeURIComponent(param!))).toEqual(['acct&123']);
+  });
 });
