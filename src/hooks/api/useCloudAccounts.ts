@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { HttpError } from '../../utils/errors';
 import { CloudAccountsResponse, FetchCloudAccountsArgs } from '../../types/cloudAccountsTypes';
 
@@ -46,6 +46,7 @@ const fetchCloudAccounts = async ({
 export const useCloudAccounts = (args: FetchCloudAccountsArgs) => {
   return useQuery({
     queryKey: ['cloudAccounts', args],
-    queryFn: () => fetchCloudAccounts(args)
+    queryFn: () => fetchCloudAccounts(args),
+    placeholderData: keepPreviousData
   });
 };
