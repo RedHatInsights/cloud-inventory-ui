@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Table, Tbody, Td, Th, Thead, Tr } from '@patternfly/react-table';
 import { formatDate } from '../../hooks/util/dates';
 import {
@@ -20,6 +20,7 @@ import { PaginationError } from '../shared/PaginationError';
 import { Link } from 'react-router-dom';
 import { Paths } from '../../utils/routing';
 import { useApiBasedTableSort } from '../../hooks/util/tables/useTableSort';
+import { MarketplacePurchasesSubscriptions } from './MarketplacePurchasesSubscriptions';
 
 type MarketplacePurchasesTableProps = {
   marketplacePurchases: MarketplacePurchase[];
@@ -49,6 +50,15 @@ export const MarketplacePurchasesTable = ({
     3: 'startDate'
   };
 
+  const [expandedRows, setExpandedRows] = useState<number[]>([]);
+
+  const setRowExpanded = (rowIndex: number, isExpanded: boolean) => {
+    setExpandedRows((prevExpanded) => {
+      const otherExpandedRows = prevExpanded.filter((index) => index !== rowIndex);
+
+      return isExpanded ? [...otherExpandedRows, rowIndex] : otherExpandedRows;
+    });
+  };
   const { getSortParams } = useApiBasedTableSort('marketplacePurchasesSort', {
     sortBy,
     setSortBy: (by: string) => setSortBy(by as MarketplacePurchaseSortField),
@@ -64,12 +74,13 @@ export const MarketplacePurchasesTable = ({
   }
 
   return (
-    <Table aria-label="Marketplace purchases table" variant="compact">
+    <Table aria-label="Marketplace purchases table" variant="compact" isExpandable>
       <Thead>
         <Tr>
-          <Th sort={getSortParams(0)}>Offering name</Th>
+          <Th />
+          <Th sort={getSortParams(1)}>Offering name</Th>
           <Th
-            sort={getSortParams(1)}
+            sort={getSortParams(2)}
             info={{
               tooltip:
                 'Some providers allow purchases to be shared across multiple provider accounts. The account shown here is the one that paid for the purchase.',
@@ -84,9 +95,9 @@ export const MarketplacePurchasesTable = ({
           >
             Marketplace account
           </Th>
-          <Th sort={getSortParams(2)}>Marketplace</Th>
+          <Th sort={getSortParams(3)}>Marketplace</Th>
           <Th
-            sort={getSortParams(3)}
+            sort={getSortParams(4)}
             info={{
               tooltip:
                 'The date shown here reflects the time that Red Hat was informed of the purchase. This date may differ from the date shown by the cloud provider.',
@@ -99,15 +110,22 @@ export const MarketplacePurchasesTable = ({
               }
             }}
           >
-            Date added
+            Date added     
           </Th>
         </Tr>
       </Thead>
-      <Tbody>
-                
-        {marketplacePurchases.map((purchase, index) => {
-          return (
-            <Tr key={`${pagination.page}-${index}`}>
+      {marketplacePurchases.map((purchase, index) => {
+        const isExpanded = expandedRows.includes(index);
+        return (
+          <Tbody key={`${pagination.page}-${index}`} isExpanded={isExpanded}>
+            <Tr isContentExpanded={isExpanded}>
+              <Td
+                expand={{
+                  rowIndex: index,
+                  isExpanded,
+                  onToggle: () => setRowExpanded(index, !isExpanded)
+                }}
+              />
               <Td dataLabel="Offering name">{purchase.offeringName}</Td>
               <Td dataLabel="Marketplace account">
                 <Link
@@ -116,7 +134,7 @@ export const MarketplacePurchasesTable = ({
                     'providerAccountID'
                   )}`}
                 >
-                   {purchase.marketplaceAccount}
+                  {purchase.marketplaceAccount}
                 </Link>
               </Td>
               <Td dataLabel="Marketplace">
@@ -124,9 +142,12 @@ export const MarketplacePurchasesTable = ({
               </Td>
               <Td dataLabel="Date added">{formatDate(purchase.startDate)}</Td>
             </Tr>
-          );
-        })}
-      </Tbody>
+            {isExpanded && (
+              <MarketplacePurchasesSubscriptions skus={purchase.skus} isExpanded={isExpanded} />
+            )}
+          </Tbody>
+        );
+      })}
     </Table>
   );
 };
