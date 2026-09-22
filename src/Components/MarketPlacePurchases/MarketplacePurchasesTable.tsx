@@ -52,6 +52,10 @@ export const MarketplacePurchasesTable = ({
 
   const [expandedRows, setExpandedRows] = useState<number[]>([]);
 
+  React.useEffect(() => {
+    setExpandedRows([]);
+  }, [marketplacePurchases]);
+
   const setRowExpanded = (rowIndex: number, isExpanded: boolean) => {
     setExpandedRows((prevExpanded) => {
       const otherExpandedRows = prevExpanded.filter((index) => index !== rowIndex);
@@ -78,9 +82,9 @@ export const MarketplacePurchasesTable = ({
       <Thead>
         <Tr>
           <Th />
-          <Th sort={getSortParams(1)}>Offering name</Th>
+          <Th sort={getSortParams(0)}>Offering name</Th>
           <Th
-            sort={getSortParams(2)}
+            sort={getSortParams(1)}
             info={{
               tooltip:
                 'Some providers allow purchases to be shared across multiple provider accounts. The account shown here is the one that paid for the purchase.',
@@ -95,9 +99,9 @@ export const MarketplacePurchasesTable = ({
           >
             Marketplace account
           </Th>
-          <Th sort={getSortParams(3)}>Marketplace</Th>
+          <Th sort={getSortParams(2)}>Marketplace</Th>
           <Th
-            sort={getSortParams(4)}
+            sort={getSortParams(3)}
             info={{
               tooltip:
                 'The date shown here reflects the time that Red Hat was informed of the purchase. This date may differ from the date shown by the cloud provider.',

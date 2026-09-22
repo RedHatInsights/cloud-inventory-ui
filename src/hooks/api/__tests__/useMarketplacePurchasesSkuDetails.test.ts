@@ -52,12 +52,17 @@ describe('useMarketplacePurchasesSkuDetails', () => {
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(result.current.data?.body).toEqual([]);
   });
+
   it('enters error state on network failure', async () => {
-    global.fetch = jest.fn(() => Promise.reject(new Error('Network error'))) as jest.Mock;
-    const { result } = renderHook(() => useMarketplacePurchasesSkuDetails(['123456']), {
-      wrapper: mocks.wrapper
-    });
-    await waitFor(() => expect(result.current.isError).toBe(true));
+    const fetchSpy = jest.spyOn(global, 'fetch').mockRejectedValue(new Error('Network error'));
+    try {
+      const { result } = renderHook(() => useMarketplacePurchasesSkuDetails(['123456']), {
+        wrapper: mocks.wrapper
+      });
+      await waitFor(() => expect(result.current.isError).toBe(true));
+    } finally {
+      fetchSpy.mockRestore();
+    }
   });
   it('starts in loading state', () => {
     mocks.addMock(`${skuDetailsUrl}?skus=123456`, {}, true);
