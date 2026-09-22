@@ -119,16 +119,21 @@ export const MarketplacePurchasesTable = ({
         </Tr>
       </Thead>
       {marketplacePurchases.map((purchase, index) => {
+        const hasSubscriptions = purchase.skus.length > 0;
         const isExpanded = expandedRows.includes(index);
         return (
           <Tbody key={`${pagination.page}-${index}`} isExpanded={isExpanded}>
             <Tr isContentExpanded={isExpanded}>
               <Td
-                expand={{
-                  rowIndex: index,
-                  isExpanded,
-                  onToggle: () => setRowExpanded(index, !isExpanded)
-                }}
+                expand={
+                  hasSubscriptions
+                    ? {
+                        rowIndex: index,
+                        isExpanded,
+                        onToggle: () => setRowExpanded(index, !isExpanded)
+                      }
+                    : undefined
+                }
               />
               <Td dataLabel="Offering name">{purchase.offeringName}</Td>
               <Td dataLabel="Marketplace account">
@@ -146,7 +151,7 @@ export const MarketplacePurchasesTable = ({
               </Td>
               <Td dataLabel="Date added">{formatDate(purchase.startDate)}</Td>
             </Tr>
-            {isExpanded && (
+            {isExpanded && hasSubscriptions && (
               <MarketplacePurchasesSubscriptions skus={purchase.skus} isExpanded={isExpanded} />
             )}
           </Tbody>
