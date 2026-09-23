@@ -3,6 +3,7 @@ import { ExpandableRowContent, Td, Tr } from '@patternfly/react-table';
 import { Grid, GridItem } from '@patternfly/react-core';
 import { useMarketplacePurchasesSkuDetails } from '../../hooks/api/useMarketplacePurchasesSkuDetails';
 import { Loading } from '../util/Loading';
+import { Link } from 'react-router-dom';
 
 type MarketplacePurchasesSubscriptionsProps = {
   skus: string[];
@@ -37,7 +38,7 @@ export const MarketplacePurchasesSubscriptions = ({
               {skus.map((sku) => (
                 <GridItem span={12} key={sku}>
                   The request for subscription names failed. For more information, view{' '}
-                  <a href={`/subscriptions/inventory/${sku}`}>{sku}</a>
+                  <Link to={`/subscriptions/inventory/${sku}`}>{sku}</Link>
                   {' details. '}
                 </GridItem>
               ))}
@@ -69,7 +70,7 @@ export const MarketplacePurchasesSubscriptions = ({
                 <GridItem span={12} key={sku}>
                   <Grid>
                     <GridItem span={4}>
-                      <a href={`/subscriptions/inventory/${sku}`}>{description}</a>
+                      <Link to={`/subscriptions/inventory/${sku}`}>{description}</Link>
                     </GridItem>
                     <GridItem span={4}>{sku}</GridItem>
                   </Grid>

@@ -188,8 +188,12 @@ describe('MarketplacePurchasesTable', () => {
   it('allows a user to sort by each marketplace purchase column', () => {
     renderTable(makeMarketplacePurchases(3), defaultPagination);
 
-    const sortableColumns = [/offering name/i];
-
+    const sortableColumns = [
+      /offering name/i,
+      /marketplace account/i,
+      /^marketplace$/i,
+      /date added/i
+    ];
     sortableColumns.forEach((name) => {
       const button = screen.getByRole('button', { name });
 

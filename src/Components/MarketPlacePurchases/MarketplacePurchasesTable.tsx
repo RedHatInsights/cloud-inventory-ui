@@ -50,17 +50,13 @@ export const MarketplacePurchasesTable = ({
     3: 'startDate'
   };
 
-  const [expandedRows, setExpandedRows] = useState<number[]>([]);
+  const [expandedRows, setExpandedRows] = useState<string[]>([]);
 
-  React.useEffect(() => {
-    setExpandedRows([]);
-  }, [marketplacePurchases]);
-
-  const setRowExpanded = (rowIndex: number, isExpanded: boolean) => {
+  const setRowExpanded = (purchaseId: string, isExpanded: boolean) => {
     setExpandedRows((prevExpanded) => {
-      const otherExpandedRows = prevExpanded.filter((index) => index !== rowIndex);
+      const otherExpandedRows = prevExpanded.filter((id) => id !== purchaseId);
 
-      return isExpanded ? [...otherExpandedRows, rowIndex] : otherExpandedRows;
+      return isExpanded ? [...otherExpandedRows, purchaseId] : otherExpandedRows;
     });
   };
   const { getSortParams } = useApiBasedTableSort('marketplacePurchasesSort', {
@@ -72,6 +68,9 @@ export const MarketplacePurchasesTable = ({
   });
 
   const onInvalidPage = hasPaginationError(pagination);
+
+  const getPurchaseId = (purchase: MarketplacePurchase) =>
+    `${purchase.marketplace}-${purchase.marketplaceAccount}-${purchase.offeringName}-${purchase.startDate}`;
 
   if (onInvalidPage) {
     return <PaginationError pagination={pagination} setPagination={setPagination} />;
@@ -114,15 +113,16 @@ export const MarketplacePurchasesTable = ({
               }
             }}
           >
-            Date added     
+            Date added
           </Th>
         </Tr>
       </Thead>
       {marketplacePurchases.map((purchase, index) => {
+        const purchaseId = getPurchaseId(purchase);
         const hasSubscriptions = purchase.skus.length > 0;
-        const isExpanded = expandedRows.includes(index);
+        const isExpanded = expandedRows.includes(purchaseId);
         return (
-          <Tbody key={`${pagination.page}-${index}`} isExpanded={isExpanded}>
+          <Tbody key={purchaseId} isExpanded={isExpanded}>
             <Tr isContentExpanded={isExpanded}>
               <Td
                 expand={
@@ -130,7 +130,7 @@ export const MarketplacePurchasesTable = ({
                     ? {
                         rowIndex: index,
                         isExpanded,
-                        onToggle: () => setRowExpanded(index, !isExpanded)
+                        onToggle: () => setRowExpanded(purchaseId, !isExpanded)
                       }
                     : undefined
                 }
