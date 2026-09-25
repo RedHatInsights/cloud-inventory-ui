@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Table, Tbody, Td, Th, Thead, Tr } from '@patternfly/react-table';
 import { formatDate } from '../../hooks/util/dates';
 import {
@@ -20,6 +20,7 @@ import { PaginationError } from '../shared/PaginationError';
 import { Link } from 'react-router-dom';
 import { Paths } from '../../utils/routing';
 import { useApiBasedTableSort } from '../../hooks/util/tables/useTableSort';
+import { MarketplacePurchasesSubscriptions } from './MarketplacePurchasesSubscriptions';
 
 type MarketplacePurchasesTableProps = {
   marketplacePurchases: MarketplacePurchase[];
@@ -49,6 +50,16 @@ export const MarketplacePurchasesTable = ({
     3: 'startDate'
   };
 
+  const [expandedRows, setExpandedRows] = useState<string[]>([]);
+
+  const setRowExpanded = (purchaseId: string, isExpanded: boolean) => {
+    setExpandedRows((prevExpanded) => {
+      const otherExpandedRows = prevExpanded.filter((id) => id !== purchaseId);
+
+      return isExpanded ? [...otherExpandedRows, purchaseId] : otherExpandedRows;
+    });
+  };
+
   const { getSortParams } = useApiBasedTableSort('marketplacePurchasesSort', {
     sortBy,
     setSortBy: (by: string) => setSortBy(by as MarketplacePurchaseSortField),
@@ -59,14 +70,18 @@ export const MarketplacePurchasesTable = ({
 
   const onInvalidPage = hasPaginationError(pagination);
 
+  const getPurchaseId = (purchase: MarketplacePurchase) =>
+    `${purchase.marketplace}-${purchase.marketplaceAccount}-${purchase.offeringName}-${purchase.startDate}`;
+
   if (onInvalidPage) {
     return <PaginationError pagination={pagination} setPagination={setPagination} />;
   }
 
   return (
-    <Table aria-label="Marketplace purchases table" variant="compact">
+    <Table aria-label="Marketplace purchases table" variant="compact" isExpandable>
       <Thead>
         <Tr>
+          <Th />
           <Th sort={getSortParams(0)}>Offering name</Th>
           <Th
             sort={getSortParams(1)}
@@ -104,26 +119,44 @@ export const MarketplacePurchasesTable = ({
         </Tr>
       </Thead>
       <Tbody>
-                
         {marketplacePurchases.map((purchase, index) => {
+          const purchaseId = getPurchaseId(purchase);
+          const hasSubscriptions = purchase.skus.length > 0;
+          const isExpanded = expandedRows.includes(purchaseId);
           return (
-            <Tr key={`${pagination.page}-${index}`}>
-              <Td dataLabel="Offering name">{purchase.offeringName}</Td>
-              <Td dataLabel="Marketplace account">
-                <Link
-                  to={`../${Paths.CloudAccounts}?${generateQueryParamsForData(
-                    [purchase.marketplaceAccount],
-                    'providerAccountID'
-                  )}`}
-                >
-                   {purchase.marketplaceAccount}
-                </Link>
-              </Td>
-              <Td dataLabel="Marketplace">
-                {marketplaceToFriendly[purchase.marketplace] ?? purchase.marketplace}
-              </Td>
-              <Td dataLabel="Date added">{formatDate(purchase.startDate)}</Td>
-            </Tr>
+            <React.Fragment key={`${pagination.page}-${index}`}>
+              <Tr isContentExpanded={isExpanded}>
+                <Td
+                  expand={
+                    hasSubscriptions
+                      ? {
+                          rowIndex: index,
+                          isExpanded,
+                          onToggle: () => setRowExpanded(purchaseId, !isExpanded)
+                        }
+                      : undefined
+                  }
+                />
+                <Td dataLabel="Offering name">{purchase.offeringName}</Td>
+                <Td dataLabel="Marketplace account">
+                  <Link
+                    to={`../${Paths.CloudAccounts}?${generateQueryParamsForData(
+                      [purchase.marketplaceAccount],
+                      'providerAccountID'
+                    )}`}
+                  >
+                    {purchase.marketplaceAccount}
+                  </Link>
+                </Td>
+                <Td dataLabel="Marketplace">
+                  {marketplaceToFriendly[purchase.marketplace] ?? purchase.marketplace}
+                </Td>
+                <Td dataLabel="Date added">{formatDate(purchase.startDate)}</Td>
+              </Tr>
+              {isExpanded && hasSubscriptions && (
+                <MarketplacePurchasesSubscriptions skus={purchase.skus} isExpanded={isExpanded} />
+              )}
+            </React.Fragment>
           );
         })}
       </Tbody>
