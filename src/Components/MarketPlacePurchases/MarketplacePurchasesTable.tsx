@@ -59,6 +59,7 @@ export const MarketplacePurchasesTable = ({
       return isExpanded ? [...otherExpandedRows, purchaseId] : otherExpandedRows;
     });
   };
+
   const { getSortParams } = useApiBasedTableSort('marketplacePurchasesSort', {
     sortBy,
     setSortBy: (by: string) => setSortBy(by as MarketplacePurchaseSortField),
@@ -117,46 +118,48 @@ export const MarketplacePurchasesTable = ({
           </Th>
         </Tr>
       </Thead>
-      {marketplacePurchases.map((purchase, index) => {
-        const purchaseId = getPurchaseId(purchase);
-        const hasSubscriptions = purchase.skus.length > 0;
-        const isExpanded = expandedRows.includes(purchaseId);
-        return (
-          <Tbody key={purchaseId} isExpanded={isExpanded}>
-            <Tr isContentExpanded={isExpanded}>
-              <Td
-                expand={
-                  hasSubscriptions
-                    ? {
-                        rowIndex: index,
-                        isExpanded,
-                        onToggle: () => setRowExpanded(purchaseId, !isExpanded)
-                      }
-                    : undefined
-                }
-              />
-              <Td dataLabel="Offering name">{purchase.offeringName}</Td>
-              <Td dataLabel="Marketplace account">
-                <Link
-                  to={`../${Paths.CloudAccounts}?${generateQueryParamsForData(
-                    [purchase.marketplaceAccount],
-                    'providerAccountID'
-                  )}`}
-                >
-                  {purchase.marketplaceAccount}
-                </Link>
-              </Td>
-              <Td dataLabel="Marketplace">
-                {marketplaceToFriendly[purchase.marketplace] ?? purchase.marketplace}
-              </Td>
-              <Td dataLabel="Date added">{formatDate(purchase.startDate)}</Td>
-            </Tr>
-            {isExpanded && hasSubscriptions && (
-              <MarketplacePurchasesSubscriptions skus={purchase.skus} isExpanded={isExpanded} />
-            )}
-          </Tbody>
-        );
-      })}
+      <Tbody>
+        {marketplacePurchases.map((purchase, index) => {
+          const purchaseId = getPurchaseId(purchase);
+          const hasSubscriptions = purchase.skus.length > 0;
+          const isExpanded = expandedRows.includes(purchaseId);
+          return (
+            <React.Fragment key={`${pagination.page}-${index}`}>
+              <Tr isContentExpanded={isExpanded}>
+                <Td
+                  expand={
+                    hasSubscriptions
+                      ? {
+                          rowIndex: index,
+                          isExpanded,
+                          onToggle: () => setRowExpanded(purchaseId, !isExpanded)
+                        }
+                      : undefined
+                  }
+                />
+                <Td dataLabel="Offering name">{purchase.offeringName}</Td>
+                <Td dataLabel="Marketplace account">
+                  <Link
+                    to={`../${Paths.CloudAccounts}?${generateQueryParamsForData(
+                      [purchase.marketplaceAccount],
+                      'providerAccountID'
+                    )}`}
+                  >
+                    {purchase.marketplaceAccount}
+                  </Link>
+                </Td>
+                <Td dataLabel="Marketplace">
+                  {marketplaceToFriendly[purchase.marketplace] ?? purchase.marketplace}
+                </Td>
+                <Td dataLabel="Date added">{formatDate(purchase.startDate)}</Td>
+              </Tr>
+              {isExpanded && hasSubscriptions && (
+                <MarketplacePurchasesSubscriptions skus={purchase.skus} isExpanded={isExpanded} />
+              )}
+            </React.Fragment>
+          );
+        })}
+      </Tbody>
     </Table>
   );
 };
