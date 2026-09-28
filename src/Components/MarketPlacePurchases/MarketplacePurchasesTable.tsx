@@ -50,17 +50,17 @@ export const MarketplacePurchasesTable = ({
     3: 'startDate'
   };
 
-  const [expandedRows, setExpandedRows] = useState<string[]>([]);
+  const [expandedRows, setExpandedRows] = useState<number[]>([]);
 
   React.useEffect(() => {
     setExpandedRows([]);
   }, [sortBy, sortDir]);
 
-  const setRowExpanded = (purchaseId: string, isExpanded: boolean) => {
+  const setRowExpanded = (rowIndex: number, isExpanded: boolean) => {
     setExpandedRows((prevExpanded) => {
-      const otherExpandedRows = prevExpanded.filter((id) => id !== purchaseId);
+      const otherExpandedRows = prevExpanded.filter((index) => index !== rowIndex);
 
-      return isExpanded ? [...otherExpandedRows, purchaseId] : otherExpandedRows;
+      return isExpanded ? [...otherExpandedRows, rowIndex] : otherExpandedRows;
     });
   };
 
@@ -73,9 +73,6 @@ export const MarketplacePurchasesTable = ({
   });
 
   const onInvalidPage = hasPaginationError(pagination);
-
-  const getPurchaseId = (purchase: MarketplacePurchase) =>
-    `${purchase.marketplace}-${purchase.marketplaceAccount}-${purchase.offeringName}-${purchase.startDate}`;
 
   if (onInvalidPage) {
     return <PaginationError pagination={pagination} setPagination={setPagination} />;
@@ -124,9 +121,8 @@ export const MarketplacePurchasesTable = ({
       </Thead>
       <Tbody>
         {marketplacePurchases.map((purchase, index) => {
-          const purchaseId = getPurchaseId(purchase);
           const hasSubscriptions = purchase.skus.length > 0;
-          const isExpanded = expandedRows.includes(purchaseId);
+          const isExpanded = expandedRows.includes(index);
           return (
             <React.Fragment key={`${pagination.page}-${index}`}>
               <Tr isContentExpanded={isExpanded}>
@@ -136,7 +132,7 @@ export const MarketplacePurchasesTable = ({
                       ? {
                           rowIndex: index,
                           isExpanded,
-                          onToggle: () => setRowExpanded(purchaseId, !isExpanded)
+                          onToggle: () => setRowExpanded(index, !isExpanded)
                         }
                       : undefined
                   }
