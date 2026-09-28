@@ -52,6 +52,10 @@ export const MarketplacePurchasesTable = ({
 
   const [expandedRows, setExpandedRows] = useState<string[]>([]);
 
+  React.useEffect(() => {
+    setExpandedRows([]);
+  }, [sortBy, sortDir]);
+
   const setRowExpanded = (purchaseId: string, isExpanded: boolean) => {
     setExpandedRows((prevExpanded) => {
       const otherExpandedRows = prevExpanded.filter((id) => id !== purchaseId);
