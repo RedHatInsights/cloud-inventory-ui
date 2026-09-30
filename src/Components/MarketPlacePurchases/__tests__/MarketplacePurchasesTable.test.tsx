@@ -1,5 +1,5 @@
 import React from 'react';
-import { fireEvent, screen, waitFor } from '@testing-library/react';
+import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { renderWithRouter } from '../../../utils/testing/customRender';
 import { MarketplacePurchasesTable } from '../MarketplacePurchasesTable';
 import { MarketplacePurchase } from '../../../hooks/api/useMarketplacePurchases';
@@ -194,7 +194,6 @@ describe('MarketplacePurchasesTable', () => {
       /^marketplace$/i,
       /date added/i
     ];
-
     sortableColumns.forEach((name) => {
       const button = screen.getByRole('button', { name });
 
@@ -206,5 +205,23 @@ describe('MarketplacePurchasesTable', () => {
 
       expect(columnHeader).toHaveAttribute('aria-sort');
     });
+  });
+
+  it('only renders an expand button for purchases with subscriptions', () => {
+    const purchases = makeMarketplacePurchases(2);
+
+    purchases[0].skus = [];
+    purchases[1].skus = ['SKU-1'];
+
+    renderTable(purchases);
+
+    const rows = screen.getAllByRole('row');
+
+    const firstPurchaseRow = rows[1];
+    const secondPurchaseRow = rows[2];
+
+    expect(within(firstPurchaseRow).queryByRole('button')).not.toBeInTheDocument();
+
+    expect(within(secondPurchaseRow).getByRole('button')).toBeInTheDocument();
   });
 });
