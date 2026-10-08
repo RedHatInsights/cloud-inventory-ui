@@ -1,20 +1,27 @@
 import React from 'react';
 import { ExpandableRowContent, Td, Tr } from '@patternfly/react-table';
-import { Grid, GridItem } from '@patternfly/react-core';
+import { Button, Grid, GridItem } from '@patternfly/react-core';
 import { useMarketplacePurchasesSkuDetails } from '../../hooks/api/useMarketplacePurchasesSkuDetails';
 import { Loading } from '../util/Loading';
 import { Link } from 'react-router-dom';
+import { MarketplacePurchasesSubscriptionsModal } from './MarketplacePurchasesSubscriptionsModal';
 
 type MarketplacePurchasesSubscriptionsProps = {
   skus: string[];
+  marketplaceAccount: string;
+  offeringName: string;
   isExpanded: boolean;
 };
 
 export const MarketplacePurchasesSubscriptions = ({
   skus,
-  isExpanded
+  isExpanded,
+  offeringName,
+  marketplaceAccount
 }: MarketplacePurchasesSubscriptionsProps) => {
   const { data, isLoading, isError } = useMarketplacePurchasesSkuDetails(skus);
+
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
 
   if (isLoading) {
     return (
@@ -49,6 +56,10 @@ export const MarketplacePurchasesSubscriptions = ({
     );
   }
 
+  const MAX_VISIBLE_SUBSCRIPTIONS = 5;
+  const visibleSubscriptions = data?.body.slice(0, MAX_VISIBLE_SUBSCRIPTIONS) ?? [];
+  const hasMoreSubscriptions = (data?.body.length ?? 0) > MAX_VISIBLE_SUBSCRIPTIONS;
+
   return (
     <>
       <Tr isExpanded={isExpanded}>
@@ -66,7 +77,7 @@ export const MarketplacePurchasesSubscriptions = ({
                   </GridItem>
                 </Grid>
               </GridItem>
-              {data?.body.map(({ sku, description }) => (
+              {visibleSubscriptions.map(({ sku, description }) => (
                 <GridItem span={12} key={sku}>
                   <Grid>
                     <GridItem span={4}>
@@ -76,10 +87,22 @@ export const MarketplacePurchasesSubscriptions = ({
                   </Grid>
                 </GridItem>
               ))}
+              {hasMoreSubscriptions && (
+                <Button variant="link" isInline onClick={() => setIsModalOpen(true)}>
+                  View more
+                </Button>
+              )}
             </Grid>
           </ExpandableRowContent>
         </Td>
       </Tr>
+      <MarketplacePurchasesSubscriptionsModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        subscriptions={data?.body ?? []}
+        marketplaceAccount={marketplaceAccount}
+        offeringName={offeringName}
+      />
     </>
   );
 };

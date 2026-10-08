@@ -154,7 +154,12 @@ export const MarketplacePurchasesTable = ({
                 <Td dataLabel="Date added">{formatDate(purchase.startDate)}</Td>
               </Tr>
               {isExpanded && hasSubscriptions && (
-                <MarketplacePurchasesSubscriptions skus={purchase.skus} isExpanded={isExpanded} />
+                <MarketplacePurchasesSubscriptions
+                  skus={purchase.skus}
+                  isExpanded={isExpanded}
+                  marketplaceAccount={purchase.marketplaceAccount}
+                  offeringName={purchase.offeringName}
+                />
               )}
             </React.Fragment>
           );
