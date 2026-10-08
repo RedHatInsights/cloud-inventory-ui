@@ -9,7 +9,14 @@ jest.mock('../../../hooks/api/useMarketplacePurchasesSkuDetails');
 const mockUseMarketplacePurchasesSkuDetails = useMarketplacePurchasesSkuDetails as jest.Mock;
 
 const renderComponent = (skus = ['123456', '789012']) =>
-  renderWithRouter(<MarketplacePurchasesSubscriptions skus={skus} isExpanded />);
+  renderWithRouter(
+    <MarketplacePurchasesSubscriptions
+      skus={skus}
+      isExpanded
+      marketplaceAccount={''}
+      offeringName={''}
+    />
+  );
 
 beforeEach(() => {
   window.history.pushState({}, '', '/');

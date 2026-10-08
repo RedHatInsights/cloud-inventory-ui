@@ -32,7 +32,10 @@ export type FetchMarketplacePurchasesArgs = {
 };
 
 export type MarketplacePurchaseSortField =
-  'offeringName' | 'marketplaceAccount' | 'marketplace' | 'startDate';
+  | 'offeringName'
+  | 'marketplaceAccount'
+  | 'marketplace'
+  | 'startDate';
 
 export type SortDirection = 'asc' | 'desc';
 
