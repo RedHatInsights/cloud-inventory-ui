@@ -1,7 +1,7 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
 import { renderWithRouter } from '../../../utils/testing/customRender';
-import { MarketplacePurchasesSubscriptionsModal } from '../MarketplacePurchasesSubscriptionsModal';
+import { MarketplacePurchasesSubscriptionsOverflowModal } from '../MarketplacePurchasesSubscriptionsOverflowModal';
 import { Paths } from '../../../utils/routing';
 
 const subscriptions = [
@@ -29,7 +29,7 @@ describe('MarketplacePurchasesSubscriptionsModal', () => {
   });
 
   it('renders the modal when open', () => {
-    renderWithRouter(<MarketplacePurchasesSubscriptionsModal {...defaultProps} />);
+    renderWithRouter(<MarketplacePurchasesSubscriptionsOverflowModal {...defaultProps} />);
 
     expect(screen.getByRole('dialog')).toBeInTheDocument();
 
@@ -37,21 +37,21 @@ describe('MarketplacePurchasesSubscriptionsModal', () => {
   });
 
   it('renders the offering name', () => {
-    renderWithRouter(<MarketplacePurchasesSubscriptionsModal {...defaultProps} />);
+    renderWithRouter(<MarketplacePurchasesSubscriptionsOverflowModal {...defaultProps} />);
 
     expect(screen.getByText('Offering name')).toBeInTheDocument();
     expect(screen.getByText('Test offering')).toBeInTheDocument();
   });
 
   it('renders the marketplace account', () => {
-    renderWithRouter(<MarketplacePurchasesSubscriptionsModal {...defaultProps} />);
+    renderWithRouter(<MarketplacePurchasesSubscriptionsOverflowModal {...defaultProps} />);
 
     expect(screen.getByText('Marketplace account')).toBeInTheDocument();
     expect(screen.getByText('account-123')).toBeInTheDocument();
   });
 
   it('links the marketplace account to Cloud Accounts', () => {
-    renderWithRouter(<MarketplacePurchasesSubscriptionsModal {...defaultProps} />);
+    renderWithRouter(<MarketplacePurchasesSubscriptionsOverflowModal {...defaultProps} />);
 
     const accountLink = screen.getByRole('link', {
       name: 'account-123'
@@ -64,7 +64,7 @@ describe('MarketplacePurchasesSubscriptionsModal', () => {
   });
 
   it('renders all subscriptions', () => {
-    renderWithRouter(<MarketplacePurchasesSubscriptionsModal {...defaultProps} />);
+    renderWithRouter(<MarketplacePurchasesSubscriptionsOverflowModal {...defaultProps} />);
 
     expect(screen.getByText('Alpha subscription')).toBeInTheDocument();
     expect(screen.getByText('SKU-100')).toBeInTheDocument();
@@ -74,7 +74,9 @@ describe('MarketplacePurchasesSubscriptionsModal', () => {
   });
 
   it('does not render the modal when closed', () => {
-    renderWithRouter(<MarketplacePurchasesSubscriptionsModal {...defaultProps} isOpen={false} />);
+    renderWithRouter(
+      <MarketplacePurchasesSubscriptionsOverflowModal {...defaultProps} isOpen={false} />
+    );
 
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });

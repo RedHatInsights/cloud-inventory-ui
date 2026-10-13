@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import {
   Button,
+  Content,
   Modal,
   ModalBody,
   ModalFooter,
@@ -10,14 +11,14 @@ import {
 } from '@patternfly/react-core';
 import { generateQueryParamsForData } from '../../hooks/util/useQueryParam';
 import { Paths } from '../../utils/routing';
-import { MarketplacePurchasesSubscriptionsTable } from './MarketplacePurchasesSubscriptionsTable';
+import { MarketplacePurchasesSubscriptionsOverflowTable } from './MarketplacePurchasesSubscriptionsOverflowTable';
 
 type Subscription = {
   sku: string;
   description: string;
 };
 
-type MarketplacePurchasesSubscriptionsModalProps = {
+type MarketplacePurchasesSubscriptionsOverflowModalProps = {
   isOpen: boolean;
   onClose: () => void;
   subscriptions: Subscription[];
@@ -25,13 +26,13 @@ type MarketplacePurchasesSubscriptionsModalProps = {
   offeringName: string;
 };
 
-export const MarketplacePurchasesSubscriptionsModal = ({
+export const MarketplacePurchasesSubscriptionsOverflowModal = ({
   isOpen,
   onClose,
   subscriptions,
   marketplaceAccount,
   offeringName
-}: MarketplacePurchasesSubscriptionsModalProps) => {
+}: MarketplacePurchasesSubscriptionsOverflowModalProps) => {
   return (
     <Modal
       variant={ModalVariant.small}
@@ -41,14 +42,11 @@ export const MarketplacePurchasesSubscriptionsModal = ({
     >
       <ModalHeader title="Subscriptions" labelId="subscriptions-modal-title" />
       <ModalBody>
-        <div>
-          <strong>Offering name</strong>
-          <div>{offeringName}</div>
-        </div>
-        <br />
-        <div>
-          <strong>Marketplace account</strong>
-          <div>
+        <Content>
+            <Content component="h4">Offering name</Content>
+            <Content component="p">{offeringName}</Content>
+            <Content component="h4">Marketplace account</Content>
+          <Content component="p">
             <Link
               to={`../${Paths.CloudAccounts}?${generateQueryParamsForData(
                 [marketplaceAccount],
@@ -57,10 +55,10 @@ export const MarketplacePurchasesSubscriptionsModal = ({
             >
               {marketplaceAccount}
             </Link>
-          </div>
-        </div>
+          </Content>
+        </Content>
         <br />
-        <MarketplacePurchasesSubscriptionsTable subscriptions={subscriptions} />
+        <MarketplacePurchasesSubscriptionsOverflowTable subscriptions={subscriptions} />
       </ModalBody>
       <ModalFooter>
         <Button variant="primary" onClick={onClose}>

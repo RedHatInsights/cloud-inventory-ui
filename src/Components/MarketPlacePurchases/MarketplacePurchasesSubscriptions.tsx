@@ -4,7 +4,7 @@ import { Button, Grid, GridItem } from '@patternfly/react-core';
 import { useMarketplacePurchasesSkuDetails } from '../../hooks/api/useMarketplacePurchasesSkuDetails';
 import { Loading } from '../util/Loading';
 import { Link } from 'react-router-dom';
-import { MarketplacePurchasesSubscriptionsModal } from './MarketplacePurchasesSubscriptionsModal';
+import { MarketplacePurchasesSubscriptionsOverflowModal } from './MarketplacePurchasesSubscriptionsOverflowModal';
 
 type MarketplacePurchasesSubscriptionsProps = {
   skus: string[];
@@ -96,7 +96,7 @@ export const MarketplacePurchasesSubscriptions = ({
           </ExpandableRowContent>
         </Td>
       </Tr>
-      <MarketplacePurchasesSubscriptionsModal
+      <MarketplacePurchasesSubscriptionsOverflowModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         subscriptions={data?.body ?? []}

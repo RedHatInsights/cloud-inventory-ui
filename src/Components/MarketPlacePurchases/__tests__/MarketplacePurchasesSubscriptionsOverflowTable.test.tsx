@@ -1,7 +1,7 @@
 import React from 'react';
 import { fireEvent, screen, within } from '@testing-library/react';
 import { renderWithRouter } from '../../../utils/testing/customRender';
-import { MarketplacePurchasesSubscriptionsTable } from '../MarketplacePurchasesSubscriptionsTable';
+import { MarketplacePurchasesSubscriptionsOverflowTable } from '../MarketplacePurchasesSubscriptionsOverflowTable';
 
 const subscriptions = [
   {
@@ -18,9 +18,15 @@ const subscriptions = [
   }
 ];
 
+beforeEach(() => {
+  window.history.pushState({}, '', '/');
+});
+
 describe('MarketplacePurchasesSubscriptionsTable', () => {
   it('renders all subscriptions in the original order by default', () => {
-    renderWithRouter(<MarketplacePurchasesSubscriptionsTable subscriptions={subscriptions} />);
+    renderWithRouter(
+      <MarketplacePurchasesSubscriptionsOverflowTable subscriptions={subscriptions} />
+    );
 
     expect(
       screen.getByRole('grid', {
@@ -38,7 +44,9 @@ describe('MarketplacePurchasesSubscriptionsTable', () => {
   });
 
   it('links subscription names to subscription inventory', () => {
-    renderWithRouter(<MarketplacePurchasesSubscriptionsTable subscriptions={subscriptions} />);
+    renderWithRouter(
+      <MarketplacePurchasesSubscriptionsOverflowTable subscriptions={subscriptions} />
+    );
 
     expect(
       screen.getByRole('link', {
@@ -48,7 +56,9 @@ describe('MarketplacePurchasesSubscriptionsTable', () => {
   });
 
   it('sorts subscriptions by name ascending and descending', () => {
-    renderWithRouter(<MarketplacePurchasesSubscriptionsTable subscriptions={subscriptions} />);
+    renderWithRouter(
+      <MarketplacePurchasesSubscriptionsOverflowTable subscriptions={subscriptions} />
+    );
 
     const subscriptionNameSortButton = screen.getByRole('button', {
       name: /subscription name/i
@@ -72,7 +82,9 @@ describe('MarketplacePurchasesSubscriptionsTable', () => {
   });
 
   it('sorts subscriptions by SKU ascending and descending', () => {
-    renderWithRouter(<MarketplacePurchasesSubscriptionsTable subscriptions={subscriptions} />);
+    renderWithRouter(
+      <MarketplacePurchasesSubscriptionsOverflowTable subscriptions={subscriptions} />
+    );
 
     const skuSortButton = screen.getByRole('button', {
       name: /^sku$/i
@@ -96,7 +108,9 @@ describe('MarketplacePurchasesSubscriptionsTable', () => {
   });
 
   it('does not apply an active sort on initial render', () => {
-    renderWithRouter(<MarketplacePurchasesSubscriptionsTable subscriptions={subscriptions} />);
+    renderWithRouter(
+      <MarketplacePurchasesSubscriptionsOverflowTable subscriptions={subscriptions} />
+    );
 
     const subscriptionNameHeader = screen.getByRole('columnheader', {
       name: /subscription name/i
@@ -111,7 +125,9 @@ describe('MarketplacePurchasesSubscriptionsTable', () => {
   });
 
   it('filters subscriptions by subscription name', () => {
-    renderWithRouter(<MarketplacePurchasesSubscriptionsTable subscriptions={subscriptions} />);
+    renderWithRouter(
+      <MarketplacePurchasesSubscriptionsOverflowTable subscriptions={subscriptions} />
+    );
 
     const filterInput = screen.getByPlaceholderText(/filter by name or sku/i);
 
@@ -128,7 +144,9 @@ describe('MarketplacePurchasesSubscriptionsTable', () => {
   });
 
   it('filters subscriptions by SKU', () => {
-    renderWithRouter(<MarketplacePurchasesSubscriptionsTable subscriptions={subscriptions} />);
+    renderWithRouter(
+      <MarketplacePurchasesSubscriptionsOverflowTable subscriptions={subscriptions} />
+    );
 
     const filterInput = screen.getByPlaceholderText(/filter by name or sku/i);
 
@@ -146,7 +164,9 @@ describe('MarketplacePurchasesSubscriptionsTable', () => {
   });
 
   it('filters subscriptions case-insensitively', () => {
-    renderWithRouter(<MarketplacePurchasesSubscriptionsTable subscriptions={subscriptions} />);
+    renderWithRouter(
+      <MarketplacePurchasesSubscriptionsOverflowTable subscriptions={subscriptions} />
+    );
 
     const filterInput = screen.getByPlaceholderText(/filter by name or sku/i);
 
@@ -162,7 +182,9 @@ describe('MarketplacePurchasesSubscriptionsTable', () => {
   });
 
   it('filters subscriptions by partial match', () => {
-    renderWithRouter(<MarketplacePurchasesSubscriptionsTable subscriptions={subscriptions} />);
+    renderWithRouter(
+      <MarketplacePurchasesSubscriptionsOverflowTable subscriptions={subscriptions} />
+    );
 
     const filterInput = screen.getByPlaceholderText(/filter by name or sku/i);
 
@@ -178,7 +200,9 @@ describe('MarketplacePurchasesSubscriptionsTable', () => {
   });
 
   it('shows all subscriptions when the filter is cleared', () => {
-    renderWithRouter(<MarketplacePurchasesSubscriptionsTable subscriptions={subscriptions} />);
+    renderWithRouter(
+      <MarketplacePurchasesSubscriptionsOverflowTable subscriptions={subscriptions} />
+    );
 
     const filterInput = screen.getByPlaceholderText(/filter by name or sku/i);
 
