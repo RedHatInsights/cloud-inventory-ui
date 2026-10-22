@@ -82,7 +82,7 @@ export const MarketplacePurchasesTable = ({
     <Table aria-label="Marketplace purchases table" variant="compact" isExpandable>
       <Thead>
         <Tr>
-          <Th />
+          <Th modifier="truncate" />
           <Th sort={getSortParams(0)}>Offering name</Th>
           <Th
             sort={getSortParams(1)}
@@ -100,8 +100,11 @@ export const MarketplacePurchasesTable = ({
           >
             Marketplace account
           </Th>
-          <Th sort={getSortParams(2)}>Marketplace</Th>
+          <Th modifier="truncate" sort={getSortParams(2)}>
+            Marketplace
+          </Th>
           <Th
+            modifier="truncate"
             sort={getSortParams(3)}
             info={{
               tooltip:
@@ -127,6 +130,7 @@ export const MarketplacePurchasesTable = ({
             <React.Fragment key={`${pagination.page}-${index}`}>
               <Tr isContentExpanded={isExpanded}>
                 <Td
+                  modifier="truncate"
                   expand={
                     hasSubscriptions
                       ? {
@@ -137,8 +141,10 @@ export const MarketplacePurchasesTable = ({
                       : undefined
                   }
                 />
-                <Td dataLabel="Offering name">{purchase.offeringName}</Td>
-                <Td dataLabel="Marketplace account">
+                <Td modifier="truncate" dataLabel="Offering name">
+                  {purchase.offeringName}
+                </Td>
+                <Td modifier="truncate" dataLabel="Marketplace account">
                   <Link
                     to={`../${Paths.CloudAccounts}?${generateQueryParamsForData(
                       [purchase.marketplaceAccount],

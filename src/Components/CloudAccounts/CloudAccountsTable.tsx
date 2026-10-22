@@ -82,8 +82,12 @@ export const CloudAccountsTable = ({
     <Table aria-label="Cloud accounts table" variant="compact">
       <Thead>
         <Tr>
-          <Th sort={getSortParams(0)}>Cloud account</Th>
-          <Th sort={getSortParams(1)}>Cloud provider</Th>
+          <Th modifier="truncate" sort={getSortParams(0)}>
+            Cloud account
+          </Th>
+          <Th modifier="truncate" sort={getSortParams(1)}>
+            Cloud provider
+          </Th>
           <Th sort={getSortParams(2)}>Gold image access</Th>
           <Th sort={getSortParams(3)}>Date added</Th>
           <Th screenReaderText="Actions" />
@@ -92,13 +96,13 @@ export const CloudAccountsTable = ({
       <Tbody>
         {displayRows.map((row) => (
           <Tr key={row.id}>
-            <Td>
+            <Td modifier="truncate">
               {row.sourceID && (
                 <Link to={`/settings/integrations/detail/${row.sourceID}`}>{row.id}</Link>
               )}
               {!row.sourceID && row.id}
             </Td>
-            <Td>
+            <Td modifier="truncate">
               <Link
                 to={{
                   pathname: '/subscriptions/cloud-inventory/gold-images',
@@ -108,14 +112,14 @@ export const CloudAccountsTable = ({
                 {row.provider}
               </Link>
             </Td>
-            <Td>
+            <Td modifier="truncate">
               <span className="pf-v6-u-display-flex pf-v6-u-align-items-center">
                 {getStatusIcon(row.goldImage, `Status: ${row.goldImage}`)}
                 <Content className="pf-v6-u-ml-sm">{row.goldImage}</Content>
               </span>
             </Td>
             <Td>{formatDate(row.date)}</Td>
-            <Td>
+            <Td modifier="truncate">
               <Link
                 to={{
                   pathname: `/subscriptions/cloud-inventory/${Paths.MarketplacePurchases}`,
