@@ -127,7 +127,6 @@ export const MarketplacePurchasesTable = ({
             <React.Fragment key={`${pagination.page}-${index}`}>
               <Tr isContentExpanded={isExpanded}>
                 <Td
-                  modifier="truncate"
                   expand={
                     hasSubscriptions
                       ? {
