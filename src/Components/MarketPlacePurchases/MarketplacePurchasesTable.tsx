@@ -54,7 +54,7 @@ export const MarketplacePurchasesTable = ({
 
   React.useEffect(() => {
     setExpandedRows([]);
-  }, [sortBy, sortDir]);
+  }, [sortBy, sortDir, , pagination.page]);
 
   const setRowExpanded = (rowIndex: number, isExpanded: boolean) => {
     setExpandedRows((prevExpanded) => {
