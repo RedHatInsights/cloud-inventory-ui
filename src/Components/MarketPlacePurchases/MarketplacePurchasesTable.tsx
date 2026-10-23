@@ -82,7 +82,7 @@ export const MarketplacePurchasesTable = ({
     <Table aria-label="Marketplace purchases table" variant="compact" isExpandable>
       <Thead>
         <Tr>
-          <Th />
+          <Th modifier="truncate" />
           <Th sort={getSortParams(0)}>Offering name</Th>
           <Th
             sort={getSortParams(1)}
@@ -137,8 +137,10 @@ export const MarketplacePurchasesTable = ({
                       : undefined
                   }
                 />
-                <Td dataLabel="Offering name">{purchase.offeringName}</Td>
-                <Td dataLabel="Marketplace account">
+                <Td modifier="truncate" dataLabel="Offering name" width={45}>
+                  {purchase.offeringName}
+                </Td>
+                <Td modifier="truncate" dataLabel="Marketplace account">
                   <Link
                     to={`../${Paths.CloudAccounts}?${generateQueryParamsForData(
                       [purchase.marketplaceAccount],

@@ -92,13 +92,13 @@ export const CloudAccountsTable = ({
       <Tbody>
         {displayRows.map((row) => (
           <Tr key={row.id}>
-            <Td>
+            <Td modifier="truncate">
               {row.sourceID && (
                 <Link to={`/settings/integrations/detail/${row.sourceID}`}>{row.id}</Link>
               )}
               {!row.sourceID && row.id}
             </Td>
-            <Td>
+            <Td modifier="truncate">
               <Link
                 to={{
                   pathname: '/subscriptions/cloud-inventory/gold-images',
