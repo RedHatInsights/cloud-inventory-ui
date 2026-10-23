@@ -137,7 +137,7 @@ export const MarketplacePurchasesTable = ({
                       : undefined
                   }
                 />
-                <Td modifier="truncate" dataLabel="Offering name">
+                <Td modifier="truncate" dataLabel="Offering name" width={45}>
                   {purchase.offeringName}
                 </Td>
                 <Td modifier="truncate" dataLabel="Marketplace account">
